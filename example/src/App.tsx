@@ -4,7 +4,10 @@ import { TPStreamsPlayerView } from 'react-native-tpstreams';
 export default function App() {
   return (
     <View style={styles.container}>
-      <TPStreamsPlayerView color="#32a852" style={styles.box} />
+      <TPStreamsPlayerView
+        source="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+        style={styles.box}
+      />
     </View>
   );
 }
@@ -16,8 +19,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   box: {
-    width: 60,
-    height: 60,
+    width: '100%',
+    height: 300,
     marginVertical: 20,
   },
 });

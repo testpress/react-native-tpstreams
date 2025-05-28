@@ -1,6 +1,6 @@
 package com.tpstreams
 
-import android.graphics.Color
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
@@ -30,9 +30,9 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     return TPStreamsRNPlayerView(context)
   }
 
-  @ReactProp(name = "color")
-  override fun setColor(view: TPStreamsRNPlayerView?, color: String?) {
-    view?.setBackgroundColor(Color.parseColor(color))
+  @ReactProp(name = "source")
+  override fun setSource(view: TPStreamsRNPlayerView, source: String?) {
+    view.setSource(source)
   }
 
   companion object {
