@@ -1,10 +1,10 @@
 import { View, StyleSheet } from 'react-native';
-import { TpstreamsView } from 'react-native-tpstreams';
+import { TPStreamsPlayerView } from 'react-native-tpstreams';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <TpstreamsView color="#32a852" style={styles.box} />
+      <TPStreamsPlayerView color="#32a852" style={styles.box} />
     </View>
   );
 }

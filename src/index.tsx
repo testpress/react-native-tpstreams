@@ -1,2 +1,2 @@
-export { default as TpstreamsView } from './TpstreamsViewNativeComponent';
-export * from './TpstreamsViewNativeComponent';
+export { default as TPStreamsPlayerView } from './TPStreamsPlayerViewNativeComponent';
+export * from './TPStreamsPlayerViewNativeComponent';

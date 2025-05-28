@@ -149,7 +149,7 @@
     ]
   },
   "codegenConfig": {
-    "name": "TpstreamsViewSpec",
+    "name": "TPStreamsPlayerViewSpec",
     "type": "all",
     "jsSrcsDir": "src",
     "android": {
@@ -157,7 +157,7 @@
     },
     "ios": {
       "componentProvider": {
-        "TpstreamsView": "TpstreamsView"
+        "TPStreamsPlayerView": "TPStreamsPlayerView"
       }
     }
   },
