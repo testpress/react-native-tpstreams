@@ -24,10 +24,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             playWhenReady = true
         }
         playerView.player = player
-        playerView.post {
-            playerView.requestLayout()
-            playerView.showController()
-        }
+        playerView.showController()
     }
 
     override fun onDetachedFromWindow() {
