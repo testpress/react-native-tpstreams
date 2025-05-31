@@ -1,6 +1,6 @@
 # react-native-tpstreams
 
-Video component for TPStreams
+Video player component for TPStreams
 
 ## Installation
 
@@ -10,15 +10,27 @@ npm install react-native-tpstreams
 
 ## Usage
 
+Initialize TPStreams with your organization ID:
 
 ```js
-import { TpstreamsView } from "react-native-tpstreams";
+import { TPStreams } from "react-native-tpstreams";
 
-// ...
-
-<TpstreamsView color="tomato" />
+// Initialize with your organization ID
+TPStreams.initialize('YOUR_ORGANIZATION_ID');
 ```
 
+Then use the player component:
+
+```js
+import { TPStreamsPlayerView } from "react-native-tpstreams";
+
+// Use the player component where needed
+<TPStreamsPlayerView 
+  videoId="YOUR_VIDEO_ID"
+  accessToken="YOUR_ACCESS_TOKEN"
+  style={{ width: '100%', height: 300 }}
+/>
+```
 
 ## Contributing
 
