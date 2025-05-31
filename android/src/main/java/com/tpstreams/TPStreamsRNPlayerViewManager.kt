@@ -30,9 +30,14 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     return TPStreamsRNPlayerView(context)
   }
 
-  @ReactProp(name = "source")
-  override fun setSource(view: TPStreamsRNPlayerView, source: String?) {
-    view.setSource(source)
+  @ReactProp(name = "videoId")
+  override fun setVideoId(view: TPStreamsRNPlayerView, videoId: String?) {
+      view.setVideoId(videoId)
+  }
+
+  @ReactProp(name = "accessToken")
+  override fun setAccessToken(view: TPStreamsRNPlayerView, accessToken: String?) {
+      view.setAccessToken(accessToken)
   }
 
   companion object {

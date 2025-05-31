@@ -5,7 +5,8 @@ export default function App() {
   return (
     <View style={styles.container}>
       <TPStreamsPlayerView
-        source="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+        videoId="3G2p5NdMaRu"
+        accessToken="328f6f1c-c188-4c3f-8e38-345c9aaa1a51"
         style={styles.box}
       />
     </View>
