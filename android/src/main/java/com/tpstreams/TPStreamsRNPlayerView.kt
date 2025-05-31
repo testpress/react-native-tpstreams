@@ -15,7 +15,6 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var accessToken: String? = null
 
     init {
-        TPStreamsPlayer.init("9q94nm")
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
