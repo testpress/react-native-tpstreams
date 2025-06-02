@@ -18,8 +18,11 @@ buildscript {
 
 rootProject.allprojects {
     repositories {
-        mavenLocal()
+        mavenCentral()  // Ensure this line is here
         google()
+        maven {
+            url "https://github.com/testpress/TPStreamsAndroidPlayerMaven/raw/main/repo"
+        }
     }
 }
 
@@ -81,7 +84,7 @@ def kotlin_version = getExtOrDefault("kotlinVersion")
 dependencies {
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "com.tpstreams:tpstreams-player:1.0.1"
+  implementation "com.tpstreams:tpstreams-player:0.0.1"
 }
 
 react {
