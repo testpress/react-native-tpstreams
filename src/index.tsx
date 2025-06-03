@@ -1,8 +1,10 @@
 import { NativeModules } from 'react-native';
-export { default as TPStreamsPlayerView } from './TPStreamsPlayerViewNativeComponent';
+// Export the native component with a different name to avoid conflicts
+export { default as TPStreamsPlayerNative } from './TPStreamsPlayerViewNativeComponent';
 export * from './TPStreamsPlayerViewNativeComponent';
 
-export { default as TPStreamsPlayer } from './TPStreamsPlayer';
+// Export the wrapper component as TPStreamsPlayerView
+export { default as TPStreamsPlayerView } from './TPStreamsPlayer';
 export type { TPStreamsPlayerRef } from './TPStreamsPlayer';
 
 const TPStreamsModule = NativeModules.TPStreams;

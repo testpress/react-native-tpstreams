@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { View, StyleSheet, Button, Text, ScrollView } from 'react-native';
-import { TPStreamsPlayer } from 'react-native-tpstreams';
+import { TPStreamsPlayerView } from 'react-native-tpstreams';
 import type { TPStreamsPlayerRef } from 'react-native-tpstreams';
 
 export default function App() {
@@ -103,7 +103,7 @@ export default function App() {
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
         <View style={styles.playerContainer}>
-          <TPStreamsPlayer
+          <TPStreamsPlayerView
             ref={playerRef}
             videoId="3G2p5NdMaRu"
             accessToken="328f6f1c-c188-4c3f-8e38-345c9aaa1a51"
