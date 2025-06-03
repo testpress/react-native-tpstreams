@@ -1,6 +1,5 @@
 package com.tpstreams
 
-import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
@@ -13,77 +12,86 @@ import com.facebook.react.common.MapBuilder
 @ReactModule(name = TPStreamsRNPlayerViewManager.NAME)
 class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
   TPStreamsRNPlayerViewManagerInterface<TPStreamsRNPlayerView> {
-  private val mDelegate: ViewManagerDelegate<TPStreamsRNPlayerView>
-
-  init {
-    mDelegate = TPStreamsRNPlayerViewManagerDelegate(this)
+  
+  companion object {
+    const val NAME = "TPStreamsRNPlayerView"
+    
+    // Event names
+    private const val EVENT_CURRENT_POSITION = "onCurrentPosition"
+    private const val EVENT_DURATION = "onDuration"
+    private const val EVENT_IS_PLAYING = "onIsPlaying"
+    private const val EVENT_PLAYBACK_SPEED = "onPlaybackSpeed"
+    private const val EVENT_PLAYER_STATE_CHANGED = "onPlayerStateChanged"
+    private const val EVENT_IS_PLAYING_CHANGED = "onIsPlayingChanged"
+    private const val EVENT_PLAYBACK_SPEED_CHANGED = "onPlaybackSpeedChanged"
+    private const val EVENT_IS_LOADING_CHANGED = "onIsLoadingChanged"
+    private const val EVENT_ERROR = "onError"
   }
+  
+  private val mDelegate: ViewManagerDelegate<TPStreamsRNPlayerView> = 
+    TPStreamsRNPlayerViewManagerDelegate(this)
 
-  override fun getDelegate(): ViewManagerDelegate<TPStreamsRNPlayerView>? {
-    return mDelegate
-  }
+  override fun getDelegate(): ViewManagerDelegate<TPStreamsRNPlayerView>? = mDelegate
 
-  override fun getName(): String {
-    return NAME
-  }
+  override fun getName(): String = NAME
 
   override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any> {
     return MapBuilder.builder<String, Any>()
-      .put("onCurrentPosition", MapBuilder.of("registrationName", "onCurrentPosition"))
-      .put("onDuration", MapBuilder.of("registrationName", "onDuration"))
-      .put("onIsPlaying", MapBuilder.of("registrationName", "onIsPlaying"))
-      .put("onPlaybackSpeed", MapBuilder.of("registrationName", "onPlaybackSpeed"))
+      .put(EVENT_CURRENT_POSITION, MapBuilder.of("registrationName", EVENT_CURRENT_POSITION))
+      .put(EVENT_DURATION, MapBuilder.of("registrationName", EVENT_DURATION))
+      .put(EVENT_IS_PLAYING, MapBuilder.of("registrationName", EVENT_IS_PLAYING))
+      .put(EVENT_PLAYBACK_SPEED, MapBuilder.of("registrationName", EVENT_PLAYBACK_SPEED))
+      .put(EVENT_PLAYER_STATE_CHANGED, MapBuilder.of("registrationName", EVENT_PLAYER_STATE_CHANGED))
+      .put(EVENT_IS_PLAYING_CHANGED, MapBuilder.of("registrationName", EVENT_IS_PLAYING_CHANGED))
+      .put(EVENT_PLAYBACK_SPEED_CHANGED, MapBuilder.of("registrationName", EVENT_PLAYBACK_SPEED_CHANGED))
+      .put(EVENT_IS_LOADING_CHANGED, MapBuilder.of("registrationName", EVENT_IS_LOADING_CHANGED))
+      .put(EVENT_ERROR, MapBuilder.of("registrationName", EVENT_ERROR))
       .build()
   }
 
-  public override fun createViewInstance(context: ThemedReactContext): TPStreamsRNPlayerView {
-    return TPStreamsRNPlayerView(context)
-  }
+  public override fun createViewInstance(context: ThemedReactContext): TPStreamsRNPlayerView =
+    TPStreamsRNPlayerView(context)
 
   @ReactProp(name = "videoId")
   override fun setVideoId(view: TPStreamsRNPlayerView, videoId: String?) {
-      view.setVideoId(videoId)
+    view.setVideoId(videoId)
   }
 
   @ReactProp(name = "accessToken")
   override fun setAccessToken(view: TPStreamsRNPlayerView, accessToken: String?) {
-      view.setAccessToken(accessToken)
+    view.setAccessToken(accessToken)
   }
 
+  // Command implementations
   override fun play(view: TPStreamsRNPlayerView) {
-      view.play()
+    view.play()
   }
-
+  
   override fun pause(view: TPStreamsRNPlayerView) {
-      view.pause()
+    view.pause()
   }
-
+  
   override fun seekTo(view: TPStreamsRNPlayerView, positionMs: Double) {
-      view.seekTo(positionMs.toLong())
+    view.seekTo(positionMs.toLong())
   }
-
+  
   override fun setPlaybackSpeed(view: TPStreamsRNPlayerView, speed: Float) {
-      view.setPlaybackSpeed(speed)
+    view.setPlaybackSpeed(speed)
   }
-
+  
   override fun getCurrentPosition(view: TPStreamsRNPlayerView) {
-      view.getCurrentPosition()
+    view.getCurrentPosition()
   }
-
+  
   override fun getDuration(view: TPStreamsRNPlayerView) {
-      view.getDuration()
+    view.getDuration()
   }
-
+  
   override fun isPlaying(view: TPStreamsRNPlayerView) {
-      view.isPlaying()
+    view.isPlaying()
   }
-
+  
   override fun getPlaybackSpeed(view: TPStreamsRNPlayerView) {
-      view.getPlaybackSpeed()
-  }
-
-
-  companion object {
-    const val NAME = "TPStreamsRNPlayerView"
+    view.getPlaybackSpeed()
   }
 }

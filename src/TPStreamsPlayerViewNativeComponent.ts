@@ -1,9 +1,19 @@
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import type { ViewProps } from 'react-native';
-import type { Double, Float } from 'react-native/Libraries/Types/CodegenTypes';
+import type {
+  Double,
+  Float,
+  Int32,
+} from 'react-native/Libraries/Types/CodegenTypes';
 import type { HostComponent } from 'react-native';
 import type { DirectEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+
+export interface ErrorEvent {
+  message: string;
+  code: Int32;
+  details?: string;
+}
 
 export interface NativeProps extends ViewProps {
   videoId?: string;
@@ -14,6 +24,13 @@ export interface NativeProps extends ViewProps {
   onDuration?: DirectEventHandler<{ duration: Double }>;
   onIsPlaying?: DirectEventHandler<{ isPlaying: boolean }>;
   onPlaybackSpeed?: DirectEventHandler<{ speed: Float }>;
+
+  // Player event props
+  onPlayerStateChanged?: DirectEventHandler<{ playbackState: Int32 }>;
+  onIsPlayingChanged?: DirectEventHandler<{ isPlaying: boolean }>;
+  onPlaybackSpeedChanged?: DirectEventHandler<{ speed: Double }>;
+  onIsLoadingChanged?: DirectEventHandler<{ isLoading: boolean }>;
+  onError?: DirectEventHandler<ErrorEvent>;
 }
 
 interface TPStreamsPlayerViewCommands {
