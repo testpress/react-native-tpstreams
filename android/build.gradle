@@ -84,7 +84,7 @@ def kotlin_version = getExtOrDefault("kotlinVersion")
 dependencies {
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "com.tpstreams:tpstreams-player:0.0.5"
+  implementation "com.tpstreams:tpstreams-player:0.0.6"
 }
 
 react {
