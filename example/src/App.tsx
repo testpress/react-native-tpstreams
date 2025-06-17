@@ -2,10 +2,12 @@ import { useRef, useState } from 'react';
 import { View, StyleSheet, Button, Text, ScrollView } from 'react-native';
 import { TPStreamsPlayerView } from 'react-native-tpstreams';
 import type { TPStreamsPlayerRef } from 'react-native-tpstreams';
+import DownloadExample from '../DownloadExample';
 
 export default function App() {
   const playerRef = useRef<TPStreamsPlayerRef>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [showDownloads, setShowDownloads] = useState(false);
 
   const handlePlay = () => {
     playerRef.current?.play();
@@ -99,6 +101,10 @@ export default function App() {
     setLastError(errorMessage);
   };
 
+  if (showDownloads) {
+    return <DownloadExample onBack={() => setShowDownloads(false)} />;
+  }
+
   return (
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
@@ -172,6 +178,18 @@ export default function App() {
             </View>
             <View style={styles.button}>
               <Button title="Get Playback Speed" onPress={checkPlaybackSpeed} />
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.buttonSection}>
+          <Text style={styles.sectionTitle}>Downloads</Text>
+          <View style={styles.buttonRow}>
+            <View style={styles.button}>
+              <Button
+                title="Show Downloads"
+                onPress={() => setShowDownloads(true)}
+              />
             </View>
           </View>
         </View>
