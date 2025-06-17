@@ -135,6 +135,73 @@ function TPStreamsPlayerExample() {
 
 ---
 
+## Download Management
+
+The TPStreamsDownload module provides functionality to manage downloaded videos. Download initiation is handled by the TPStreams Player SDK directly, but you can use this module to view and manage existing downloads.
+
+### Download Methods
+
+- `getDownloads()`: Returns `Promise<DownloadItem[]>` - Gets all download items with details
+
+- `getDownloadStatus(videoId: string)`: Returns `Promise<number>` - Gets download state for a specific video
+
+- `pauseDownload(videoId: string)`: Returns `Promise<boolean>` - Pauses an ongoing download
+
+- `resumeDownload(videoId: string)`: Returns `Promise<boolean>` - Resumes a paused download
+
+- `cancelDownload(videoId: string)`: Returns `Promise<boolean>` - Cancels and removes a download
+
+- `isDownloaded(videoId: string)`: Returns `Promise<boolean>` - Checks if a video is downloaded
+
+### Download States
+
+Download states are represented as integers:
+- `0` - Idle
+- `1` - Downloading
+- `2` - Paused
+- `3` - Completed
+- `4` - Failed
+
+### DownloadItem Properties
+
+The `DownloadItem` object contains:
+- `videoId: string` - The video identifier
+- `assetId: string` - The asset identifier
+- `title: string` - Video title
+- `thumbnailUrl?: string` - Optional thumbnail URL
+- `totalBytes: number` - Total download size in bytes
+- `downloadedBytes: number` - Downloaded bytes so far
+- `progressPercentage: number` - Download progress (0-100)
+- `state: number` - Current download state
+
+### Download Example
+
+```js
+import { TPStreamsDownload } from 'react-native-tpstreams';
+import type { DownloadItem } from 'react-native-tpstreams';
+
+// Get all downloads
+const downloads = await TPStreamsDownload.getDownloads();
+
+// Check download state
+const state = await TPStreamsDownload.getDownloadStatus('video-id');
+
+// Manage downloads
+if (state === 1) { // Downloading
+  await TPStreamsDownload.pauseDownload('video-id');
+} else if (state === 2) { // Paused
+  await TPStreamsDownload.resumeDownload('video-id');
+}
+
+// Remove download
+await TPStreamsDownload.cancelDownload('video-id');
+
+// Check if downloaded
+const isDownloaded = await TPStreamsDownload.isDownloaded('video-id');
+```
+
+---
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
