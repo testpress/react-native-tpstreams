@@ -4,7 +4,6 @@ const { TPStreamsDownload } = NativeModules;
 
 export interface DownloadItem {
   videoId: string;
-  assetId: string;
   title: string;
   thumbnailUrl?: string;
   totalBytes: number;
