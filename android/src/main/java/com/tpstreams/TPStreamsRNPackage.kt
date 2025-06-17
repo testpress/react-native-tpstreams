@@ -16,6 +16,7 @@ class TPStreamsRNPackage : ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
     val modules: MutableList<NativeModule> = ArrayList()
     modules.add(TPStreamsRNModule(reactContext))
+    modules.add(TPStreamsDownloadModule(reactContext))
     return modules
   }
 }
