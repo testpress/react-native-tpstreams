@@ -7,6 +7,9 @@ export * from './TPStreamsPlayerViewNativeComponent';
 export { default as TPStreamsPlayerView } from './TPStreamsPlayer';
 export type { TPStreamsPlayerRef } from './TPStreamsPlayer';
 
+export { default as TPStreamsDownload } from './TPStreamsDownload';
+export type { DownloadItem } from './TPStreamsDownload';
+
 const TPStreamsModule = NativeModules.TPStreams;
 
 export const TPStreams = {
