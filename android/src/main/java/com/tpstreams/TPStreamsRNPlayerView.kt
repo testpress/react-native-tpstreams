@@ -19,6 +19,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     private var videoId: String? = null
     private var accessToken: String? = null
+    private var shouldAutoPlay: Boolean = true
+    private var startAt: Long = 0
+    private var showDefaultCaptions: Boolean = false
+    private var enableDownload: Boolean = false
 
     init {
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -50,21 +54,69 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     }
 
     fun setVideoId(videoId: String?) {
-        this.videoId = videoId
-        tryCreatePlayer()
+        if (this.videoId != videoId) {
+            this.videoId = videoId
+            tryCreatePlayer()
+        }
     }
 
     fun setAccessToken(accessToken: String?) {
-        this.accessToken = accessToken
-        tryCreatePlayer()
+        if (this.accessToken != accessToken) {
+            this.accessToken = accessToken
+            tryCreatePlayer()
+        }
+    }
+
+    fun setShouldAutoPlay(shouldAutoPlay: Boolean) {
+        if (this.shouldAutoPlay != shouldAutoPlay) {
+            this.shouldAutoPlay = shouldAutoPlay
+            tryCreatePlayer()
+        }
+    }
+
+    fun setStartAt(startAt: Long) {
+        if (this.startAt != startAt) {
+            this.startAt = startAt
+            tryCreatePlayer()
+        }
+    }
+
+    fun setShowDefaultCaptions(showDefaultCaptions: Boolean) {
+        if (this.showDefaultCaptions != showDefaultCaptions) {
+            this.showDefaultCaptions = showDefaultCaptions
+            tryCreatePlayer()
+        }
+    }
+
+    fun setEnableDownload(enableDownload: Boolean) {
+        if (this.enableDownload != enableDownload) {
+            this.enableDownload = enableDownload
+            tryCreatePlayer()
+        }
     }
 
     private fun tryCreatePlayer() {
         if (videoId.isNullOrEmpty() || accessToken.isNullOrEmpty()) return
-        if (player != null) return
+
+        if (player != null) {
+            try {
+                player?.release()
+                player = null
+            } catch (e: Exception) {
+                Log.e("TPStreamsRN", "Error releasing player", e)
+            }
+        }
 
         try {
-            player = TPStreamsPlayer.create(context, videoId!!, accessToken!!)
+            player = TPStreamsPlayer.create(
+                context, 
+                videoId!!, 
+                accessToken!!, 
+                shouldAutoPlay, 
+                startAt,
+                enableDownload, 
+                showDefaultCaptions 
+            )
             
             // Add player event listeners
             player?.addListener(createPlayerListener())

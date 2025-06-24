@@ -18,6 +18,10 @@ export interface ErrorEvent {
 export interface NativeProps extends ViewProps {
   videoId?: string;
   accessToken?: string;
+  shouldAutoPlay?: boolean;
+  startAt?: Double;
+  enableDownload?: boolean;
+  showDefaultCaptions?: boolean;
 
   // Event props for receiving data from native methods
   onCurrentPosition?: DirectEventHandler<{ position: Double }>;
