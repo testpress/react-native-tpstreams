@@ -3,7 +3,7 @@ package com.tpstreams
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.tpstreams.player.TPStreamsPlayer
+import com.tpstreams.player.TPStreamsSDK
 
 class TPStreamsRNModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -13,6 +13,6 @@ class TPStreamsRNModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod
     fun initialize(organizationId: String) {
-        TPStreamsPlayer.init(organizationId)
+        TPStreamsSDK.init(organizationId)
     }
 } 
