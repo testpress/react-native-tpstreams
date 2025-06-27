@@ -62,6 +62,26 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     view.setAccessToken(accessToken)
   }
 
+  @ReactProp(name = "shouldAutoPlay")
+  override fun setShouldAutoPlay(view: TPStreamsRNPlayerView, shouldAutoPlay: Boolean) {
+    view.setShouldAutoPlay(shouldAutoPlay)
+  }
+
+  @ReactProp(name = "startAt")
+  override fun setStartAt(view: TPStreamsRNPlayerView, startAt: Double) {
+    view.setStartAt(startAt.toLong())
+  }
+
+  @ReactProp(name = "showDefaultCaptions")
+  override fun setShowDefaultCaptions(view: TPStreamsRNPlayerView, showDefaultCaptions: Boolean) {
+    view.setShowDefaultCaptions(showDefaultCaptions)
+  }
+
+  @ReactProp(name = "enableDownload")
+  override fun setEnableDownload(view: TPStreamsRNPlayerView, enableDownload: Boolean) {
+    view.setEnableDownload(enableDownload)
+  }
+
   // Command implementations
   override fun play(view: TPStreamsRNPlayerView) {
     view.play()
@@ -93,5 +113,10 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
   
   override fun getPlaybackSpeed(view: TPStreamsRNPlayerView) {
     view.getPlaybackSpeed()
+  }
+  
+  override fun onAfterUpdateTransaction(view: TPStreamsRNPlayerView) {
+    super.onAfterUpdateTransaction(view)
+    view.tryCreatePlayer()
   }
 }

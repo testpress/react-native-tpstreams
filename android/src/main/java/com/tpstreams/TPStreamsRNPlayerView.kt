@@ -19,6 +19,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     private var videoId: String? = null
     private var accessToken: String? = null
+    private var shouldAutoPlay: Boolean = true
+    private var startAt: Long = 0
+    private var showDefaultCaptions: Boolean = false
+    private var enableDownload: Boolean = false
 
     init {
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -51,20 +55,42 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     fun setVideoId(videoId: String?) {
         this.videoId = videoId
-        tryCreatePlayer()
     }
 
     fun setAccessToken(accessToken: String?) {
         this.accessToken = accessToken
-        tryCreatePlayer()
     }
 
-    private fun tryCreatePlayer() {
+    fun setShouldAutoPlay(shouldAutoPlay: Boolean) {
+        this.shouldAutoPlay = shouldAutoPlay
+    }
+
+    fun setStartAt(startAt: Long) {
+        this.startAt = startAt
+    }
+
+    fun setShowDefaultCaptions(showDefaultCaptions: Boolean) {
+        this.showDefaultCaptions = showDefaultCaptions
+    }
+
+    fun setEnableDownload(enableDownload: Boolean) {
+        this.enableDownload = enableDownload
+    }
+
+    fun tryCreatePlayer() {
         if (videoId.isNullOrEmpty() || accessToken.isNullOrEmpty()) return
         if (player != null) return
 
         try {
-            player = TPStreamsPlayer.create(context, videoId!!, accessToken!!)
+            player = TPStreamsPlayer.create(
+                context, 
+                videoId!!, 
+                accessToken!!, 
+                shouldAutoPlay, 
+                startAt,
+                enableDownload, 
+                showDefaultCaptions 
+            )
             
             // Add player event listeners
             player?.addListener(createPlayerListener())

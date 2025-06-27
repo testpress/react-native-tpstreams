@@ -35,6 +35,10 @@ export interface TPStreamsPlayerRef {
 export interface TPStreamsPlayerProps extends ViewProps {
   videoId?: string;
   accessToken?: string;
+  shouldAutoPlay?: boolean;
+  startAt?: number;
+  enableDownload?: boolean;
+  showDefaultCaptions?: boolean;
   onPlayerStateChanged?: (state: number) => void;
   onIsPlayingChanged?: (isPlaying: boolean) => void;
   onPlaybackSpeedChanged?: (speed: number) => void;
@@ -57,6 +61,10 @@ const TPStreamsPlayerView = forwardRef<
   const {
     videoId,
     accessToken,
+    shouldAutoPlay,
+    startAt,
+    enableDownload,
+    showDefaultCaptions,
     style,
     onPlayerStateChanged,
     onIsPlayingChanged,
@@ -203,6 +211,10 @@ const TPStreamsPlayerView = forwardRef<
     ...restProps,
     videoId,
     accessToken,
+    shouldAutoPlay,
+    startAt,
+    enableDownload,
+    showDefaultCaptions,
     style,
     onCurrentPosition,
     onDuration,
