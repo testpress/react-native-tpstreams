@@ -54,58 +54,32 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     }
 
     fun setVideoId(videoId: String?) {
-        if (this.videoId != videoId) {
-            this.videoId = videoId
-            tryCreatePlayer()
-        }
+        this.videoId = videoId
     }
 
     fun setAccessToken(accessToken: String?) {
-        if (this.accessToken != accessToken) {
-            this.accessToken = accessToken
-            tryCreatePlayer()
-        }
+        this.accessToken = accessToken
     }
 
     fun setShouldAutoPlay(shouldAutoPlay: Boolean) {
-        if (this.shouldAutoPlay != shouldAutoPlay) {
-            this.shouldAutoPlay = shouldAutoPlay
-            tryCreatePlayer()
-        }
+        this.shouldAutoPlay = shouldAutoPlay
     }
 
     fun setStartAt(startAt: Long) {
-        if (this.startAt != startAt) {
-            this.startAt = startAt
-            tryCreatePlayer()
-        }
+        this.startAt = startAt
     }
 
     fun setShowDefaultCaptions(showDefaultCaptions: Boolean) {
-        if (this.showDefaultCaptions != showDefaultCaptions) {
-            this.showDefaultCaptions = showDefaultCaptions
-            tryCreatePlayer()
-        }
+        this.showDefaultCaptions = showDefaultCaptions
     }
 
     fun setEnableDownload(enableDownload: Boolean) {
-        if (this.enableDownload != enableDownload) {
-            this.enableDownload = enableDownload
-            tryCreatePlayer()
-        }
+        this.enableDownload = enableDownload
     }
 
-    private fun tryCreatePlayer() {
+    fun tryCreatePlayer() {
         if (videoId.isNullOrEmpty() || accessToken.isNullOrEmpty()) return
-
-        if (player != null) {
-            try {
-                player?.release()
-                player = null
-            } catch (e: Exception) {
-                Log.e("TPStreamsRN", "Error releasing player", e)
-            }
-        }
+        if (player != null) return
 
         try {
             player = TPStreamsPlayer.create(
