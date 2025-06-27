@@ -77,6 +77,20 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 ---
 
+## Player Props
+
+- `videoId`: (Required) The ID of the video to play.
+
+- `accessToken`: (Required) Access token for the video.
+
+- `startAt`: (Optional) Position in seconds where playback should start. Default is 0.
+
+- `shouldAutoPlay`: (Optional) Whether the video should start playing automatically. Default is true.
+
+- `showDefaultCaptions`: (Optional) Whether to show default captions if available. Default is false.
+
+---
+
 ## Example
 
 ```js
@@ -116,6 +130,9 @@ function TPStreamsPlayerExample() {
         videoId="YOUR_VIDEO_ID"
         accessToken="YOUR_ACCESS_TOKEN"
         style={{ height: 250 }}
+        startAt={100}
+        shouldAutoPlay={false}
+        showDefaultCaptions={true}
         onPlayerStateChanged={(state) => console.log(`Player state: ${state}`)}
         onIsPlayingChanged={(isPlaying) => console.log(`Is playing: ${isPlaying}`)}
         onPlaybackSpeedChanged={(speed) => console.log(`Speed changed: ${speed}x`)}
