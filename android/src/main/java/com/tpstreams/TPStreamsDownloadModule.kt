@@ -102,7 +102,7 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
             for (item in downloadItems) {
                 val map = Arguments.createMap()
                 map.putString("assetId", item.assetId)
-                map.putString("title", item.title)
+                map.putString("title", item.title ?: "Untitled")
                 item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
                 map.putDouble("totalBytes", item.totalBytes.toDouble())
                 map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
