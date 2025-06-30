@@ -89,6 +89,8 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `showDefaultCaptions`: (Optional) Whether to show default captions if available. Default is false.
 
+- `enableDownload`: (Optional) Whether to enable download functionality for the video. When set to true, the player will show a download button. Default is false.
+
 ---
 
 ## Downloads
@@ -176,6 +178,7 @@ function TPStreamsPlayerExample() {
         startAt={100}
         shouldAutoPlay={false}
         showDefaultCaptions={true}
+        enableDownload={true}
         onPlayerStateChanged={(state) => console.log(`Player state: ${state}`)}
         onIsPlayingChanged={(isPlaying) => console.log(`Is playing: ${isPlaying}`)}
         onPlaybackSpeedChanged={(speed) => console.log(`Speed changed: ${speed}x`)}
