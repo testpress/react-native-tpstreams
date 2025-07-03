@@ -15,7 +15,7 @@ export {
   isDownloading,
   isPaused,
   getDownloadStatus,
-  getAllDownloadItems,
+  getAllDownloads,
   type DownloadItem,
 } from './TPStreamsDownload';
 

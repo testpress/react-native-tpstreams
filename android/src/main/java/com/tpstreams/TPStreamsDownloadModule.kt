@@ -97,7 +97,7 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun getAllDownloadItems(promise: Promise) {
+    fun getAllDownloads(promise: Promise) {
         try {
             val downloadItems = downloadClient.getAllDownloadItems()
             val result = Arguments.createArray()
