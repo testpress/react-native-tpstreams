@@ -89,6 +89,40 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `showDefaultCaptions`: (Optional) Whether to show default captions if available. Default is false.
 
+- `enableDownload`: (Optional) Whether to enable download functionality for the video. When set to true, the player will show a download button. Default is false.
+
+---
+
+## Downloads
+
+### Download Methods
+
+- `pauseDownload(videoId: string)`: Pauses an ongoing download. Returns `Promise<void>`.
+
+- `resumeDownload(videoId: string)`: Resumes a paused download. Returns `Promise<void>`.
+
+- `removeDownload(videoId: string)`: Removes a downloaded video. Returns `Promise<void>`.
+
+- `isDownloaded(videoId: string)`: Checks if a video has been downloaded. Returns `Promise<boolean>`.
+
+- `isDownloading(videoId: string)`: Checks if a video is currently downloading. Returns `Promise<boolean>`.
+
+- `isPaused(videoId: string)`: Checks if a video download is paused. Returns `Promise<boolean>`.
+
+- `getDownloadStatus(videoId: string)`: Gets the download status of a video as a descriptive string. Returns `Promise<string>`.
+
+- `getAllDownloads()`: Gets all downloaded videos. Returns `Promise<DownloadItem[]>`.
+
+### Download Item
+
+The download item object (`DownloadItem`) contains information about a downloaded or downloading video, including:
+
+- `assetId`: The ID of the video.
+- `state`: The current state of the download as String (Queued, Downloading, Completed, Failed, Removing, Restarting, Paused ).
+- `progressPercentage`: Download progress from 0 to 100.
+- `title`: The title of the video Asset.
+- `thumbnailUrl`: URL to the video thumbnail (if available).
+
 ---
 
 ## Example
@@ -133,6 +167,7 @@ function TPStreamsPlayerExample() {
         startAt={100}
         shouldAutoPlay={false}
         showDefaultCaptions={true}
+        enableDownload={true}
         onPlayerStateChanged={(state) => console.log(`Player state: ${state}`)}
         onIsPlayingChanged={(isPlaying) => console.log(`Is playing: ${isPlaying}`)}
         onPlaybackSpeedChanged={(speed) => console.log(`Speed changed: ${speed}x`)}
@@ -152,6 +187,105 @@ function TPStreamsPlayerExample() {
 
 ---
 
+## Download Example
+
+```js
+import {
+  pauseDownload,
+  resumeDownload,
+  removeDownload,
+  getAllDownloads,
+  getDownloadStatus,
+  isDownloaded,
+  isDownloading,
+  type DownloadItem,
+} from 'react-native-tpstreams';
+
+// Get all downloads
+const loadDownloads = async () => {
+  try {
+    const items: DownloadItem[] = await getAllDownloads();
+    console.log(`Found ${items.length} downloads`);
+    return items;
+  } catch (error) {
+    console.error('Failed to load downloads:', error);
+  }
+};
+
+// Check download status
+const checkStatus = async (videoId: string) => {
+  try {
+    const status = await getDownloadStatus(videoId);
+    console.log(`Status: ${status}`);
+    return status;
+  } catch (error) {
+    console.error('Error checking status:', error);
+  }
+};
+
+// Check if video is downloaded
+const checkIfDownloaded = async (videoId: string) => {
+  try {
+    const downloaded: boolean = await isDownloaded(videoId);
+    console.log(`Is downloaded: ${downloaded}`);
+    return downloaded;
+  } catch (error) {
+    console.error('Error checking if downloaded:', error);
+  }
+};
+
+// Check if video is currently downloading
+const checkIfDownloading = async (videoId: string) => {
+  try {
+    const downloading: boolean = await isDownloading(videoId);
+    console.log(`Is downloading: ${downloading}`);
+    return downloading;
+  } catch (error) {
+    console.error('Error checking if downloading:', error);
+  }
+};
+
+// Pause a download
+const pauseVideoDownload = async (videoId: string) => {
+  try {
+    await pauseDownload(videoId);
+    console.log('Download paused successfully');
+    
+    // Check status after pausing
+    const status = await getDownloadStatus(videoId);
+    console.log(`New status: ${status}`);
+  } catch (error) {
+    console.error('Error pausing download:', error);
+  }
+};
+
+// Resume a download
+const resumeVideoDownload = async (videoId: string) => {
+  try {
+    await resumeDownload(videoId);
+    console.log('Download resumed');
+    
+    // Check status after resuming
+    const status = await getDownloadStatus(videoId);
+    console.log(`New status: ${status}`);
+  } catch (error) {
+    console.error('Error resuming download:', error);
+  }
+};
+
+// Remove a download
+const removeVideoDownload = async (videoId: string) => {
+  try {
+    await removeDownload(videoId);
+    console.log('Download removed');
+  } catch (error) {
+    console.error('Error removing download:', error);
+  }
+};
+```
+
+---
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
@@ -159,5 +293,3 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 ## License
 
 MIT
-
----
