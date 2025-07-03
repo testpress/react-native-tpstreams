@@ -109,30 +109,19 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `isPaused(videoId: string)`: Checks if a video download is paused. Returns `Promise<boolean>`.
 
-- `getDownloadStatus(videoId: string)`: Gets the download status of a video as a descriptive string. Returns `Promise<string>` with values like "Downloading: 45%", "Downloaded", "Paused", etc.
+- `getDownloadStatus(videoId: string)`: Gets the download status of a video as a descriptive string. Returns `Promise<string>`.
 
-- `getAllDownloadItems()`: Gets all downloaded videos. Returns `Promise<DownloadItem[]>`.
+- `getAllDownloads()`: Gets all downloaded videos. Returns `Promise<DownloadItem[]>`.
 
 ### Download Item
 
 The download item object (`DownloadItem`) contains information about a downloaded or downloading video, including:
 
 - `assetId`: The ID of the video.
-- `state`: The current state of the download (0: queued, 1: downloading, 2: completed, 3: failed, 6: stopped/paused).
+- `state`: The current state of the download as String (Queued, Downloading, Completed, Failed, Removing, Restarting, Paused ).
 - `progressPercentage`: Download progress from 0 to 100.
-- `title`: The title of the video (if available).
+- `title`: The title of the video Asset.
 - `thumbnailUrl`: URL to the video thumbnail (if available).
-
-### Download States
-
-| Constant | Value | Meaning |
-|----------|-------|---------|
-| STATE_QUEUED | 0 | Download is waiting to start (e.g., waiting for Wi-Fi) |
-| STATE_STOPPED | 1 | Download paused/stopped due to user or other stop reason |
-| STATE_DOWNLOADING | 2 | Actively downloading |
-| STATE_COMPLETED | 3 | Successfully downloaded |
-| STATE_FAILED | 4 | Download failed |
-| STATE_REMOVING | 5 | Download is being removed |
 
 ---
 
@@ -205,7 +194,7 @@ import {
   pauseDownload,
   resumeDownload,
   removeDownload,
-  getAllDownloadItems,
+  getAllDownloads,
   getDownloadStatus,
   isDownloaded,
   isDownloading,
@@ -215,30 +204,11 @@ import {
 // Get all downloads
 const loadDownloads = async () => {
   try {
-    const items: DownloadItem[] = await getAllDownloadItems();
+    const items: DownloadItem[] = await getAllDownloads();
     console.log(`Found ${items.length} downloads`);
-    
-    items.forEach((item: DownloadItem) => {
-      console.log(`Video ${item.title}: ${item.progressPercentage.toFixed(1)}% downloaded`);
-      console.log(`State: ${getStateText(item.state)}`);
-    });
-    
     return items;
   } catch (error) {
     console.error('Failed to load downloads:', error);
-  }
-};
-
-// Helper function to convert state to readable text
-const getStateText = (state: number): string => {
-  switch (state) {
-    case 0: return 'Queued';
-    case 1: return 'Paused';
-    case 2: return 'Downloading';
-    case 3: return 'Completed';
-    case 4: return 'Failed';
-    case 5: return 'Removing';
-    default: return 'Unknown';
   }
 };
 
