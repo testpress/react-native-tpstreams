@@ -40,6 +40,6 @@ export function getDownloadStatus(videoId: string): Promise<string> {
   return TPStreamsDownload.getDownloadStatus(videoId);
 }
 
-export function getAllDownloadItems(): Promise<DownloadItem[]> {
-  return TPStreamsDownload.getAllDownloadItems();
+export function getAllDownloads(): Promise<DownloadItem[]> {
+  return TPStreamsDownload.getAllDownloads();
 }
