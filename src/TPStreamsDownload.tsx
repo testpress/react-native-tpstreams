@@ -3,41 +3,41 @@ import { NativeModules } from 'react-native';
 const { TPStreamsDownload } = NativeModules;
 
 export interface DownloadItem {
-  assetId: string;
+  videoId: string;
   title: string;
   thumbnailUrl?: string;
   totalBytes: number;
   downloadedBytes: number;
   progressPercentage: number;
-  state: number;
+  state: string;
 }
 
-export function pauseDownload(assetId: string): Promise<void> {
-  return TPStreamsDownload.pauseDownload(assetId);
+export function pauseDownload(videoId: string): Promise<void> {
+  return TPStreamsDownload.pauseDownload(videoId);
 }
 
-export function resumeDownload(assetId: string): Promise<void> {
-  return TPStreamsDownload.resumeDownload(assetId);
+export function resumeDownload(videoId: string): Promise<void> {
+  return TPStreamsDownload.resumeDownload(videoId);
 }
 
-export function removeDownload(assetId: string): Promise<void> {
-  return TPStreamsDownload.removeDownload(assetId);
+export function removeDownload(videoId: string): Promise<void> {
+  return TPStreamsDownload.removeDownload(videoId);
 }
 
-export function isDownloaded(assetId: string): Promise<boolean> {
-  return TPStreamsDownload.isDownloaded(assetId);
+export function isDownloaded(videoId: string): Promise<boolean> {
+  return TPStreamsDownload.isDownloaded(videoId);
 }
 
-export function isDownloading(assetId: string): Promise<boolean> {
-  return TPStreamsDownload.isDownloading(assetId);
+export function isDownloading(videoId: string): Promise<boolean> {
+  return TPStreamsDownload.isDownloading(videoId);
 }
 
-export function isPaused(assetId: string): Promise<boolean> {
-  return TPStreamsDownload.isPaused(assetId);
+export function isPaused(videoId: string): Promise<boolean> {
+  return TPStreamsDownload.isPaused(videoId);
 }
 
-export function getDownloadStatus(assetId: string): Promise<string> {
-  return TPStreamsDownload.getDownloadStatus(assetId);
+export function getDownloadStatus(videoId: string): Promise<string> {
+  return TPStreamsDownload.getDownloadStatus(videoId);
 }
 
 export function getAllDownloadItems(): Promise<DownloadItem[]> {

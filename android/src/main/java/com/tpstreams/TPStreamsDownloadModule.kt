@@ -1,10 +1,13 @@
 package com.tpstreams
 
 import android.util.Log
-import com.facebook.react.bridge.*
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.tpstreams.player.download.DownloadClient
 import com.tpstreams.player.download.DownloadItem
-import androidx.media3.exoplayer.offline.Download
 
 class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -17,9 +20,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun pauseDownload(assetId: String, promise: Promise) {
+    fun pauseDownload(videoId: String, promise: Promise) {
         try {
-            downloadClient.pauseDownload(assetId)
+            downloadClient.pauseDownload(videoId)
             promise.resolve(null)
         } catch (e: Exception) {
             Log.e(TAG, "Error pausing download: ${e.message}", e)
@@ -28,9 +31,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun resumeDownload(assetId: String, promise: Promise) {
+    fun resumeDownload(videoId: String, promise: Promise) {
         try {
-            downloadClient.resumeDownload(assetId)
+            downloadClient.resumeDownload(videoId)
             promise.resolve(null)
         } catch (e: Exception) {
             Log.e(TAG, "Error resuming download: ${e.message}", e)
@@ -39,9 +42,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun removeDownload(assetId: String, promise: Promise) {
+    fun removeDownload(videoId: String, promise: Promise) {
         try {
-            downloadClient.removeDownload(assetId)
+            downloadClient.removeDownload(videoId)
             promise.resolve(null)
         } catch (e: Exception) {
             Log.e(TAG, "Error removing download: ${e.message}", e)
@@ -50,9 +53,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun isDownloaded(assetId: String, promise: Promise) {
+    fun isDownloaded(videoId: String, promise: Promise) {
         try {
-            val isDownloaded = downloadClient.isDownloaded(assetId)
+            val isDownloaded = downloadClient.isDownloaded(videoId)
             promise.resolve(isDownloaded)
         } catch (e: Exception) {
             Log.e(TAG, "Error checking if downloaded: ${e.message}", e)
@@ -61,9 +64,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun isDownloading(assetId: String, promise: Promise) {
+    fun isDownloading(videoId: String, promise: Promise) {
         try {
-            val isDownloading = downloadClient.isDownloading(assetId)
+            val isDownloading = downloadClient.isDownloading(videoId)
             promise.resolve(isDownloading)
         } catch (e: Exception) {
             Log.e(TAG, "Error checking if downloading: ${e.message}", e)
@@ -72,9 +75,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun isPaused(assetId: String, promise: Promise) {
+    fun isPaused(videoId: String, promise: Promise) {
         try {
-            val isPaused = downloadClient.isPaused(assetId)
+            val isPaused = downloadClient.isPaused(videoId)
             promise.resolve(isPaused)
         } catch (e: Exception) {
             Log.e(TAG, "Error checking if paused: ${e.message}", e)
@@ -83,9 +86,9 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun getDownloadStatus(assetId: String, promise: Promise) {
+    fun getDownloadStatus(videoId: String, promise: Promise) {
         try {
-            val status = downloadClient.getDownloadStatus(assetId)
+            val status = downloadClient.getDownloadStatus(videoId)
             promise.resolve(status)
         } catch (e: Exception) {
             Log.e(TAG, "Error getting download status: ${e.message}", e)
@@ -101,13 +104,13 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
             
             for (item in downloadItems) {
                 val map = Arguments.createMap()
-                map.putString("assetId", item.assetId)
+                map.putString("videoId", item.assetId)
                 map.putString("title", item.title)
                 item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
                 map.putDouble("totalBytes", item.totalBytes.toDouble())
                 map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
                 map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                map.putInt("state", item.state)
+                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
                 
                 result.pushMap(map)
             }
