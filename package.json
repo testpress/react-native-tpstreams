@@ -157,7 +157,7 @@
     },
     "ios": {
       "componentProvider": {
-        "TPStreamsPlayerView": "TPStreamsPlayerView"
+        "TPStreamsPlayerView": "TPStreamsRNPlayerView"
       }
     }
   },
