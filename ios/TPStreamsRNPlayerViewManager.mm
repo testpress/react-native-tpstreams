@@ -1,6 +1,7 @@
 #import <React/RCTViewManager.h>
 #import <React/RCTUIManager.h>
 #import "RCTBridge.h"
+#import "TPStreamsRNPlayerView.h"
 
 @interface TPStreamsRNPlayerViewManager : RCTViewManager
 @end
@@ -11,7 +12,7 @@ RCT_EXPORT_MODULE(TPStreamsRNPlayerView)
 
 - (UIView *)view
 {
-  return [[UIView alloc] init];
+  return [TPStreamsRNPlayerView new];
 }
 
 @end
