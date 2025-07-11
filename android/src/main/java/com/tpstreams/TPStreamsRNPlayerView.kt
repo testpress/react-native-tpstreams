@@ -178,6 +178,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        player?.pause()
+    }
+
+    fun releasePlayer() {
         try {
             player?.release()
         } catch (e: Exception) {
