@@ -119,4 +119,9 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     super.onAfterUpdateTransaction(view)
     view.tryCreatePlayer()
   }
+  
+  override fun onDropViewInstance(view: TPStreamsRNPlayerView) {
+    super.onDropViewInstance(view)
+    view.releasePlayer()
+  }
 }
