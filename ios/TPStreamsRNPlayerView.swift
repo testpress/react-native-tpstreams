@@ -9,25 +9,23 @@ class TPStreamsRNPlayerView: UIView {
 
     private var _videoId: NSString = ""
     private var _accessToken: NSString = ""
+    private var setupScheduled = false
 
-@objc var videoId: NSString {
-  get { _videoId }
-  set {
-    print(newValue)
-    _videoId = newValue ?? ""
-    checkAndSetupPlayer()
-  }
-}
+    @objc var videoId: NSString {
+        get { _videoId }
+        set {
+            _videoId = newValue
+            schedulePlayerSetup()
+        }
+    }
 
-@objc var accessToken: NSString {
-  get { _accessToken }
-  set {
-    print(newValue)
-    _accessToken = newValue ?? ""
-    checkAndSetupPlayer()
-  }
-}
-
+    @objc var accessToken: NSString {
+        get { _accessToken }
+        set {
+            _accessToken = newValue
+            schedulePlayerSetup()
+        }
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,18 +37,34 @@ class TPStreamsRNPlayerView: UIView {
         backgroundColor = .black
     }
 
-    private func checkAndSetupPlayer() {
-        if videoId.length > 0 && accessToken.length > 0 {
-            setupPlayer()
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerViewController?.view.frame = bounds
+    }
+
+    private func schedulePlayerSetup() {
+        guard videoId.length > 0, accessToken.length > 0 else { return }
+
+        if setupScheduled { return }
+        setupScheduled = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.setupPlayer()
         }
     }
 
-private func setupPlayer() {
+    private func setupPlayer() {
+        // Remove previous playerViewController if any
+        playerViewController?.view.removeFromSuperview()
+        playerViewController?.removeFromParent()
+        playerViewController = nil
+        player = nil
+
         player = TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { error in
-                        if let error = error {
-                            print("Online setup error: \(error.localizedDescription)")
-                        }
-                    }
+            if let error = error {
+                print("Online setup error: \(error.localizedDescription)")
+            }
+        }
 
         let config = TPStreamPlayerConfigurationBuilder()
             .setPreferredForwardDuration(15)
@@ -64,17 +78,17 @@ private func setupPlayer() {
         vc.player = player
         vc.config = config
 
+        if let parentVC = self.reactViewController() {
+            parentVC.addChild(vc)
+            addSubview(vc.view)
+            vc.view.frame = bounds
+            vc.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            vc.view.isHidden = false
+            bringSubviewToFront(vc.view)
+            vc.didMove(toParent: parentVC)
+        }
 
-            if let parentVC = self.reactViewController() {
-                parentVC.addChild(vc)
-                self.addSubview(vc.view)
-                vc.view.frame = self.bounds
-                vc.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                vc.didMove(toParent: parentVC)
-            }
-            self.player?.play()
-
-
-        self.playerViewController = vc
+        player?.play()
+        playerViewController = vc
     }
 }

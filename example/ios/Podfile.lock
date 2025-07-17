@@ -1666,7 +1666,7 @@ PODS:
     - Sentry/Core (= 8.50.2)
   - Sentry/Core (8.50.2)
   - SocketRocket (0.7.1)
-  - Tpstreams (0.2.4):
+  - TPStreamsRNPlayerView (0.2.13):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1771,7 +1771,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - Tpstreams (from `../..`)
+  - TPStreamsRNPlayerView (from `../..`)
   - TPStreamsSDK (from `https://github.com/testpress/iOSPlayerSDK.git`, branch `fix_assets_resources`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -1925,7 +1925,7 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  Tpstreams:
+  TPStreamsRNPlayerView:
     :path: "../.."
   TPStreamsSDK:
     :branch: fix_assets_resources
@@ -2015,7 +2015,7 @@ SPEC CHECKSUMS:
   RealmSwift: 0b4f808fed6898f1f6c26f501f740efd80dff0b4
   Sentry: d95f5f3b32d01324b3e27d3c52747005302cc026
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Tpstreams: 00852b120c93303dda2feeea42f0f8b18841e188
+  TPStreamsRNPlayerView: 9d5cb923472e8dbae93ffa35e0d6a223cdde6d16
   TPStreamsSDK: 8c07ae329361ba141e6b84e6af86d977c5397d7c
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
