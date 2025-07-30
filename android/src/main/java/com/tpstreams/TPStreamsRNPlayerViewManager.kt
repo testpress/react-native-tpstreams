@@ -89,14 +89,12 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     val metadataMap = if (!metadata.isNullOrEmpty()) {
       try {
         val jsonObject = org.json.JSONObject(metadata)
-        val map = mutableMapOf<String, String>()
-        val keys = jsonObject.keys()
-        while (keys.hasNext()) {
-          val key = keys.next()
-          map[key] = jsonObject.getString(key)
-        }
+        val map = jsonObject.keys()
+        .asSequence()
+        .associate { it to jsonObject.getString(it) }
+        .toMutableMap()
         map
-      } catch (e: Exception) {
+      } catch (e: org.json.JSONException) {
         android.util.Log.w("TPStreamsRN", "Error parsing download metadata: ${e.message}")
         null
       }
