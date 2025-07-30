@@ -112,6 +112,14 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
                 map.putDouble("progressPercentage", item.progressPercentage.toDouble())
                 map.putString("state", downloadClient.getDownloadStatus(item.assetId))
                 
+                try {
+                    val metadataJson = org.json.JSONObject(item.metadata as Map<*, *>)
+                    map.putString("metadata", metadataJson.toString())
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error serializing metadata for item ${item.assetId}: ${e.message}")
+                    map.putString("metadata", "{}")
+                }
+                
                 result.pushMap(map)
             }
             

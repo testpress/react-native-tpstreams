@@ -22,6 +22,7 @@ export interface NativeProps extends ViewProps {
   startAt?: Double;
   enableDownload?: boolean;
   showDefaultCaptions?: boolean;
+  downloadMetadata?: string;
 
   // Event props for receiving data from native methods
   onCurrentPosition?: DirectEventHandler<{ position: Double }>;

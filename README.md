@@ -93,6 +93,8 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `enableDownload`: (Optional) Whether to enable download functionality for the video. When set to true, the player will show a download button. Default is false.
 
+- `downloadMetadata`: (Optional) Custom metadata to attach to downloads. Accepts an object with string key-value pairs. This metadata is stored with the download and can be retrieved later. Default is undefined.
+
 ---
 
 ## Downloads
@@ -124,6 +126,7 @@ The download item object (`DownloadItem`) contains information about a downloade
 - `progressPercentage`: Download progress from 0 to 100.
 - `title`: The title of the video Asset.
 - `thumbnailUrl`: URL to the video thumbnail (if available).
+- `metadata`: Custom metadata attached to the download as a JSON string (if provided during download).
 
 ---
 
@@ -179,6 +182,11 @@ function TPStreamsPlayerExample() {
           // Fetch a new token from your server
           const newToken = await getNewTokenForVideo(videoId);
           callback(newToken);
+        }}
+        downloadMetadata={{
+          category: 'educational',
+          subject: 'mathematics',
+          level: 'intermediate'
         }}
       />
       

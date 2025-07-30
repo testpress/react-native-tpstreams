@@ -10,6 +10,7 @@ export interface DownloadItem {
   downloadedBytes: number;
   progressPercentage: number;
   state: string;
+  metadata: string;
 }
 
 export function pauseDownload(videoId: string): Promise<void> {

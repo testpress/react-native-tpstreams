@@ -23,6 +23,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var startAt: Long = 0
     private var showDefaultCaptions: Boolean = false
     private var enableDownload: Boolean = false
+    private var downloadMetadata: Map<String, String>? = null
     private var accessTokenCallback: ((String) -> Unit)? = null
 
     init {
@@ -78,6 +79,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         this.enableDownload = enableDownload
     }
     
+    fun setDownloadMetadata(metadata: Map<String, String>?) {
+        this.downloadMetadata = metadata
+    }
+    
     fun setNewAccessToken(newToken: String) {
         Log.d("TPStreamsRNPlayerView", "Setting new access token")
         accessTokenCallback?.let { callback ->
@@ -98,7 +103,8 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 shouldAutoPlay, 
                 startAt,
                 enableDownload, 
-                showDefaultCaptions 
+                showDefaultCaptions,
+                downloadMetadata
             )
             
             player?.listener = object : TPStreamsPlayer.Listener {
