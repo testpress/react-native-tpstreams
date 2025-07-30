@@ -35,6 +35,7 @@ export interface NativeProps extends ViewProps {
   onPlaybackSpeedChanged?: DirectEventHandler<{ speed: Double }>;
   onIsLoadingChanged?: DirectEventHandler<{ isLoading: boolean }>;
   onError?: DirectEventHandler<ErrorEvent>;
+  onAccessTokenExpired?: DirectEventHandler<{ videoId: string }>;
 }
 
 interface TPStreamsPlayerViewCommands {
@@ -56,6 +57,10 @@ interface TPStreamsPlayerViewCommands {
   getPlaybackSpeed: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>
   ) => void;
+  setNewAccessToken: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    newToken: string
+  ) => void;
 }
 
 export const Commands = codegenNativeCommands<TPStreamsPlayerViewCommands>({
@@ -68,6 +73,7 @@ export const Commands = codegenNativeCommands<TPStreamsPlayerViewCommands>({
     'getDuration',
     'isPlaying',
     'getPlaybackSpeed',
+    'setNewAccessToken',
   ],
 });
 

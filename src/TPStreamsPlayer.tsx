@@ -48,6 +48,10 @@ export interface TPStreamsPlayerProps extends ViewProps {
     code: number;
     details?: string;
   }) => void;
+  onAccessTokenExpired?: (
+    videoId: string,
+    callback: (newToken: string) => void
+  ) => void;
 }
 
 /**
@@ -71,6 +75,7 @@ const TPStreamsPlayerView = forwardRef<
     onPlaybackSpeedChanged,
     onIsLoadingChanged,
     onError,
+    onAccessTokenExpired,
     ...restProps
   } = props;
 
@@ -160,6 +165,22 @@ const TPStreamsPlayerView = forwardRef<
     [onError]
   );
 
+  const handleAccessTokenExpired = useCallback(
+    (event: { nativeEvent: { videoId: string } }) => {
+      if (onAccessTokenExpired) {
+        const { videoId: expiredVideoId } = event.nativeEvent;
+        onAccessTokenExpired(expiredVideoId, (newToken: string) => {
+          if (nativeRef.current) {
+            Commands.setNewAccessToken(nativeRef.current, newToken);
+          } else {
+            console.error('[RN] Native ref is not available');
+          }
+        });
+      }
+    },
+    [onAccessTokenExpired]
+  );
+
   // Helper to create promise-based API methods
   const createPromiseMethod = useCallback(
     (command: (ref: any) => void, eventKey: string) => {
@@ -225,6 +246,7 @@ const TPStreamsPlayerView = forwardRef<
     onPlaybackSpeedChanged: handlePlaybackSpeedChanged,
     onIsLoadingChanged: handleIsLoadingChanged,
     onError: handleError,
+    onAccessTokenExpired: handleAccessTokenExpired,
   };
 
   return <TPStreamsPlayerNative {...nativeProps} ref={nativeRef} />;

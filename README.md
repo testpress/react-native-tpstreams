@@ -75,6 +75,8 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `onError(error: {message: string, code: number, details?: string})`: Fires when an error occurs.
 
+- `onAccessTokenExpired(videoId: string, callback: (newToken: string) => void)`: Fires when the access token expires. Call the callback with a new token to continue playback.
+
 ---
 
 ## Player Props
@@ -173,6 +175,11 @@ function TPStreamsPlayerExample() {
         onPlaybackSpeedChanged={(speed) => console.log(`Speed changed: ${speed}x`)}
         onIsLoadingChanged={(isLoading) => console.log(`Loading: ${isLoading}`)}
         onError={(error) => console.error('Player error:', error)}
+        onAccessTokenExpired={async (videoId, callback) => {
+          // Fetch a new token from your server
+          const newToken = await getNewTokenForVideo(videoId);
+          callback(newToken);
+        }}
       />
       
       <Button title="Play" onPress={handlePlay} />
