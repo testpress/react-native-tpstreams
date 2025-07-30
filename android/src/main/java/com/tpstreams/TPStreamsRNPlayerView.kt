@@ -23,6 +23,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var startAt: Long = 0
     private var showDefaultCaptions: Boolean = false
     private var enableDownload: Boolean = false
+    private var accessTokenCallback: ((String) -> Unit)? = null
 
     init {
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -76,6 +77,12 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     fun setEnableDownload(enableDownload: Boolean) {
         this.enableDownload = enableDownload
     }
+    
+    fun setNewAccessToken(newToken: String) {
+        Log.d("TPStreamsRNPlayerView", "Setting new access token")
+        accessTokenCallback?.invoke(newToken)
+        accessTokenCallback = null
+    }
 
     fun tryCreatePlayer() {
         if (videoId.isNullOrEmpty() || accessToken.isNullOrEmpty()) return
@@ -92,6 +99,13 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 showDefaultCaptions 
             )
             
+            player?.listener = object : TPStreamsPlayer.Listener {
+                override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
+                    accessTokenCallback = callback
+                    emitEvent("onAccessTokenExpired", mapOf("videoId" to videoId))
+                }
+            }
+
             // Add player event listeners
             player?.addListener(createPlayerListener())
             
@@ -188,5 +202,6 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             Log.e("TPStreamsRN", "Error releasing player", e)
         }
         player = null
+        accessTokenCallback = null
     }
 }
