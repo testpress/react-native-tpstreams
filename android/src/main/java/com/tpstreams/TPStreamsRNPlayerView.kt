@@ -80,8 +80,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     
     fun setNewAccessToken(newToken: String) {
         Log.d("TPStreamsRNPlayerView", "Setting new access token")
-        accessTokenCallback?.invoke(newToken)
-        accessTokenCallback = null
+        accessTokenCallback?.let { callback ->
+            callback(newToken)
+            accessTokenCallback = null
+        } ?: Log.w("TPStreamsRNPlayerView", "No callback available for token refresh")
     }
 
     fun tryCreatePlayer() {
@@ -101,6 +103,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             
             player?.listener = object : TPStreamsPlayer.Listener {
                 override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
+                    if (accessTokenCallback != null) {
+                        Log.w("TPStreamsRNPlayerView", "onAccessTokenExpired called while another refresh is in progress. Ignoring.")
+                        return
+                    }
                     accessTokenCallback = callback
                     emitEvent("onAccessTokenExpired", mapOf("videoId" to videoId))
                 }

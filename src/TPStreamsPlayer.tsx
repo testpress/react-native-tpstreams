@@ -168,14 +168,13 @@ const TPStreamsPlayerView = forwardRef<
   const handleAccessTokenExpired = useCallback(
     (event: { nativeEvent: { videoId: string } }) => {
       if (onAccessTokenExpired) {
-        const { videoId } = event.nativeEvent;
-        onAccessTokenExpired(videoId, (newToken: string) => {
+        const { videoId: expiredVideoId } = event.nativeEvent;
+        onAccessTokenExpired(expiredVideoId, (newToken: string) => {
           if (nativeRef.current) {
             Commands.setNewAccessToken(nativeRef.current, newToken);
           } else {
             console.error('[RN] Native ref is not available');
           }
-          return newToken;
         });
       }
     },

@@ -175,8 +175,9 @@ function TPStreamsPlayerExample() {
         onPlaybackSpeedChanged={(speed) => console.log(`Speed changed: ${speed}x`)}
         onIsLoadingChanged={(isLoading) => console.log(`Loading: ${isLoading}`)}
         onError={(error) => console.error('Player error:', error)}
-        onAccessTokenExpired={(videoId, callback) => {
-          const newToken = getNewTokenForVideo(videoId);
+        onAccessTokenExpired={async (videoId, callback) => {
+          // Fetch a new token from your server
+          const newToken = await getNewTokenForVideo(videoId);
           callback(newToken);
         }}
       />
