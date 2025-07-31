@@ -1,4 +1,5 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, NativeEventEmitter } from 'react-native';
+import type { EmitterSubscription } from 'react-native';
 
 const { TPStreamsDownload } = NativeModules;
 
@@ -11,6 +12,30 @@ export interface DownloadItem {
   progressPercentage: number;
   state: string;
   metadata: string;
+}
+
+export type DownloadProgressChange = DownloadItem;
+export type DownloadProgressListener = (
+  changes: DownloadProgressChange[]
+) => void;
+
+const downloadEventEmitter = new NativeEventEmitter(TPStreamsDownload);
+
+export function addDownloadProgressListener(): Promise<void> {
+  return TPStreamsDownload.addDownloadProgressListener();
+}
+
+export function removeDownloadProgressListener(): Promise<void> {
+  return TPStreamsDownload.removeDownloadProgressListener();
+}
+
+export function onDownloadProgressChanged(
+  listener: DownloadProgressListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener(
+    'onDownloadProgressChanged',
+    listener
+  );
 }
 
 export function pauseDownload(videoId: string): Promise<void> {
