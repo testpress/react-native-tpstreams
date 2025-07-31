@@ -6,17 +6,87 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.tpstreams.player.download.DownloadClient
 import com.tpstreams.player.download.DownloadItem
 
-class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), DownloadClient.Listener {
 
     private val downloadClient: DownloadClient by lazy {
         DownloadClient.getInstance(reactContext)
     }
 
+    private var isListening = false
+
     override fun getName(): String {
         return "TPStreamsDownload"
+    }
+
+    @ReactMethod
+    fun addDownloadProgressListener(promise: Promise) {
+        try {
+            if (!isListening) {
+                downloadClient.addListener(this)
+                isListening = true
+                Log.d(TAG, "Started listening for download progress")
+            }
+            promise.resolve(null)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting progress listener: ${e.message}", e)
+            promise.reject("PROGRESS_LISTENER_START_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun removeDownloadProgressListener(promise: Promise) {
+        try {
+            if (isListening) {
+                downloadClient.removeListener(this)
+                isListening = false
+                Log.d(TAG, "Stopped listening for download progress")
+            }
+            promise.resolve(null)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping progress listener: ${e.message}", e)
+            promise.reject("PROGRESS_LISTENER_STOP_ERROR", e.message, e)
+        }
+    }
+
+    override fun onDownloadsChanged() {
+        try {
+            val currentDownloads = downloadClient.getAllDownloadItems()
+            
+            val result = Arguments.createArray()
+            for (item in currentDownloads) {
+                val map = Arguments.createMap()
+                map.putString("videoId", item.assetId)
+                map.putString("title", item.title)
+                item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
+                map.putDouble("totalBytes", item.totalBytes.toDouble())
+                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
+                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
+                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
+                
+                val metadataJson = org.json.JSONObject()
+                item.metadata.forEach { (key, value) ->
+                    metadataJson.put(key, value)
+                }
+                map.putString("metadata", metadataJson.toString())
+                
+                result.pushMap(map)
+            }
+            
+            emitEvent("onDownloadProgressChanged", result)
+                
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadsChanged: ${e.message}", e)
+        }
+    }
+
+    private fun emitEvent(eventName: String, data: Any) {
+        reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit(eventName, data)
     }
 
     @ReactMethod

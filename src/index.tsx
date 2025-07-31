@@ -16,7 +16,12 @@ export {
   isPaused,
   getDownloadStatus,
   getAllDownloads,
+  addDownloadProgressListener,
+  removeDownloadProgressListener,
+  onDownloadProgressChanged,
   type DownloadItem,
+  type DownloadProgressChange,
+  type DownloadProgressListener,
 } from './TPStreamsDownload';
 
 const TPStreamsModule = NativeModules.TPStreams;

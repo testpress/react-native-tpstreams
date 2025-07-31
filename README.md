@@ -117,15 +117,39 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `getAllDownloads()`: Gets all downloaded videos. Returns `Promise<DownloadItem[]>`.
 
+### Real-time Download Progress
+
+The library provides real-time download progress updates for optimal performance:
+
+#### Progress Listener Methods
+
+- `addDownloadProgressListener()`: Starts listening for download progress updates. Returns `Promise<void>`.
+
+- `removeDownloadProgressListener()`: Stops listening for download progress updates. Returns `Promise<void>`.
+
+- `onDownloadProgressChanged(listener: DownloadProgressListener)`: Adds a listener for progress changes. Returns `EmitterSubscription`.
+
+#### Progress Listener Types
+
+```typescript
+// Progress update event (uses existing DownloadItem interface)
+type DownloadProgressChange = DownloadItem;
+
+// Listener function type
+type DownloadProgressListener = (downloads: DownloadProgressChange[]) => void;
+```
+
 ### Download Item
 
 The download item object (`DownloadItem`) contains information about a downloaded or downloading video, including:
 
-- `assetId`: The ID of the video.
-- `state`: The current state of the download as String (Queued, Downloading, Completed, Failed, Removing, Restarting, Paused ).
-- `progressPercentage`: Download progress from 0 to 100.
-- `title`: The title of the video Asset.
+- `videoId`: The ID of the video.
+- `title`: The title of the video.
 - `thumbnailUrl`: URL to the video thumbnail (if available).
+- `totalBytes`: Total size of the video in bytes.
+- `downloadedBytes`: Number of bytes downloaded so far.
+- `progressPercentage`: Download progress from 0 to 100.
+- `state`: The current state of the download as String (Queued, Downloading, Completed, Failed, Removing, Restarting, Paused).
 - `metadata`: Custom metadata attached to the download as a JSON string (if provided during download).
 
 ---
@@ -298,6 +322,285 @@ const removeVideoDownload = async (videoId: string) => {
   }
 };
 ```
+
+## Real-time Download Progress Example
+
+Here's a complete example showing how to implement real-time download progress in a React Native component:
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import {
+  addDownloadProgressListener,
+  removeDownloadProgressListener,
+  onDownloadProgressChanged,
+  pauseDownload,
+  resumeDownload,
+  removeDownload,
+  type DownloadItem,
+  type DownloadProgressChange,
+} from 'react-native-tpstreams';
+
+const DownloadProgressExample = () => {
+  const [downloads, setDownloads] = useState<DownloadItem[]>([]);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    // Setup progress listener when component mounts
+    const setupProgressListener = async () => {
+      try {
+        // Start listening for progress updates
+        await addDownloadProgressListener();
+        
+        // Add listener for progress updates
+        const subscription = onDownloadProgressChanged((downloads: DownloadProgressChange[]) => {
+          console.log('Progress changes received:', downloads.length, 'downloads');
+          
+          // Simply replace the state with the complete list from native
+          setDownloads(downloads);
+        });
+
+        // Cleanup function
+        return () => {
+          subscription.remove(); // Remove the listener
+          removeDownloadProgressListener(); // Stop listening
+        };
+      } catch (error) {
+        console.error('Failed to setup progress listener:', error);
+        setIsInitializing(false);
+      }
+    };
+
+    setupProgressListener();
+  }, []);
+
+  const handlePauseDownload = async (videoId: string) => {
+    try {
+      await pauseDownload(videoId);
+      console.log('Download paused successfully');
+    } catch (error) {
+      console.error('Error pausing download:', error);
+      Alert.alert('Error', 'Failed to pause download');
+    }
+  };
+
+  const handleResumeDownload = async (videoId: string) => {
+    try {
+      await resumeDownload(videoId);
+      console.log('Download resumed successfully');
+    } catch (error) {
+      console.error('Error resuming download:', error);
+      Alert.alert('Error', 'Failed to resume download');
+    }
+  };
+
+  const handleRemoveDownload = async (videoId: string) => {
+    try {
+      await removeDownload(videoId);
+      console.log('Download removed successfully');
+    } catch (error) {
+      console.error('Error removing download:', error);
+      Alert.alert('Error', 'Failed to remove download');
+    }
+  };
+
+  const renderDownloadItem = (item: DownloadItem) => {
+    const isCompleted = item.state === 'Completed';
+    const isDownloading = item.state === 'Downloading';
+    const isPaused = item.state === 'Paused';
+
+    return (
+      <View key={item.videoId} style={styles.downloadItem}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.status}>Status: {item.state}</Text>
+        
+        {!isCompleted && (
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: `${item.progressPercentage}%` }
+                ]} 
+              />
+            </View>
+            <Text style={styles.progressText}>
+              {item.progressPercentage.toFixed(1)}%
+            </Text>
+          </View>
+        )}
+        
+        {item.totalBytes > 0 && (
+          <Text style={styles.bytesText}>
+            {(item.downloadedBytes / (1024 * 1024)).toFixed(1)} MB / 
+            {(item.totalBytes / (1024 * 1024)).toFixed(1)} MB
+          </Text>
+        )}
+        
+        <View style={styles.buttonContainer}>
+          {!isCompleted && (
+            <>
+              {isDownloading && (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handlePauseDownload(item.videoId)}
+                >
+                  <Text style={styles.buttonText}>Pause</Text>
+                </TouchableOpacity>
+              )}
+              
+              {isPaused && (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleResumeDownload(item.videoId)}
+                >
+                  <Text style={styles.buttonText}>Resume</Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
+          
+          <TouchableOpacity
+            style={[styles.button, styles.removeButton]}
+            onPress={() => handleRemoveDownload(item.videoId)}
+          >
+            <Text style={styles.buttonText}>Remove</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  if (isInitializing) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading downloads...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>Downloads ({downloads.length})</Text>
+      
+      {downloads.length > 0 ? (
+        downloads.map(renderDownloadItem)
+      ) : (
+        <Text style={styles.emptyText}>No downloads available</Text>
+      )}
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  downloadItem: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  status: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  progressBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#eee',
+    borderRadius: 4,
+    marginRight: 12,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#007AFF',
+    borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 12,
+    color: '#666',
+    width: 40,
+  },
+  bytesText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 12,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  button: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#007AFF',
+    borderRadius: 6,
+  },
+  removeButton: {
+    backgroundColor: '#FF3B30',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#666',
+    fontSize: 16,
+  },
+});
+
+export default DownloadProgressExample;
+```
+
+### Key Features of the Real-time Progress System:
+
+1. **Real-time Updates**: Progress bars and status update in real-time
+2. **Automatic UI Updates**: UI automatically reflects current download states
+3. **Efficient State Management**: Uses functional state updates to avoid race conditions
+4. **Proper Cleanup**: Removes listeners when component unmounts
+5. **Error Handling**: Graceful error handling with user feedback
+6. **Type Safety**: Full TypeScript support with proper types
+
+### Best Practices:
+
+1. **Start listening when needed**: Only start the progress listener when your screen is active
+2. **Stop listening when not needed**: Always stop listening to save resources
+3. **Use functional state updates**: Prevents race conditions with concurrent updates
+4. **Debounce if needed**: Consider debouncing updates for better UI performance
 
 ---
 
