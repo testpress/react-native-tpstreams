@@ -136,7 +136,7 @@ The library provides real-time download progress updates for optimal performance
 type DownloadProgressChange = DownloadItem;
 
 // Listener function type
-type DownloadProgressListener = (changes: DownloadProgressChange[]) => void;
+type DownloadProgressListener = (downloads: DownloadProgressChange[]) => void;
 ```
 
 ### Download Item
@@ -360,24 +360,11 @@ const DownloadProgressExample = () => {
         await addDownloadProgressListener();
         
         // Add listener for progress updates
-        const subscription = onDownloadProgressChanged((changes: DownloadProgressChange[]) => {
-          console.log('Progress changes received:', changes.length, 'changes');
+        const subscription = onDownloadProgressChanged((downloads: DownloadProgressChange[]) => {
+          console.log('Progress changes received:', downloads.length, 'downloads');
           
-          setDownloads((prevDownloads) => {
-            const updatedDownloads = [...prevDownloads];
-            
-            for (const change of changes) {
-              // Update existing item or add new one
-              const index = updatedDownloads.findIndex(d => d.videoId === change.videoId);
-              if (index >= 0) {
-                updatedDownloads[index] = change;
-              } else {
-                updatedDownloads.push(change);
-              }
-            }
-            
-            return updatedDownloads;
-          });
+          // Simply replace the state with the complete list from native
+          setDownloads(downloads);
         });
 
         // Cleanup function

@@ -56,29 +56,27 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
         try {
             val currentDownloads = downloadClient.getAllDownloadItems()
             
-            if (currentDownloads.isNotEmpty()) {
-                val result = Arguments.createArray()
-                for (item in currentDownloads) {
-                    val map = Arguments.createMap()
-                    map.putString("videoId", item.assetId)
-                    map.putString("title", item.title)
-                    item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
-                    map.putDouble("totalBytes", item.totalBytes.toDouble())
-                    map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
-                    map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                    map.putString("state", downloadClient.getDownloadStatus(item.assetId))
-                    
-                    val metadataJson = org.json.JSONObject()
-                    item.metadata.forEach { (key, value) ->
-                        metadataJson.put(key, value)
-                    }
-                    map.putString("metadata", metadataJson.toString())
-                    
-                    result.pushMap(map)
-                }
+            val result = Arguments.createArray()
+            for (item in currentDownloads) {
+                val map = Arguments.createMap()
+                map.putString("videoId", item.assetId)
+                map.putString("title", item.title)
+                item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
+                map.putDouble("totalBytes", item.totalBytes.toDouble())
+                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
+                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
+                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
                 
-                emitEvent("onDownloadProgressChanged", result)
+                val metadataJson = org.json.JSONObject()
+                item.metadata.forEach { (key, value) ->
+                    metadataJson.put(key, value)
+                }
+                map.putString("metadata", metadataJson.toString())
+                
+                result.pushMap(map)
             }
+            
+            emitEvent("onDownloadProgressChanged", result)
                 
         } catch (e: Exception) {
             Log.e(TAG, "Error in onDownloadsChanged: ${e.message}", e)

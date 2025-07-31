@@ -16,7 +16,7 @@ export interface DownloadItem {
 
 export type DownloadProgressChange = DownloadItem;
 export type DownloadProgressListener = (
-  changes: DownloadProgressChange[]
+  downloads: DownloadProgressChange[]
 ) => void;
 
 const downloadEventEmitter = new NativeEventEmitter(TPStreamsDownload);
