@@ -53,12 +53,12 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     @ReactMethod
-    fun addListener(eventName: String) {
+    fun addListener(_: String) {
         // Required by NativeEventEmitter - no action needed
     }
 
     @ReactMethod
-    fun removeListeners(count: Int) {
+    fun removeListeners(_: Int) {
         // Required by NativeEventEmitter - no action needed
     }
 
