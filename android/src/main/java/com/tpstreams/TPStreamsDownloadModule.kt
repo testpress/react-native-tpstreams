@@ -52,6 +52,16 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
         }
     }
 
+    @ReactMethod
+    fun addListener(eventName: String) {
+        // Required by NativeEventEmitter - no action needed
+    }
+
+    @ReactMethod
+    fun removeListeners(count: Int) {
+        // Required by NativeEventEmitter - no action needed
+    }
+
     override fun onDownloadsChanged() {
         try {
             val currentDownloads = downloadClient.getAllDownloadItems()
