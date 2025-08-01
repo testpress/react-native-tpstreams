@@ -21,6 +21,7 @@ export interface NativeProps extends ViewProps {
   shouldAutoPlay?: boolean;
   startAt?: Double;
   enableDownload?: boolean;
+  offlineLicenseExpireTime?: Double;
   showDefaultCaptions?: boolean;
   downloadMetadata?: string;
 

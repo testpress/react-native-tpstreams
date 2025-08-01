@@ -93,6 +93,8 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 
 - `enableDownload`: (Optional) Whether to enable download functionality for the video. When set to true, the player will show a download button. Default is false.
 
+- `offlineLicenseExpireTime`: (Optional) The expiration time for offline licenses in seconds. If not provided, defaults to 15 days (1,296,000 seconds).
+
 - `downloadMetadata`: (Optional) Custom metadata to attach to downloads. Accepts an object with string key-value pairs. This metadata is stored with the download and can be retrieved later. Default is undefined.
 
 ---
@@ -197,6 +199,12 @@ function TPStreamsPlayerExample() {
         shouldAutoPlay={false}
         showDefaultCaptions={true}
         enableDownload={true}
+        offlineLicenseExpireTime={2 * 24 * 60 * 60} // 2 days in seconds
+        downloadMetadata={{
+          category: 'educational',
+          subject: 'mathematics',
+          level: 'intermediate'
+        }}
         onPlayerStateChanged={(state) => console.log(`Player state: ${state}`)}
         onIsPlayingChanged={(isPlaying) => console.log(`Is playing: ${isPlaying}`)}
         onPlaybackSpeedChanged={(speed) => console.log(`Speed changed: ${speed}x`)}
@@ -206,11 +214,6 @@ function TPStreamsPlayerExample() {
           // Fetch a new token from your server
           const newToken = await getNewTokenForVideo(videoId);
           callback(newToken);
-        }}
-        downloadMetadata={{
-          category: 'educational',
-          subject: 'mathematics',
-          level: 'intermediate'
         }}
       />
       
@@ -353,6 +356,8 @@ const DownloadProgressExample = () => {
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
+    let subscription: any = null;
+    
     // Setup progress listener when component mounts
     const setupProgressListener = async () => {
       try {
@@ -360,18 +365,12 @@ const DownloadProgressExample = () => {
         await addDownloadProgressListener();
         
         // Add listener for progress updates
-        const subscription = onDownloadProgressChanged((downloads: DownloadProgressChange[]) => {
+        subscription = onDownloadProgressChanged((downloads: DownloadProgressChange[]) => {
           console.log('Progress changes received:', downloads.length, 'downloads');
           
           // Simply replace the state with the complete list from native
           setDownloads(downloads);
         });
-
-        // Cleanup function
-        return () => {
-          subscription.remove(); // Remove the listener
-          removeDownloadProgressListener(); // Stop listening
-        };
       } catch (error) {
         console.error('Failed to setup progress listener:', error);
         setIsInitializing(false);
@@ -379,6 +378,14 @@ const DownloadProgressExample = () => {
     };
 
     setupProgressListener();
+
+    // Cleanup function - moved outside async function
+    return () => {
+      if (subscription) {
+        subscription.remove(); // Remove the listener
+      }
+      removeDownloadProgressListener(); // Stop listening
+    };
   }, []);
 
   const handlePauseDownload = async (videoId: string) => {

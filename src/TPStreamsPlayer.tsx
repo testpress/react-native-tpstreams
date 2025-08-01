@@ -38,6 +38,7 @@ export interface TPStreamsPlayerProps extends ViewProps {
   shouldAutoPlay?: boolean;
   startAt?: number;
   enableDownload?: boolean;
+  offlineLicenseExpireTime?: number;
   showDefaultCaptions?: boolean;
   downloadMetadata?: { [key: string]: string };
   onPlayerStateChanged?: (state: number) => void;
@@ -69,6 +70,7 @@ const TPStreamsPlayerView = forwardRef<
     shouldAutoPlay,
     startAt,
     enableDownload,
+    offlineLicenseExpireTime,
     showDefaultCaptions,
     downloadMetadata,
     style,
@@ -241,6 +243,7 @@ const TPStreamsPlayerView = forwardRef<
     downloadMetadata: downloadMetadata
       ? JSON.stringify(downloadMetadata)
       : undefined,
+    offlineLicenseExpireTime,
     style,
     onCurrentPosition,
     onDuration,

@@ -17,6 +17,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var player: TPStreamsPlayer? = null
     private val reactContext: ReactContext = context
 
+    companion object {
+        private const val DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME = 15L * 24L * 60L * 60L // 15 days in seconds
+    }
+
     private var videoId: String? = null
     private var accessToken: String? = null
     private var shouldAutoPlay: Boolean = true
@@ -24,6 +28,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var showDefaultCaptions: Boolean = false
     private var enableDownload: Boolean = false
     private var downloadMetadata: Map<String, String>? = null
+    private var offlineLicenseExpireTime: Long = DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
     private var accessTokenCallback: ((String) -> Unit)? = null
 
     init {
@@ -83,6 +88,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         this.downloadMetadata = metadata
     }
     
+    fun setOfflineLicenseExpireTime(expireTime: Long?) {
+        this.offlineLicenseExpireTime = expireTime ?: DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
+    }
+    
     fun setNewAccessToken(newToken: String) {
         Log.d("TPStreamsRNPlayerView", "Setting new access token")
         accessTokenCallback?.let { callback ->
@@ -104,7 +113,8 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 startAt,
                 enableDownload, 
                 showDefaultCaptions,
-                downloadMetadata
+                downloadMetadata,
+                offlineLicenseExpireTime
             )
             
             player?.listener = object : TPStreamsPlayer.Listener {

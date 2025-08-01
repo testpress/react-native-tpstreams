@@ -84,6 +84,11 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     view.setEnableDownload(enableDownload)
   }
 
+  @ReactProp(name = "offlineLicenseExpireTime")
+  override fun setOfflineLicenseExpireTime(view: TPStreamsRNPlayerView, expireTime: Double) {
+    view.setOfflineLicenseExpireTime(expireTime.toLong())
+  }
+
   @ReactProp(name = "downloadMetadata")
   override fun setDownloadMetadata(view: TPStreamsRNPlayerView, metadata: String?) {
     val metadataMap = if (!metadata.isNullOrEmpty()) {
