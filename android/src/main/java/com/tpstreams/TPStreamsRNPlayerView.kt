@@ -11,6 +11,7 @@ import com.tpstreams.player.TPStreamsPlayerView
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.PlaybackException
+import android.media.MediaCodec
 
 class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) {
     private val playerView: TPStreamsPlayerView = TPStreamsPlayerView(context)
@@ -165,9 +166,21 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             
             override fun onPlayerError(error: PlaybackException) {
                 Log.e("TPStreamsRN", "Player error", error)
+                if (isDrmLicenseExpiredError(error)) {
+                    sendErrorEvent("Playback error", 5000, "Offline DRM license expired")
+                    return
+                }
                 sendErrorEvent("Playback error", error.errorCode, error.message)
             }
         }
+    }
+
+    private fun isDrmLicenseExpiredError(error: PlaybackException): Boolean {
+        val cause = error.cause
+        return error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_EXPIRED ||
+               error.errorCode == PlaybackException.ERROR_CODE_DRM_DISALLOWED_OPERATION ||
+               error.errorCode == PlaybackException.ERROR_CODE_DRM_SYSTEM_ERROR ||
+               cause is MediaCodec.CryptoException
     }
 
     // Player control methods
