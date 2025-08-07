@@ -20,6 +20,8 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     companion object {
         private const val DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME = 15L * 24L * 60L * 60L // 15 days in seconds
+        private const val ERROR_CODE_PLAYER_CREATION_FAILED = 1001
+        private const val ERROR_CODE_DRM_LICENSE_EXPIRED = 5001
     }
 
     private var videoId: String? = null
@@ -142,7 +144,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             emitEvent("onIsLoadingChanged", mapOf("isLoading" to false))
         } catch (e: Exception) {
             Log.e("TPStreamsRN", "Error creating player", e)
-            sendErrorEvent("Error creating player", 1001, e.message)
+            sendErrorEvent("Error creating player", ERROR_CODE_PLAYER_CREATION_FAILED, e.message)
         }
     }
 
@@ -167,7 +169,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             override fun onPlayerError(error: PlaybackException) {
                 Log.e("TPStreamsRN", "Player error", error)
                 if (isDrmLicenseExpiredError(error)) {
-                    sendErrorEvent("Playback error", 5000, "Offline DRM license expired")
+                    sendErrorEvent("Playback error", ERROR_CODE_DRM_LICENSE_EXPIRED, "Offline DRM license expired")
                     return
                 }
                 sendErrorEvent("Playback error", error.errorCode, error.message)
