@@ -86,7 +86,7 @@ dependencies {
 }
 
 react {
-  jsRootDir = file("../src/")
+  jsRootDir = file("../spec/")
   libraryName = "TpstreamsView"
   codegenJavaPackageName = "com.tpstreams"
 }

@@ -151,7 +151,7 @@
   "codegenConfig": {
     "name": "TPStreamsPlayerViewSpec",
     "type": "all",
-    "jsSrcsDir": "src",
+    "jsSrcsDir": "spec",
     "android": {
       "javaPackageName": "com.tpstreams"
     },
