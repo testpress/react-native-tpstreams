@@ -1,14 +1,10 @@
 import Foundation
 import React
-import TPStreamsSDK
 
 @objc(TPStreamsDownloads)
 class TPStreamsDownloadsModule: NSObject, RCTEventEmitterProtocol {
     
     private var hasListeners = false
-    private var downloadClient: TPDownloadClient {
-        return TPDownloadClient.shared
-    }
     
     @objc
     static func requiresMainQueueSetup() -> Bool {
@@ -16,81 +12,64 @@ class TPStreamsDownloadsModule: NSObject, RCTEventEmitterProtocol {
     }
     
     @objc
-    override func supportedEvents() -> [String] {
+    func supportedEvents() -> [String] {
         return [
             "onDownloadProgressChanged"
         ]
     }
     
     @objc
-    override func startObserving() {
+    func startObserving() {
         hasListeners = true
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleDownloadChanged(_:)),
-            name: .TPDownloadProgressChanged,
-            object: nil
-        )
+        // TODO: Add observer for download progress changes
     }
     
     @objc
-    override func stopObserving() {
+    func stopObserving() {
         hasListeners = false
-        NotificationCenter.default.removeObserver(self)
+        // TODO: Remove observer
     }
+
+    @objc
+    func sendEvent(withName name: String, body: Any?) {
+        // This method is required by RCTEventEmitterProtocol
+        // It should send events to React Native when hasListeners is true
+        if hasListeners {
+            // TODO: Implement actual event sending logic
+            // For now, this satisfies the protocol requirement
+        }
+    }
+    
+    // MARK: - Native Methods (TODO: Implement with TPDownloadClient)
     
     @objc
     func getAll(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        do {
-            let downloads = downloadClient.getAllDownloads()
-            let result = downloads.map { convertDownloadItemToDict($0) }
-            resolve(result)
-        } catch {
-            reject("DOWNLOAD_ITEMS_ERROR", "Failed to get downloads: \(error.localizedDescription)", error)
-        }
+        // TODO: Get all downloads from TPDownloadClient.shared.getAllDownloads()
+        resolve([])
     }
     
     @objc
     func get(_ videoId: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        do {
-            if let download = downloadClient.getDownload(videoId: videoId) {
-                resolve(convertDownloadItemToDict(download))
-            } else {
-                resolve(nil)
-            }
-        } catch {
-            reject("DOWNLOAD_ITEM_ERROR", "Failed to get download: \(error.localizedDescription)", error)
-        }
+        // TODO: Get download by videoId from TPDownloadClient.shared.getDownload(videoId:)
+        resolve(nil)
     }
     
     @objc
     func pause(_ videoId: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        do {
-            try downloadClient.pauseDownload(videoId: videoId)
-            resolve(nil)
-        } catch {
-            reject("DOWNLOAD_PAUSE_ERROR", "Failed to pause download: \(error.localizedDescription)", error)
-        }
+        // TODO: Pause download using TPDownloadClient.shared.pauseDownload(videoId:)
+        resolve(nil)
     }
     
     @objc
     func resume(_ videoId: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        do {
-            try downloadClient.resumeDownload(videoId: videoId)
-            resolve(nil)
-        } catch {
-            reject("DOWNLOAD_RESUME_ERROR", "Failed to resume download: \(error.localizedDescription)", error)
-        }
+        // TODO: Resume download using TPDownloadClient.shared.resumeDownload(videoId:)
+        resolve(nil)
     }
     
     @objc
     func remove(_ videoId: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        do {
-            try downloadClient.removeDownload(videoId: videoId)
-            resolve(nil)
-        } catch {
-            reject("DOWNLOAD_REMOVE_ERROR", "Failed to remove download: \(error.localizedDescription)", error)
-        }
+        // TODO: Remove download using TPDownloadClient.shared.removeDownload(videoId:)
+        resolve(nil)
     }
     
     @objc
@@ -101,46 +80,6 @@ class TPStreamsDownloadsModule: NSObject, RCTEventEmitterProtocol {
     @objc
     func removeListeners(_ count: NSNumber) {
         // Required for RCTEventEmitter
-    }
-    
-    // MARK: - Notification Handlers
-    
-    @objc
-    private func handleDownloadChanged(_ notification: Notification) {
-        guard hasListeners else { return }
-        
-        // Get all current downloads and emit a single event with all download data
-        // This matches the Android implementation behavior
-        do {
-            let downloads = downloadClient.getAllDownloads()
-            let downloadMaps = downloads.map { convertDownloadItemToDict($0) }
-            sendEvent(withName: "onDownloadProgressChanged", body: downloadMaps)
-        } catch {
-            // If we can't get downloads, try to get from notification object
-            if let downloads = notification.object as? [TPDownloadItem] {
-                let downloadMaps = downloads.map { convertDownloadItemToDict($0) }
-                sendEvent(withName: "onDownloadProgressChanged", body: downloadMaps)
-            }
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func convertDownloadItemToDict(_ item: TPDownloadItem) -> [String: Any] {
-        var dict: [String: Any] = [
-            "videoId": item.videoId,
-            "title": item.title,
-            "totalBytes": item.totalBytes,
-            "downloadedBytes": item.downloadedBytes,
-            "progressPercentage": item.progressPercentage,
-            "state": item.state.rawValue
-        ]
-        
-        if let thumbnailUrl = item.thumbnailUrl {
-            dict["thumbnailUrl"] = thumbnailUrl
-        }
-        
-        return dict
     }
 }
 

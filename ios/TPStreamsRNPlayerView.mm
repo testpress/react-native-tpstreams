@@ -1,9 +1,9 @@
 #import "TPStreamsRNPlayerView.h"
 
-#import <react/renderer/components/TPStreamsPlayerViewSpec/ComponentDescriptors.h>
-#import <react/renderer/components/TPStreamsPlayerViewSpec/EventEmitters.h>
-#import <react/renderer/components/TPStreamsPlayerViewSpec/Props.h>
-#import <react/renderer/components/TPStreamsPlayerViewSpec/RCTComponentViewHelpers.h>
+#import <react/renderer/components/TPStreamsSpec/ComponentDescriptors.h>
+#import <react/renderer/components/TPStreamsSpec/EventEmitters.h>
+#import <react/renderer/components/TPStreamsSpec/Props.h>
+#import <react/renderer/components/TPStreamsSpec/RCTComponentViewHelpers.h>
 
 #import "RCTFabricComponentsPlugins.h"
 

@@ -252,6 +252,9 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.mainTitle}>TPStreams</Text>
+      </View>
       {renderNavBar()}
       {activeScreen === 'player' ? (
         renderPlayerScreen()
@@ -279,6 +282,19 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingTop: 10,
     paddingBottom: 20,
+  },
+  headerContainer: {
+    paddingTop: 50, // Adjust as needed for padding
+    paddingBottom: 10,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  mainTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
   },
   navBar: {
     flexDirection: 'row',
