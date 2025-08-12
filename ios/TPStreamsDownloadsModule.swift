@@ -18,10 +18,7 @@ class TPStreamsDownloadsModule: NSObject, RCTEventEmitterProtocol {
     @objc
     override func supportedEvents() -> [String] {
         return [
-            "onDownloadProgressChanged",
-            "onDownloadStateChanged",
-            "onDownloadCompleted",
-            "onDownloadError"
+            "onDownloadProgressChanged"
         ]
     }
     
@@ -30,22 +27,8 @@ class TPStreamsDownloadsModule: NSObject, RCTEventEmitterProtocol {
         hasListeners = true
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleDownloadProgress(_:)),
+            selector: #selector(handleDownloadChanged(_:)),
             name: .TPDownloadProgressChanged,
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleDownloadStateChanged(_:)),
-            name: .TPDownloadStateChanged,
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleDownloadError(_:)),
-            name: .TPDownloadError,
             object: nil
         )
     }
@@ -123,46 +106,21 @@ class TPStreamsDownloadsModule: NSObject, RCTEventEmitterProtocol {
     // MARK: - Notification Handlers
     
     @objc
-    private func handleDownloadProgress(_ notification: Notification) {
+    private func handleDownloadChanged(_ notification: Notification) {
         guard hasListeners else { return }
         
-        if let downloads = notification.object as? [TPDownloadItem] {
+        // Get all current downloads and emit a single event with all download data
+        // This matches the Android implementation behavior
+        do {
+            let downloads = downloadClient.getAllDownloads()
             let downloadMaps = downloads.map { convertDownloadItemToDict($0) }
             sendEvent(withName: "onDownloadProgressChanged", body: downloadMaps)
-        }
-    }
-    
-    @objc
-    private func handleDownloadStateChanged(_ notification: Notification) {
-        guard hasListeners else { return }
-        
-        if let download = notification.object as? TPDownloadItem {
-            let downloadMap = convertDownloadItemToDict(download)
-            sendEvent(withName: "onDownloadStateChanged", body: downloadMap)
-            
-            // Also emit completed event if download is complete
-            if download.state == .completed {
-                sendEvent(withName: "onDownloadCompleted", body: downloadMap)
+        } catch {
+            // If we can't get downloads, try to get from notification object
+            if let downloads = notification.object as? [TPDownloadItem] {
+                let downloadMaps = downloads.map { convertDownloadItemToDict($0) }
+                sendEvent(withName: "onDownloadProgressChanged", body: downloadMaps)
             }
-        }
-    }
-    
-    @objc
-    private func handleDownloadError(_ notification: Notification) {
-        guard hasListeners else { return }
-        
-        if let userInfo = notification.userInfo,
-           let videoId = userInfo["videoId"] as? String,
-           let error = userInfo["error"] as? Error,
-           let errorCode = userInfo["errorCode"] as? Int {
-            
-            let errorMap: [String: Any] = [
-                "videoId": videoId,
-                "message": error.localizedDescription,
-                "code": errorCode
-            ]
-            
-            sendEvent(withName: "onDownloadError", body: errorMap)
         }
     }
     

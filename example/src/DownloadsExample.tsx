@@ -13,6 +13,7 @@ import {
   TPStreamsDownloads,
   type TPStreamsDownloadsItem,
 } from 'react-native-tpstreams';
+import type { EmitterSubscription } from 'react-native';
 
 // The event name emitted by the native module
 const DOWNLOAD_PROGRESS_EVENT = 'onDownloadProgressChanged';
@@ -23,7 +24,7 @@ const DownloadsExample = () => {
 
   useEffect(() => {
     let eventEmitter: NativeEventEmitter | null = null;
-    let progressSubscription: any = null;
+    let progressSubscription: EmitterSubscription | null = null;
 
     // Load initial downloads
     const loadInitialDownloads = async () => {

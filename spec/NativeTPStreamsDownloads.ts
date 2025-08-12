@@ -4,7 +4,7 @@ import { TurboModuleRegistry } from 'react-native';
 export type DownloadItem = {
   videoId: string;
   title: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
   totalBytes: number;
   downloadedBytes: number;
   progressPercentage: number;

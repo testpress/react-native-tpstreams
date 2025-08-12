@@ -7,36 +7,25 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  NativeEventEmitter,
 } from 'react-native';
 import {
-  addDownloadProgressListener,
-  removeDownloadProgressListener,
-  onDownloadProgressChanged,
-  onDownloadStateChanged,
-  onDownloadCompleted,
-  onDownloadError,
-  pauseDownload,
-  resumeDownload,
-  removeDownload,
-  getAllDownloads,
-  type DownloadItem,
-  type DownloadProgressChange,
+  TPStreamsDownloads,
+  type TPStreamsDownloadsItem,
 } from 'react-native-tpstreams';
+import type { EmitterSubscription } from 'react-native';
 
 const DownloadList = () => {
-  const [downloads, setDownloads] = useState<DownloadItem[]>([]);
+  const [downloads, setDownloads] = useState<TPStreamsDownloadsItem[]>([]);
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    let progressSubscription: any = null;
-    let stateSubscription: any = null;
-    let completedSubscription: any = null;
-    let errorSubscription: any = null;
+    let progressSubscription: EmitterSubscription | null = null;
 
     // Load initial downloads
     const loadInitialDownloads = async () => {
       try {
-        const items = await getAllDownloads();
+        const items = await TPStreamsDownloads.getAll();
         setDownloads(items);
         console.log(`Loaded ${items.length} downloads initially`);
       } catch (error) {
@@ -46,17 +35,18 @@ const DownloadList = () => {
       }
     };
 
-    // Setup progress listener when component mounts
-    const setupProgressListener = async () => {
+    // Setup event listeners
+    const setupEventListeners = async () => {
       try {
-        // Start listening for progress updates
-        await addDownloadProgressListener();
+        // Create event emitter for the TPStreamsDownloads module
+        const eventEmitter = new NativeEventEmitter(TPStreamsDownloads);
 
-        // Add listener for progress updates
-        progressSubscription = onDownloadProgressChanged(
-          (downloadItems: DownloadProgressChange[]) => {
+        // Add listener for progress updates (this handles all download changes)
+        progressSubscription = eventEmitter.addListener(
+          'onDownloadProgressChanged',
+          (downloadItems: TPStreamsDownloadsItem[]) => {
             console.log(
-              'Progress changes received:',
+              'Download changes received:',
               downloadItems.length,
               'downloads'
             );
@@ -64,85 +54,32 @@ const DownloadList = () => {
           }
         );
 
-        // Add listener for state changes
-        stateSubscription = onDownloadStateChanged((download) => {
-          console.log(
-            'Download state changed:',
-            download.videoId,
-            download.state
-          );
-          setDownloads((prevDownloads) => {
-            const updatedDownloads = [...prevDownloads];
-            const index = updatedDownloads.findIndex(
-              (item) => item.videoId === download.videoId
-            );
-            if (index !== -1) {
-              updatedDownloads[index] = download;
-            } else {
-              updatedDownloads.push(download);
-            }
-            return updatedDownloads;
-          });
-        });
-
-        // Add listener for completed downloads
-        completedSubscription = onDownloadCompleted((download) => {
-          console.log('Download completed:', download.videoId);
-          Alert.alert(
-            'Download Complete',
-            `${download.title} has been downloaded successfully.`
-          );
-          setDownloads((prevDownloads) => {
-            const updatedDownloads = [...prevDownloads];
-            const index = updatedDownloads.findIndex(
-              (item) => item.videoId === download.videoId
-            );
-            if (index !== -1) {
-              updatedDownloads[index] = download;
-            }
-            return updatedDownloads;
-          });
-        });
-
-        // Add listener for download errors
-        errorSubscription = onDownloadError((error) => {
-          console.error('Download error:', error);
-          Alert.alert(
-            'Download Error',
-            `Error downloading video: ${error.message}`
-          );
-        });
+        // Start receiving progress updates from the native module
+        TPStreamsDownloads.startProgressUpdates();
 
         loadInitialDownloads();
       } catch (error) {
-        console.error('Failed to setup progress listener:', error);
+        console.error('Failed to setup event listeners:', error);
         setIsInitializing(false);
       }
     };
 
-    setupProgressListener();
+    setupEventListeners();
 
     // Cleanup function
     return () => {
       if (progressSubscription) {
         progressSubscription.remove();
       }
-      if (stateSubscription) {
-        stateSubscription.remove();
-      }
-      if (completedSubscription) {
-        completedSubscription.remove();
-      }
-      if (errorSubscription) {
-        errorSubscription.remove();
-      }
-      removeDownloadProgressListener();
+
+      // Stop receiving progress updates from the native module
+      TPStreamsDownloads.stopProgressUpdates();
     };
   }, []);
 
   const handlePauseDownload = async (videoId: string) => {
     try {
-      await pauseDownload(videoId);
+      await TPStreamsDownloads.pause(videoId);
       console.log('Download paused successfully');
     } catch (error) {
       console.error('Error pausing download:', error);
@@ -152,7 +89,7 @@ const DownloadList = () => {
 
   const handleResumeDownload = async (videoId: string) => {
     try {
-      await resumeDownload(videoId);
+      await TPStreamsDownloads.resume(videoId);
       console.log('Download resumed successfully');
     } catch (error) {
       console.error('Error resuming download:', error);
@@ -173,7 +110,7 @@ const DownloadList = () => {
           {
             text: 'Remove',
             onPress: async () => {
-              await removeDownload(videoId);
+              await TPStreamsDownloads.remove(videoId);
               console.log('Download removed successfully');
               // Update the UI by filtering out the removed download
               setDownloads((prevDownloads) =>
@@ -190,7 +127,7 @@ const DownloadList = () => {
     }
   };
 
-  const renderDownloadItem = (item: DownloadItem) => {
+  const renderDownloadItem = (item: TPStreamsDownloadsItem) => {
     const isCompleted = item.state === 'Completed';
     const isDownloading = item.state === 'Downloading';
     const isPaused = item.state === 'Paused';

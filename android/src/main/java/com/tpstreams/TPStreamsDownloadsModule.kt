@@ -10,6 +10,7 @@ import com.tpstreams.NativeTPStreamsDownloadsSpec
 import com.tpstreams.player.download.DownloadClient
 import com.tpstreams.player.download.DownloadItem
 import org.json.JSONObject
+import com.facebook.react.bridge.WritableMap
 
 class TPStreamsDownloadsModule(private val reactContext: ReactApplicationContext) : 
     NativeTPStreamsDownloadsSpec(reactContext), 
@@ -28,16 +29,7 @@ class TPStreamsDownloadsModule(private val reactContext: ReactApplicationContext
             val result = Arguments.createArray()
             
             for (item in downloadItems) {
-                val map = Arguments.createMap()
-                map.putString("videoId", item.assetId)
-                map.putString("title", item.title)
-                item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
-                map.putDouble("totalBytes", item.totalBytes.toDouble())
-                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
-                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
-                
-                result.pushMap(map)
+                result.pushMap(convertDownloadItemToMap(item))
             }
             
             promise.resolve(result)
@@ -52,16 +44,7 @@ class TPStreamsDownloadsModule(private val reactContext: ReactApplicationContext
             val download = downloadClient.getDownload(videoId)
             download?.let { 
                 val item = downloadClient.createDownloadItem(it)
-                val map = Arguments.createMap()
-                map.putString("videoId", item.assetId)
-                map.putString("title", item.title)
-                item.thumbnailUrl?.let { url -> map.putString("thumbnailUrl", url) }
-                map.putDouble("totalBytes", item.totalBytes.toDouble())
-                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
-                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                map.putString("state", downloadClient.getDownloadStatus(videoId))
-                
-                promise.resolve(map)
+                promise.resolve(convertDownloadItemToMap(item))
             } ?: promise.resolve(null)
         } catch (e: Exception) {
             Log.e(TAG, "Error getting download item: ${e.message}", e)
@@ -115,9 +98,6 @@ class TPStreamsDownloadsModule(private val reactContext: ReactApplicationContext
         }
     }
 
-    // These methods are required by React Native's NativeEventEmitter
-    // but we don't need to do anything in them as we handle the actual
-    // listener registration in startProgressUpdates and stopProgressUpdates
     override fun addListener(eventName: String) {
         // Required by NativeEventEmitter, but no-op
         // Actual listener registration happens in startProgressUpdates
@@ -134,22 +114,25 @@ class TPStreamsDownloadsModule(private val reactContext: ReactApplicationContext
             
             val result = Arguments.createArray()
             for (item in currentDownloads) {
-                val map = Arguments.createMap()
-                map.putString("videoId", item.assetId)
-                map.putString("title", item.title)
-                item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
-                map.putDouble("totalBytes", item.totalBytes.toDouble())
-                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
-                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
-                
-                result.pushMap(map)
+                result.pushMap(convertDownloadItemToMap(item))
             }
             
             emitEvent("onDownloadProgressChanged", result)
         } catch (e: Exception) {
             Log.e(TAG, "Error in onDownloadsChanged: ${e.message}", e)
         }
+    }
+
+    private fun convertDownloadItemToMap(item: DownloadItem): WritableMap {
+        val map = Arguments.createMap()
+        map.putString("videoId", item.assetId)
+        map.putString("title", item.title)
+        item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
+        map.putDouble("totalBytes", item.totalBytes.toDouble())
+        map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
+        map.putDouble("progressPercentage", item.progressPercentage.toDouble())
+        map.putString("state", downloadClient.getDownloadStatus(item.assetId))
+        return map
     }
 
     private fun emitEvent(eventName: String, data: Any) {
