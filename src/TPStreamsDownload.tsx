@@ -1,6 +1,5 @@
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import type { EmitterSubscription } from 'react-native';
-import TPStreamsDownloads from '../spec/NativeTPStreamsDownloads';
 
 const { TPStreamsDownload } = NativeModules;
 
@@ -19,22 +18,8 @@ export type DownloadProgressChange = DownloadItem;
 export type DownloadProgressListener = (
   downloads: DownloadProgressChange[]
 ) => void;
-export type DownloadStateChangeListener = (download: DownloadItem) => void;
-export type DownloadErrorListener = (error: {
-  videoId: string;
-  message: string;
-  code: number;
-}) => void;
 
-// Event constants
-export const DOWNLOAD_EVENTS = {
-  PROGRESS_CHANGED: 'onDownloadProgressChanged',
-  STATE_CHANGED: 'onDownloadStateChanged',
-  COMPLETED: 'onDownloadCompleted',
-  ERROR: 'onDownloadError',
-};
-
-const downloadEventEmitter = new NativeEventEmitter(TPStreamsDownloads);
+const downloadEventEmitter = new NativeEventEmitter(TPStreamsDownload);
 
 export function addDownloadProgressListener(): Promise<void> {
   return TPStreamsDownload.addDownloadProgressListener();
@@ -48,30 +33,9 @@ export function onDownloadProgressChanged(
   listener: DownloadProgressListener
 ): EmitterSubscription {
   return downloadEventEmitter.addListener(
-    DOWNLOAD_EVENTS.PROGRESS_CHANGED,
+    'onDownloadProgressChanged',
     listener
   );
-}
-
-export function onDownloadStateChanged(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener(
-    DOWNLOAD_EVENTS.STATE_CHANGED,
-    listener
-  );
-}
-
-export function onDownloadCompleted(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener(DOWNLOAD_EVENTS.COMPLETED, listener);
-}
-
-export function onDownloadError(
-  listener: DownloadErrorListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener(DOWNLOAD_EVENTS.ERROR, listener);
 }
 
 export function pauseDownload(videoId: string): Promise<void> {
