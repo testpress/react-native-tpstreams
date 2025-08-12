@@ -20,15 +20,9 @@ export {
   addDownloadProgressListener,
   removeDownloadProgressListener,
   onDownloadProgressChanged,
-  onDownloadStateChanged,
-  onDownloadCompleted,
-  onDownloadError,
-  DOWNLOAD_EVENTS,
   type DownloadItem,
   type DownloadProgressChange,
   type DownloadProgressListener,
-  type DownloadStateChangeListener,
-  type DownloadErrorListener,
 } from './TPStreamsDownload';
 
 // Export the TPStreamsDownloads TurboModule directly
