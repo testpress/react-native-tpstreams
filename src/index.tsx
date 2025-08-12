@@ -7,6 +7,7 @@ export * from '../spec/TPStreamsPlayerViewNativeComponent';
 export { default as TPStreamsPlayerView } from './TPStreamsPlayer';
 export type { TPStreamsPlayerRef } from './TPStreamsPlayer';
 
+// Export the original download module
 export {
   pauseDownload,
   resumeDownload,
@@ -19,10 +20,20 @@ export {
   addDownloadProgressListener,
   removeDownloadProgressListener,
   onDownloadProgressChanged,
+  onDownloadStateChanged,
+  onDownloadCompleted,
+  onDownloadError,
+  DOWNLOAD_EVENTS,
   type DownloadItem,
   type DownloadProgressChange,
   type DownloadProgressListener,
+  type DownloadStateChangeListener,
+  type DownloadErrorListener,
 } from './TPStreamsDownload';
+
+// Export the TPStreamsDownloads TurboModule directly
+export { default as TPStreamsDownloads } from '../spec/NativeTPStreamsDownloads';
+export type { DownloadItem as TPStreamsDownloadsItem } from '../spec/NativeTPStreamsDownloads';
 
 const TPStreamsModule = NativeModules.TPStreams;
 

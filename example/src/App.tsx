@@ -1,11 +1,28 @@
 import { useRef, useState } from 'react';
-import { View, StyleSheet, Button, Text, ScrollView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { TPStreamsPlayerView } from 'react-native-tpstreams';
 import type { TPStreamsPlayerRef } from 'react-native-tpstreams';
+import DownloadList from './DownloadList';
+import DownloadsExample from './DownloadsExample';
+
+// If you need to initialize TPStreams, uncomment and add your organization ID:
+// import { TPStreams } from 'react-native-tpstreams';
+// TPStreams.initialize('YOUR_ORGANIZATION_ID');
 
 export default function App() {
   const playerRef = useRef<TPStreamsPlayerRef>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [activeScreen, setActiveScreen] = useState<
+    'player' | 'downloads' | 'downloadsturbo'
+  >('player');
 
   const handlePlay = () => {
     playerRef.current?.play();
@@ -99,20 +116,74 @@ export default function App() {
     setLastError(errorMessage);
   };
 
-  return (
+  const renderNavBar = () => (
+    <View style={styles.navBar}>
+      <TouchableOpacity
+        style={[
+          styles.navButton,
+          activeScreen === 'player' && styles.activeNavButton,
+        ]}
+        onPress={() => setActiveScreen('player')}
+      >
+        <Text
+          style={[
+            styles.navButtonText,
+            activeScreen === 'player' && styles.activeNavButtonText,
+          ]}
+        >
+          Player
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.navButton,
+          activeScreen === 'downloads' && styles.activeNavButton,
+        ]}
+        onPress={() => setActiveScreen('downloads')}
+      >
+        <Text
+          style={[
+            styles.navButtonText,
+            activeScreen === 'downloads' && styles.activeNavButtonText,
+          ]}
+        >
+          Downloads
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.navButton,
+          activeScreen === 'downloadsturbo' && styles.activeNavButton,
+        ]}
+        onPress={() => setActiveScreen('downloadsturbo')}
+      >
+        <Text
+          style={[
+            styles.navButtonText,
+            activeScreen === 'downloadsturbo' && styles.activeNavButtonText,
+          ]}
+        >
+          Turbo Downloads
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderPlayerScreen = () => (
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
         <View style={styles.playerContainer}>
           <TPStreamsPlayerView
             ref={playerRef}
-            videoId="3G2p5NdMaRu"
-            accessToken="328f6f1c-c188-4c3f-8e38-345c9aaa1a51"
+            videoId="42h2tZ5fmNf"
+            accessToken="9327e2d0-fa13-4288-902d-840f32cd0eed"
             style={styles.player}
             onPlayerStateChanged={handlePlayerStateChanged}
             onIsPlayingChanged={handleIsPlayingChanged}
             onPlaybackSpeedChanged={handlePlaybackSpeedChanged}
             onIsLoadingChanged={handleIsLoadingChanged}
             onError={handleError}
+            enableDownload={true}
           />
         </View>
 
@@ -178,9 +249,26 @@ export default function App() {
       </View>
     </ScrollView>
   );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      {renderNavBar()}
+      {activeScreen === 'player' ? (
+        renderPlayerScreen()
+      ) : activeScreen === 'downloads' ? (
+        <DownloadList />
+      ) : (
+        <DownloadsExample />
+      )}
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   scrollView: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -189,8 +277,32 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 40,
+    paddingTop: 10,
     paddingBottom: 20,
+  },
+  navBar: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  navButton: {
+    flex: 1,
+    paddingVertical: 15,
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  activeNavButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#007AFF',
+  },
+  navButtonText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  activeNavButtonText: {
+    color: '#007AFF',
+    fontWeight: 'bold',
   },
   playerContainer: {
     width: '100%',

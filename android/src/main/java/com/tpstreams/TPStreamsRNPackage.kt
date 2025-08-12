@@ -17,6 +17,7 @@ class TPStreamsRNPackage : ReactPackage {
     val modules: MutableList<NativeModule> = ArrayList()
     modules.add(TPStreamsRNModule(reactContext))
     modules.add(TPStreamsDownloadModule(reactContext))
+    modules.add(TPStreamsDownloadsModule(reactContext))
     return modules
   }
 }
