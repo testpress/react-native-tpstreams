@@ -6,6 +6,7 @@
 #import <react/renderer/components/TPStreamsSpec/RCTComponentViewHelpers.h>
 
 #import "RCTFabricComponentsPlugins.h"
+#import "TPStreams-Swift.h"
 
 using namespace facebook::react;
 
@@ -13,7 +14,7 @@ using namespace facebook::react;
 @end
 
 @implementation TPStreamsRNPlayerView {
-    UIView * _view;
+    TPStreamsPlayerHostingView * _view;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -27,11 +28,17 @@ using namespace facebook::react;
     static const auto defaultProps = std::make_shared<const TPStreamsRNPlayerViewProps>();
     _props = defaultProps;
 
-    _view = [[UIView alloc] init];
+    _view = [[TPStreamsPlayerHostingView alloc] initWithFrame:frame];
     self.contentView = _view;
   }
 
   return self;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    _view.frame = self.bounds;
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
