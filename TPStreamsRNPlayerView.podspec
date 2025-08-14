@@ -18,8 +18,17 @@ Pod::Spec.new do |s|
   
   s.swift_version = '5.0'
   
+  # Set up the bridging header
+  s.pod_target_xcconfig = {
+    'SWIFT_OBJC_BRIDGING_HEADER' => '$(PODS_TARGET_SRCROOT)/ios/TPStreamsRNPlayerView-Bridging-Header.h',
+    'CLANG_ENABLE_MODULES' => 'YES'
+  }
+  
   # Ensure the module is not built as a framework to avoid bridging header conflicts
   s.static_framework = true
+  
+  # Add dependency on TPStreamsSDK
+  s.dependency 'TPStreamsSDK'
 
  install_modules_dependencies(s)
 end
