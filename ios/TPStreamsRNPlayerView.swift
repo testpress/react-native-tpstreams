@@ -1,0 +1,163 @@
+import UIKit
+import TPStreamsSDK
+import CoreMedia
+
+@objc(TPStreamsRNPlayerView)
+class TPStreamsRNPlayerView: UIView {
+
+    private var player: TPAVPlayer?
+    private var playerViewController: TPStreamPlayerViewController?
+
+    private var _videoId: NSString = ""
+    private var _accessToken: NSString = ""
+    private var _shouldAutoPlay: Bool = true
+    private var _startAt: Double = 0
+    private var _enableDownload: Bool = false
+    private var _offlineLicenseExpireTime: Double = 0
+    private var _showDefaultCaptions: Bool = false
+    private var _downloadMetadata: String?
+    private var setupScheduled = false
+
+    @objc var videoId: NSString {
+        get { _videoId }
+        set {
+            _videoId = newValue
+            schedulePlayerSetup()
+        }
+    }
+
+    @objc var accessToken: NSString {
+        get { _accessToken }
+        set {
+            _accessToken = newValue
+            schedulePlayerSetup()
+        }
+    }
+    
+    @objc var shouldAutoPlay: Bool {
+        get { _shouldAutoPlay }
+        set {
+            _shouldAutoPlay = newValue
+        }
+    }
+    
+    @objc var startAt: Double {
+        get { _startAt }
+        set {
+            _startAt = newValue
+        }
+    }
+    
+    @objc var enableDownload: Bool {
+        get { _enableDownload }
+        set {
+            _enableDownload = newValue
+        }
+    }
+    
+    @objc var offlineLicenseExpireTime: Double {
+        get { _offlineLicenseExpireTime }
+        set {
+            _offlineLicenseExpireTime = newValue
+        }
+    }
+    
+    @objc var showDefaultCaptions: Bool {
+        get { _showDefaultCaptions }
+        set {
+            _showDefaultCaptions = newValue
+        }
+    }
+    
+    @objc var downloadMetadata: NSString? {
+        get { _downloadMetadata as NSString? }
+        set {
+            _downloadMetadata = newValue as String?
+        }
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .black
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        backgroundColor = .black
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerViewController?.view.frame = bounds
+    }
+
+    private func schedulePlayerSetup() {
+        guard videoId.length > 0, accessToken.length > 0 else { return }
+
+        if setupScheduled { return }
+        setupScheduled = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.setupPlayer()
+        }
+    }
+
+    private func setupPlayer() {
+        playerViewController?.view.removeFromSuperview()
+        playerViewController?.removeFromParent()
+        playerViewController = nil
+        player = nil
+
+        player = TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { error in
+            if let error = error {
+                print("Online setup error: \(error.localizedDescription)")
+            }
+        }
+        
+        if startAt > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                self?.seekTo(position: self?.startAt ?? 0)
+            }
+        }
+
+        let configBuilder = TPStreamPlayerConfigurationBuilder()
+            .setPreferredForwardDuration(15)
+            .setPreferredRewindDuration(5)
+            .setprogressBarThumbColor(.systemBlue)
+            .setwatchedProgressTrackColor(.systemBlue)
+        
+        if enableDownload {
+            configBuilder.showDownloadOption()
+        }
+        
+        let config = configBuilder.build()
+
+        let vc = TPStreamPlayerViewController()
+        vc.player = player
+        vc.config = config
+
+        if let parentVC = self.reactViewController() {
+            parentVC.addChild(vc)
+            addSubview(vc.view)
+            vc.view.frame = bounds
+            vc.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            vc.view.isHidden = false
+            bringSubviewToFront(vc.view)
+            vc.didMove(toParent: parentVC)
+        }
+
+        if shouldAutoPlay {
+            player?.play()
+        }
+        
+        playerViewController = vc
+    }
+    
+    private func seekTo(position: Double) {
+        guard position > 0, let player = player else { return }
+        
+        let seconds = position / 1000.0
+        let seekTime = CMTimeMakeWithSeconds(seconds, preferredTimescale: 1000)
+        player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+}
