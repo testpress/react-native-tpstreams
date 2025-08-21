@@ -1,6 +1,7 @@
 import UIKit
 import TPStreamsSDK
 import CoreMedia
+import React
 
 @objc(TPStreamsRNPlayerView)
 class TPStreamsRNPlayerView: UIView {
@@ -17,6 +18,17 @@ class TPStreamsRNPlayerView: UIView {
     private var _showDefaultCaptions: Bool = false
     private var _downloadMetadata: String?
     private var setupScheduled = false
+    
+    @objc var onCurrentPosition: RCTDirectEventBlock?
+    @objc var onDuration: RCTDirectEventBlock?
+    @objc var onIsPlaying: RCTDirectEventBlock?
+    @objc var onPlaybackSpeed: RCTDirectEventBlock?
+    @objc var onPlayerStateChanged: RCTDirectEventBlock?
+    @objc var onIsPlayingChanged: RCTDirectEventBlock?
+    @objc var onPlaybackSpeedChanged: RCTDirectEventBlock?
+    @objc var onIsLoadingChanged: RCTDirectEventBlock?
+    @objc var onError: RCTDirectEventBlock?
+    @objc var onAccessTokenExpired: RCTDirectEventBlock?
 
     @objc var videoId: NSString {
         get { _videoId }
@@ -153,11 +165,62 @@ class TPStreamsRNPlayerView: UIView {
         playerViewController = vc
     }
     
-    private func seekTo(position: Double) {
+    @objc func seekTo(position: Double) {
         guard position > 0, let player = player else { return }
         
-        let seconds = position / 1000.0
-        let seekTime = CMTimeMakeWithSeconds(seconds, preferredTimescale: 1000)
+        let seekTime = CMTimeMakeWithSeconds(position, preferredTimescale: 1000)
         player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+    
+    @objc func play() {
+        player?.play()
+    }
+    
+    @objc func pause() {
+        player?.pause()
+    }
+    
+    @objc func setPlaybackSpeed(_ speed: Float) {
+        player?.rate = speed
+    }
+    
+    @objc func getCurrentPosition() {
+        guard let player = player else {
+            onCurrentPosition?(["position": 0])
+            return
+        }
+        
+        let currentTime = player.currentTime()
+        let positionMs = CMTimeGetSeconds(currentTime) * 1000
+        onCurrentPosition?(["position": positionMs])
+    }
+    
+    @objc func getDuration() {
+        guard let player = player, let currentItem = player.currentItem else {
+            onDuration?(["duration": 0])
+            return
+        }
+        
+        let durationMs = CMTimeGetSeconds(currentItem.duration) * 1000
+        onDuration?(["duration": durationMs])
+    }
+    
+    @objc func isPlaying() {
+        guard let player = player else {
+            onIsPlaying?(["isPlaying": false])
+            return
+        }
+        
+        let isPlaying = player.timeControlStatus == .playing
+        onIsPlaying?(["isPlaying": isPlaying])
+    }
+    
+    @objc func getPlaybackSpeed() {
+        let speed = player?.rate ?? 1.0
+        onPlaybackSpeed?(["speed": speed])
+    }
+
+    @objc func setNewAccessToken(_ newToken: String) {
+        print("TPStreamsRNPlayerView: setNewAccessToken called with token: \(newToken)")
     }
 }
