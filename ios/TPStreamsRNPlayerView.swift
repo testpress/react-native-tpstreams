@@ -4,7 +4,7 @@ import CoreMedia
 import React
 
 @objc(TPStreamsRNPlayerView)
-class TPStreamsRNPlayerView: UIView {
+public class TPStreamsRNPlayerView: UIView {
 
     private var player: TPAVPlayer?
     private var playerViewController: TPStreamPlayerViewController?
