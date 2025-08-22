@@ -18,7 +18,6 @@
     "android",
     "ios",
     "cpp",
-    "spec",
     "*.podspec",
     "react-native.config.js",
     "!ios/build",
