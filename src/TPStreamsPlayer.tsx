@@ -226,7 +226,10 @@ const TPStreamsPlayerView = forwardRef<
       ),
       getDuration: createPromiseMethod(Commands.getDuration, 'duration'),
       isPlaying: createPromiseMethod(Commands.isPlaying, 'isPlaying'),
-      getPlaybackSpeed: createPromiseMethod(Commands.getPlaybackSpeed, 'speed'),
+      getPlaybackSpeed: createPromiseMethod(
+        Commands.getPlaybackSpeed,
+        'playbackSpeed'
+      ),
     }),
     [createPromiseMethod]
   );
