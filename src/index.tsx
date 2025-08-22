@@ -1,15 +1,7 @@
 import { NativeModules } from 'react-native';
-
-import TPStreamsPlayerViewNativeComponent from '../spec/TPStreamsPlayerViewNativeComponent';
-import type {
-  ErrorEvent,
-  NativeProps,
-} from '../spec/TPStreamsPlayerViewNativeComponent';
-import NativeTPStreamsDownloads from '../spec/NativeTPStreamsDownloads';
-import type { DownloadItem as TPStreamsDownloadsItem } from '../spec/NativeTPStreamsDownloads';
-
-export const TPStreamsPlayerNative = TPStreamsPlayerViewNativeComponent;
-export type { ErrorEvent, NativeProps };
+// Export the native component with a different name to avoid conflicts
+export { default as TPStreamsPlayerNative } from '../spec/TPStreamsPlayerViewNativeComponent';
+export * from '../spec/TPStreamsPlayerViewNativeComponent';
 
 // Export the wrapper component as TPStreamsPlayerView
 export { default as TPStreamsPlayerView } from './TPStreamsPlayer';
@@ -34,8 +26,8 @@ export {
 } from './TPStreamsDownload';
 
 // Export the TPStreamsDownloads TurboModule directly
-export const TPStreamsDownloads = NativeTPStreamsDownloads;
-export type { TPStreamsDownloadsItem };
+export { default as TPStreamsDownloads } from '../spec/NativeTPStreamsDownloads';
+export type { DownloadItem as TPStreamsDownloadsItem } from '../spec/NativeTPStreamsDownloads';
 
 const TPStreamsModule = NativeModules.TPStreams;
 
