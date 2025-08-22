@@ -126,6 +126,12 @@ class TPStreamsRNPlayerView: UIView {
         player = TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { error in
             if let error = error {
                 print("Online setup error: \(error.localizedDescription)")
+                let nsError = error as NSError
+                self.onError?([
+                    "message": "Player initialization failed",
+                    "code": nsError.code,
+                    "details": error.localizedDescription
+                ])
             }
         }
         
