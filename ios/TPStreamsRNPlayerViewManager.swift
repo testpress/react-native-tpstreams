@@ -13,26 +13,6 @@ class TPStreamsRNPlayerViewManager: RCTViewManager {
         return true
     }
     
-    // Expose props to React Native
-    @objc func propConfig(
-        _ name: String,
-        config: RCTBridge,
-        defaultView: UIView,
-        defaultProps: NSDictionary,
-        didSetProps: @escaping ([NSString]) -> Void
-    ) -> [NSString] {
-        return [
-            "videoId" as NSString,
-            "accessToken" as NSString,
-            "shouldAutoPlay" as NSString,
-            "startAt" as NSString,
-            "enableDownload" as NSString,
-            "offlineLicenseExpireTime" as NSString,
-            "showDefaultCaptions" as NSString,
-            "downloadMetadata" as NSString
-        ]
-    }
-    
     // MARK: - Player Commands - Simply delegate to the view
     
     @objc func seekTo(_ node: NSNumber, position: NSNumber) {
@@ -41,7 +21,7 @@ class TPStreamsRNPlayerViewManager: RCTViewManager {
                 forReactTag: node
             ) as? TPStreamsRNPlayerView
             
-            component?.seekTo(position: position.doubleValue)
+            component?.seekTo(position: position.doubleValue/1000.0)
         }
     }
     
