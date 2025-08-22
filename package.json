@@ -38,8 +38,9 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
-    "release": "release-it --only-version"
+    "prepare": "bob build && yarn copy-spec",
+    "release": "release-it --only-version",
+    "copy-spec": "mkdir -p lib/spec && cp -R spec/* lib/spec/"
   },
   "keywords": [
     "react-native",
