@@ -21,7 +21,7 @@ class TPStreamsRNPlayerViewManager: RCTViewManager {
                 forReactTag: node
             ) as? TPStreamsRNPlayerView
             
-            component?.seekTo(position: position.doubleValue/1000.0)
+            component?.seekTo(position: position.doubleValue)
         }
     }
     

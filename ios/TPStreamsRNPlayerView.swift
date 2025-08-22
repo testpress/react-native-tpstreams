@@ -2,6 +2,7 @@ import UIKit
 import TPStreamsSDK
 import CoreMedia
 import React
+import AVFoundation
 
 @objc(TPStreamsRNPlayerView)
 class TPStreamsRNPlayerView: UIView {
@@ -18,6 +19,7 @@ class TPStreamsRNPlayerView: UIView {
     private var _showDefaultCaptions: Bool = false
     private var _downloadMetadata: String?
     private var setupScheduled = false
+    private var playerStatusObserver: NSKeyValueObservation?
     
     @objc var onCurrentPosition: RCTDirectEventBlock?
     @objc var onDuration: RCTDirectEventBlock?
@@ -119,6 +121,7 @@ class TPStreamsRNPlayerView: UIView {
         playerViewController?.removeFromParent()
         playerViewController = nil
         player = nil
+        playerStatusObserver?.invalidate()
 
         player = TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { error in
             if let error = error {
@@ -127,8 +130,11 @@ class TPStreamsRNPlayerView: UIView {
         }
         
         if startAt > 0 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                self?.seekTo(position: self?.startAt ?? 0)
+            playerStatusObserver = player?.observe(\.status, options: [.new]) { [weak self] player, _ in
+                guard let self = self, player.status == .readyToPlay else { return }
+                self.seekTo(position: self.startAt*1000.0)
+                self.playerStatusObserver?.invalidate()
+                self.playerStatusObserver = nil
             }
         }
 
@@ -166,9 +172,9 @@ class TPStreamsRNPlayerView: UIView {
     }
     
     @objc func seekTo(position: Double) {
-        guard position > 0, let player = player else { return }
+        guard position >= 0, let player = player else { return }
         
-        let seekTime = CMTimeMakeWithSeconds(position, preferredTimescale: 1000)
+        let seekTime = CMTime(value: CMTimeValue(position), timescale: 1000)
         player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
     }
     
@@ -222,5 +228,9 @@ class TPStreamsRNPlayerView: UIView {
 
     @objc func setNewAccessToken(_ newToken: String) {
         print("TPStreamsRNPlayerView: setNewAccessToken called with token: \(newToken)")
+    }
+
+    deinit {
+        playerStatusObserver?.invalidate()
     }
 }
