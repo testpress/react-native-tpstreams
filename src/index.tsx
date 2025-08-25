@@ -26,8 +26,8 @@ export {
 } from './TPStreamsDownload';
 
 // Export the TPStreamsDownloads TurboModule directly
-export { default as TPStreamsDownloads } from '../spec/NativeTPStreamsDownloads';
-export type { DownloadItem as TPStreamsDownloadsItem } from '../spec/NativeTPStreamsDownloads';
+// export { default as TPStreamsDownloads } from '../spec/NativeTPStreamsDownloads';
+// export type { DownloadItem as TPStreamsDownloadsItem } from '../spec/NativeTPStreamsDownloads';
 
 const TPStreamsModule = NativeModules.TPStreams;
 
