@@ -1,11 +1,22 @@
 import { useRef, useState } from 'react';
-import { View, StyleSheet, Button, Text, ScrollView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { TPStreamsPlayerView } from 'react-native-tpstreams';
 import type { TPStreamsPlayerRef } from 'react-native-tpstreams';
+import DownloadList from './DownloadList';
 
 export default function App() {
   const playerRef = useRef<TPStreamsPlayerRef>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [currentScreen, setCurrentScreen] = useState<'player' | 'downloads'>(
+    'player'
+  );
 
   const handlePlay = () => {
     playerRef.current?.play();
@@ -99,97 +110,167 @@ export default function App() {
     setLastError(errorMessage);
   };
 
-  return (
-    <ScrollView style={styles.scrollView}>
+  // Navigation
+  const navigateToDownloads = () => {
+    setCurrentScreen('downloads');
+  };
+
+  const navigateToPlayer = () => {
+    setCurrentScreen('player');
+  };
+
+  // Render the navigation header
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>
+        {currentScreen === 'player' ? 'TPStreams Player' : 'Downloads'}
+      </Text>
+      <TouchableOpacity
+        style={styles.headerButton}
+        onPress={
+          currentScreen === 'player' ? navigateToDownloads : navigateToPlayer
+        }
+      >
+        <Text style={styles.headerButtonText}>
+          {currentScreen === 'player' ? 'View Downloads' : 'Back to Player'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Main render function
+  if (currentScreen === 'downloads') {
+    return (
       <View style={styles.container}>
-        <View style={styles.playerContainer}>
-          <TPStreamsPlayerView
-            ref={playerRef}
-            videoId="3G2p5NdMaRu"
-            accessToken="328f6f1c-c188-4c3f-8e38-345c9aaa1a51"
-            style={styles.player}
-            onPlayerStateChanged={handlePlayerStateChanged}
-            onIsPlayingChanged={handleIsPlayingChanged}
-            onPlaybackSpeedChanged={handlePlaybackSpeedChanged}
-            onIsLoadingChanged={handleIsLoadingChanged}
-            onError={handleError}
-          />
-        </View>
-
-        {lastError && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{lastError}</Text>
-          </View>
-        )}
-
-        <View style={styles.buttonSection}>
-          <Text style={styles.sectionTitle}>Playback Controls</Text>
-          <View style={styles.buttonRow}>
-            <View style={styles.button}>
-              <Button title="Play" onPress={handlePlay} />
-            </View>
-            <View style={styles.button}>
-              <Button title="Pause" onPress={handlePause} />
-            </View>
-          </View>
-          <View style={styles.buttonRow}>
-            <View style={styles.button}>
-              <Button title="Seek to 30s" onPress={handleSeek} />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.buttonSection}>
-          <Text style={styles.sectionTitle}>Playback Speed</Text>
-          <View style={styles.buttonRow}>
-            <View style={styles.button}>
-              <Button title="Normal (1x)" onPress={handleSpeedNormal} />
-            </View>
-            <View style={styles.button}>
-              <Button title="Fast (2x)" onPress={handleSpeedFast} />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.buttonSection}>
-          <Text style={styles.sectionTitle}>
-            Player Information (Check Console)
-          </Text>
-          <View style={styles.buttonRow}>
-            <View style={styles.button}>
-              <Button
-                title="Get Current Position"
-                onPress={checkCurrentPosition}
-              />
-            </View>
-            <View style={styles.button}>
-              <Button title="Get Duration" onPress={checkDuration} />
-            </View>
-          </View>
-          <View style={styles.buttonRow}>
-            <View style={styles.button}>
-              <Button title="Is Playing" onPress={checkIsPlaying} />
-            </View>
-            <View style={styles.button}>
-              <Button title="Get Playback Speed" onPress={checkPlaybackSpeed} />
-            </View>
-          </View>
-        </View>
+        {renderHeader()}
+        <DownloadList />
       </View>
-    </ScrollView>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {renderHeader()}
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.contentContainer}>
+          <View style={styles.playerContainer}>
+            <TPStreamsPlayerView
+              ref={playerRef}
+              videoId="4P3nJXp2xFT"
+              accessToken="cde2c1a6-434d-4fd1-99f4-9e2024bf2576"
+              style={styles.player}
+              onPlayerStateChanged={handlePlayerStateChanged}
+              onIsPlayingChanged={handleIsPlayingChanged}
+              onPlaybackSpeedChanged={handlePlaybackSpeedChanged}
+              onIsLoadingChanged={handleIsLoadingChanged}
+              onError={handleError}
+              enableDownload={true}
+            />
+          </View>
+
+          {lastError && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{lastError}</Text>
+            </View>
+          )}
+
+          <View style={styles.buttonSection}>
+            <Text style={styles.sectionTitle}>Playback Controls</Text>
+            <View style={styles.buttonRow}>
+              <View style={styles.button}>
+                <Button title="Play" onPress={handlePlay} />
+              </View>
+              <View style={styles.button}>
+                <Button title="Pause" onPress={handlePause} />
+              </View>
+            </View>
+            <View style={styles.buttonRow}>
+              <View style={styles.button}>
+                <Button title="Seek to 30s" onPress={handleSeek} />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.buttonSection}>
+            <Text style={styles.sectionTitle}>Playback Speed</Text>
+            <View style={styles.buttonRow}>
+              <View style={styles.button}>
+                <Button title="Normal (1x)" onPress={handleSpeedNormal} />
+              </View>
+              <View style={styles.button}>
+                <Button title="Fast (2x)" onPress={handleSpeedFast} />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.buttonSection}>
+            <Text style={styles.sectionTitle}>
+              Player Information (Check Console)
+            </Text>
+            <View style={styles.buttonRow}>
+              <View style={styles.button}>
+                <Button
+                  title="Get Current Position"
+                  onPress={checkCurrentPosition}
+                />
+              </View>
+              <View style={styles.button}>
+                <Button title="Get Duration" onPress={checkDuration} />
+              </View>
+            </View>
+            <View style={styles.buttonRow}>
+              <View style={styles.button}>
+                <Button title="Is Playing" onPress={checkIsPlaying} />
+              </View>
+              <View style={styles.button}>
+                <Button
+                  title="Get Playback Speed"
+                  onPress={checkPlaybackSpeed}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
+  container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  container: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 16,
+    backgroundColor: '#007AFF',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  headerButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 6,
+  },
+  headerButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  scrollView: {
     flex: 1,
+  },
+  contentContainer: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 40,
     paddingBottom: 20,
   },
   playerContainer: {
