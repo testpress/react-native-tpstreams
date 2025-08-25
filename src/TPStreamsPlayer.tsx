@@ -1,11 +1,11 @@
 import { forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
 import TPStreamsPlayerNative, {
   Commands,
-} from '../spec/TPStreamsPlayerViewNativeComponent';
+} from './TPStreamsPlayerViewNativeComponent';
 import type {
   NativeProps,
   ErrorEvent,
-} from '../spec/TPStreamsPlayerViewNativeComponent';
+} from './TPStreamsPlayerViewNativeComponent';
 import type { ViewProps } from 'react-native';
 
 // Create a unique ID for each instance to track promises
