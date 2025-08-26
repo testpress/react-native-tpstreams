@@ -10,13 +10,15 @@ class TPStreamsModule: NSObject {
    @objc func initialize(_ organizationId: NSString) {
      if !isInitialized {
        print("Initializing TPStreamsSDK with org code: \(organizationId)")
-       TPStreamsSDK.initialize(withOrgCode: organizationId as String)
+       DispatchQueue.main.async {
+        TPStreamsSDK.initialize(withOrgCode: organizationId as String)
+       }
        isInitialized = true
      }
    }
 
    @objc
    static func requiresMainQueueSetup() -> Bool {
-     return false
+     return true
    }
 }
