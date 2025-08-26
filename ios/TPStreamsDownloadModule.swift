@@ -128,7 +128,6 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
                 reject("ERROR", "Module deallocated", nil)
                 return
             }
-            print("pauseDownload called for videoId: \(videoId)")
             self.downloadManager.pauseDownload(videoId)
             resolve(nil)
         }
@@ -154,7 +153,6 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
                 return
             }
             self.downloadManager.deleteDownload(videoId)
-            print("removeDownload called for videoId: \(videoId)")
             resolve(nil)
         }
     }
