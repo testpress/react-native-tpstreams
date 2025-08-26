@@ -12,8 +12,8 @@ class TPStreamsModule: NSObject {
        print("Initializing TPStreamsSDK with org code: \(organizationId)")
        DispatchQueue.main.async {
         TPStreamsSDK.initialize(withOrgCode: organizationId as String)
+        self.isInitialized = true
        }
-       isInitialized = true
      }
    }
 
