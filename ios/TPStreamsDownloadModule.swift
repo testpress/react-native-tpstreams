@@ -154,7 +154,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
             }
             if self.downloadManager.isAssetDownloaded(assetID: videoId) {
                 self.downloadManager.deleteDownload(videoId)
-            }else{
+            } else {
                 self.downloadManager.cancelDownload(videoId)
             }
             resolve(nil)
