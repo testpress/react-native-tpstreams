@@ -152,7 +152,11 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
                 reject("ERROR", "Module deallocated", nil)
                 return
             }
-            self.downloadManager.deleteDownload(videoId)
+            if self.downloadManager.isAssetDownloaded(assetID: videoId) {
+                self.downloadManager.deleteDownload(videoId)
+            } else {
+                self.downloadManager.cancelDownload(videoId)
+            }
             resolve(nil)
         }
     }
