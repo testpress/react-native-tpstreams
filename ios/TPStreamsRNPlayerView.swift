@@ -11,7 +11,6 @@ class TPStreamsRNPlayerView: UIView {
     private var playerViewController: TPStreamPlayerViewController?
     private var playerStatusObserver: NSKeyValueObservation?
     private var setupScheduled = false
-    private var currentItemChangeObservation: NSKeyValueObservation?
     
     @objc var videoId: NSString = ""
     @objc var accessToken: NSString = ""
@@ -54,7 +53,6 @@ class TPStreamsRNPlayerView: UIView {
     }
 
     private func schedulePlayerSetup() {
-        guard videoId.length > 0, accessToken.length > 0 else { return }
         guard !setupScheduled else { return }
         
         setupScheduled = true
@@ -70,6 +68,12 @@ class TPStreamsRNPlayerView: UIView {
             ? createOfflinePlayer()
             : createOnlinePlayer()
         
+        guard player != nil else {
+            print("Failed to create player - invalid videoId or accessToken")
+            setupScheduled = false
+            return
+        }
+
         configurePlayerView()
         observePlayerChanges()
         setupScheduled = false
@@ -85,16 +89,17 @@ class TPStreamsRNPlayerView: UIView {
     
     private func removeObservers() {
         playerStatusObserver?.invalidate()
-        currentItemChangeObservation?.invalidate()
     }
     
-    private func createOfflinePlayer() -> TPAVPlayer {
+    private func createOfflinePlayer() -> TPAVPlayer? {
+        guard videoId.length > 0 else { return nil }
         return TPAVPlayer(offlineAssetId: videoId as String) { [weak self] error in
             self?.handlePlayerError(error, context: "Offline setup")
         }
     }
     
-    private func createOnlinePlayer() -> TPAVPlayer {
+    private func createOnlinePlayer() -> TPAVPlayer? {
+        guard videoId.length > 0, accessToken.length > 0 else { return nil }
         return TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { [weak self] error in
             self?.handlePlayerError(error, context: "Online setup")
         }
@@ -153,7 +158,6 @@ class TPStreamsRNPlayerView: UIView {
         
     private func observePlayerChanges() {
         setupSeekObserver()
-        setupCurrentItemObserver()
     }
     
     private func setupSeekObserver() {
@@ -164,14 +168,6 @@ class TPStreamsRNPlayerView: UIView {
             self.seekTo(position: self.startAt * 1000.0)
             self.playerStatusObserver?.invalidate()
             self.playerStatusObserver = nil
-        }
-    }
-    
-    private func setupCurrentItemObserver() {
-        guard let player = player else { return }
-        
-        currentItemChangeObservation = player.observe(\.currentItem, options: [.new]) { [weak self] (_, _) in
-            guard let self = self else { return }
         }
     }
     
@@ -192,7 +188,8 @@ class TPStreamsRNPlayerView: UIView {
     
     @objc func getCurrentPosition() {
         guard let player = player else {
-            onCurrentPosition?(["position": 0]); return
+            onCurrentPosition?(["position": 0])
+            return
         }
         let positionMs = CMTimeGetSeconds(player.currentTime()) * 1000
         onCurrentPosition?(["position": positionMs])
@@ -200,7 +197,8 @@ class TPStreamsRNPlayerView: UIView {
     
     @objc func getDuration() {
         guard let duration = player?.currentItem?.duration else {
-            onDuration?(["duration": 0]); return
+            onDuration?(["duration": 0])
+            return
         }
         let durationMs = CMTimeGetSeconds(duration) * 1000
         onDuration?(["duration": durationMs])
