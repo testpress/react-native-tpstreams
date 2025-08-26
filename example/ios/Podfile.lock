@@ -1666,7 +1666,7 @@ PODS:
     - Sentry/Core (= 8.50.2)
   - Sentry/Core (8.50.2)
   - SocketRocket (0.7.1)
-  - TPStreamsRNPlayerView (0.2.19):
+  - TPStreamsRNPlayerView (0.2.26):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2007,7 +2007,7 @@ SPEC CHECKSUMS:
   RealmSwift: 7c258367cc498594aa989b7d9620989a276ad7f4
   Sentry: d95f5f3b32d01324b3e27d3c52747005302cc026
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  TPStreamsRNPlayerView: 3b8fa6213860dab88ef724aa170fbe29522e1b96
+  TPStreamsRNPlayerView: 6ba8d0d5360695323f8e415833ac12979a587834
   TPStreamsSDK: 941499388576b2b6b2cf2f96aea259f410e2a410
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
