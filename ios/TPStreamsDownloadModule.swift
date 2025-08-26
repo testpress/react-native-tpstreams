@@ -162,15 +162,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     @objc
     func isDownloaded(_ videoId: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else {
-                reject("ERROR", "Module deallocated", nil)
-                return
-            }
-            let offlineAssets = self.downloadManager.getAllOfflineAssets()
-            let isDownloaded = offlineAssets.contains { asset in
-                asset.assetId == videoId && Status(rawValue: asset.status) == .finished
-            }
-            resolve(isDownloaded)
+            resolve(self?.downloadManager.isAssetDownloaded(assetID: videoId) ?? false)
         }
     }
     
@@ -216,7 +208,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
             if let asset = offlineAssets.first(where: { $0.assetId == videoId }) {
                 resolve(mapDownloadStatus(Status(rawValue: asset.status)))
             } else {
-                resolve("NotDownloaded")
+                resolve(PlayerConstants.statusNotDownloaded)
             }
         }
     }
