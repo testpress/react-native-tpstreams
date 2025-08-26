@@ -9,17 +9,18 @@ class TPStreamsRNPlayerView: UIView {
 
     private var player: TPAVPlayer?
     private var playerViewController: TPStreamPlayerViewController?
-
-    private var _videoId: NSString = ""
-    private var _accessToken: NSString = ""
-    private var _shouldAutoPlay: Bool = true
-    private var _startAt: Double = 0
-    private var _enableDownload: Bool = false
-    private var _offlineLicenseExpireTime: Double = 0
-    private var _showDefaultCaptions: Bool = false
-    private var _downloadMetadata: String?
-    private var setupScheduled = false
     private var playerStatusObserver: NSKeyValueObservation?
+    private var setupScheduled = false
+    private var currentItemChangeObservation: NSKeyValueObservation?
+    
+    @objc var videoId: NSString = ""
+    @objc var accessToken: NSString = ""
+    @objc var shouldAutoPlay: Bool = true
+    @objc var startAt: Double = 0
+    @objc var enableDownload: Bool = false
+    @objc var offlineLicenseExpireTime: Double = 0
+    @objc var showDefaultCaptions: Bool = false
+    @objc var downloadMetadata: NSString?
     
     @objc var onCurrentPosition: RCTDirectEventBlock?
     @objc var onDuration: RCTDirectEventBlock?
@@ -31,65 +32,7 @@ class TPStreamsRNPlayerView: UIView {
     @objc var onIsLoadingChanged: RCTDirectEventBlock?
     @objc var onError: RCTDirectEventBlock?
     @objc var onAccessTokenExpired: RCTDirectEventBlock?
-
-    @objc var videoId: NSString {
-        get { _videoId }
-        set {
-            _videoId = newValue
-            schedulePlayerSetup()
-        }
-    }
-
-    @objc var accessToken: NSString {
-        get { _accessToken }
-        set {
-            _accessToken = newValue
-            schedulePlayerSetup()
-        }
-    }
     
-    @objc var shouldAutoPlay: Bool {
-        get { _shouldAutoPlay }
-        set {
-            _shouldAutoPlay = newValue
-        }
-    }
-    
-    @objc var startAt: Double {
-        get { _startAt }
-        set {
-            _startAt = newValue
-        }
-    }
-    
-    @objc var enableDownload: Bool {
-        get { _enableDownload }
-        set {
-            _enableDownload = newValue
-        }
-    }
-    
-    @objc var offlineLicenseExpireTime: Double {
-        get { _offlineLicenseExpireTime }
-        set {
-            _offlineLicenseExpireTime = newValue
-        }
-    }
-    
-    @objc var showDefaultCaptions: Bool {
-        get { _showDefaultCaptions }
-        set {
-            _showDefaultCaptions = newValue
-        }
-    }
-    
-    @objc var downloadMetadata: NSString? {
-        get { _downloadMetadata as NSString? }
-        set {
-            _downloadMetadata = newValue as String?
-        }
-    }
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .black
@@ -104,46 +47,85 @@ class TPStreamsRNPlayerView: UIView {
         super.layoutSubviews()
         playerViewController?.view.frame = bounds
     }
+    
+    override func didSetProps(_ changedProps: [String]!) {
+        super.didSetProps(changedProps)
+        schedulePlayerSetup()
+    }
 
     private func schedulePlayerSetup() {
         guard videoId.length > 0, accessToken.length > 0 else { return }
-
-        if setupScheduled { return }
+        guard !setupScheduled else { return }
+        
         setupScheduled = true
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.setupPlayer()
+        DispatchQueue.main.async { [weak self] in
+            self?.setupPlayer()
         }
     }
-
+    
     private func setupPlayer() {
+        cleanupPlayer()
+        
+        player = TPStreamsDownloadManager.shared.isAssetDownloaded(assetID: videoId as String)
+            ? createOfflinePlayer()
+            : createOnlinePlayer()
+        
+        configurePlayerView()
+        observePlayerChanges()
+        setupScheduled = false
+    }
+    
+    private func cleanupPlayer() {
+        removeObservers()
         playerViewController?.view.removeFromSuperview()
         playerViewController?.removeFromParent()
         playerViewController = nil
         player = nil
+    }
+    
+    private func removeObservers() {
         playerStatusObserver?.invalidate()
-
-        player = TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { error in
-            if let error = error {
-                print("Online setup error: \(error.localizedDescription)")
-                let nsError = error as NSError
-                self.onError?([
-                    "message": "Player initialization failed",
-                    "code": nsError.code,
-                    "details": error.localizedDescription
-                ])
-            }
+        currentItemChangeObservation?.invalidate()
+    }
+    
+    private func createOfflinePlayer() -> TPAVPlayer {
+        return TPAVPlayer(offlineAssetId: videoId as String) { [weak self] error in
+            self?.handlePlayerError(error, context: "Offline setup")
         }
+    }
+    
+    private func createOnlinePlayer() -> TPAVPlayer {
+        return TPAVPlayer(assetID: videoId as String, accessToken: accessToken as String) { [weak self] error in
+            self?.handlePlayerError(error, context: "Online setup")
+        }
+    }
+    
+    private func handlePlayerError(_ error: Error?, context: String) {
+        guard let error = error else { return }
+        let nsError = error as NSError
+        print("\(context) error: \(error.localizedDescription)")
+        onError?([
+            "message": "Player initialization failed",
+            "code": nsError.code,
+            "details": error.localizedDescription
+        ])
+    }
+    
+    private func configurePlayerView() {
+        guard let player = player else { return }
         
-        if startAt > 0 {
-            playerStatusObserver = player?.observe(\.status, options: [.new]) { [weak self] player, _ in
-                guard let self = self, player.status == .readyToPlay else { return }
-                self.seekTo(position: self.startAt*1000.0)
-                self.playerStatusObserver?.invalidate()
-                self.playerStatusObserver = nil
-            }
-        }
-
+        let configBuilder = createPlayerConfigBuilder()
+        let playerVC = TPStreamPlayerViewController()
+        playerVC.player = player
+        playerVC.config = configBuilder.build()
+        
+        attachPlayerViewController(playerVC)
+        
+        if shouldAutoPlay { player.play() }
+        playerViewController = playerVC
+    }
+    
+    private func createPlayerConfigBuilder() -> TPStreamPlayerConfigurationBuilder {
         let configBuilder = TPStreamPlayerConfigurationBuilder()
             .setPreferredForwardDuration(15)
             .setPreferredRewindDuration(5)
@@ -154,27 +136,43 @@ class TPStreamsRNPlayerView: UIView {
             configBuilder.showDownloadOption()
         }
         
-        let config = configBuilder.build()
-
-        let vc = TPStreamPlayerViewController()
-        vc.player = player
-        vc.config = config
-
-        if let parentVC = self.reactViewController() {
-            parentVC.addChild(vc)
-            addSubview(vc.view)
-            vc.view.frame = bounds
-            vc.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            vc.view.isHidden = false
-            bringSubviewToFront(vc.view)
-            vc.didMove(toParent: parentVC)
-        }
-
-        if shouldAutoPlay {
-            player?.play()
-        }
+        return configBuilder
+    }
+    
+    private func attachPlayerViewController(_ playerVC: TPStreamPlayerViewController) {
+        guard let parentVC = reactViewController() else { return }
         
-        playerViewController = vc
+        parentVC.addChild(playerVC)
+        addSubview(playerVC.view)
+        playerVC.view.frame = bounds
+        playerVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        playerVC.view.isHidden = false
+        bringSubviewToFront(playerVC.view)
+        playerVC.didMove(toParent: parentVC)
+    }
+        
+    private func observePlayerChanges() {
+        setupSeekObserver()
+        setupCurrentItemObserver()
+    }
+    
+    private func setupSeekObserver() {
+        guard let player = player, startAt > 0 else { return }
+        
+        playerStatusObserver = player.observe(\.status, options: [.new]) { [weak self] player, _ in
+            guard let self = self, player.status == .readyToPlay else { return }
+            self.seekTo(position: self.startAt * 1000.0)
+            self.playerStatusObserver?.invalidate()
+            self.playerStatusObserver = nil
+        }
+    }
+    
+    private func setupCurrentItemObserver() {
+        guard let player = player else { return }
+        
+        currentItemChangeObservation = player.observe(\.currentItem, options: [.new]) { [weak self] (_, _) in
+            guard let self = self else { return }
+        }
     }
     
     @objc func seekTo(position: Double) {
@@ -184,13 +182,9 @@ class TPStreamsRNPlayerView: UIView {
         player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
     }
     
-    @objc func play() {
-        player?.play()
-    }
-    
-    @objc func pause() {
-        player?.pause()
-    }
+    @objc func play() { player?.play() }
+
+    @objc func pause() { player?.pause() }
     
     @objc func setPlaybackSpeed(_ speed: Float) {
         player?.rate = speed
@@ -198,45 +192,35 @@ class TPStreamsRNPlayerView: UIView {
     
     @objc func getCurrentPosition() {
         guard let player = player else {
-            onCurrentPosition?(["position": 0])
-            return
+            onCurrentPosition?(["position": 0]); return
         }
-        
-        let currentTime = player.currentTime()
-        let positionMs = CMTimeGetSeconds(currentTime) * 1000
+        let positionMs = CMTimeGetSeconds(player.currentTime()) * 1000
         onCurrentPosition?(["position": positionMs])
     }
     
     @objc func getDuration() {
-        guard let player = player, let currentItem = player.currentItem else {
-            onDuration?(["duration": 0])
-            return
+        guard let duration = player?.currentItem?.duration else {
+            onDuration?(["duration": 0]); return
         }
-        
-        let durationMs = CMTimeGetSeconds(currentItem.duration) * 1000
+        let durationMs = CMTimeGetSeconds(duration) * 1000
         onDuration?(["duration": durationMs])
     }
     
     @objc func isPlaying() {
-        guard let player = player else {
-            onIsPlaying?(["isPlaying": false])
-            return
-        }
-        
-        let isPlaying = player.timeControlStatus == .playing
+        let isPlaying = player?.timeControlStatus == .playing
         onIsPlaying?(["isPlaying": isPlaying])
     }
     
     @objc func getPlaybackSpeed() {
-        let speed = player?.rate ?? 1.0
-        onPlaybackSpeed?(["speed": speed])
+        onPlaybackSpeed?(["speed": player?.rate ?? 1.0])
     }
 
     @objc func setNewAccessToken(_ newToken: String) {
-        print("TPStreamsRNPlayerView: setNewAccessToken called with token: \(newToken)")
+        print("New access token set: \(newToken)")
+        // TODO: Reinitialize player with new token if needed
     }
-
+    
     deinit {
-        playerStatusObserver?.invalidate()
+        removeObservers()
     }
 }
