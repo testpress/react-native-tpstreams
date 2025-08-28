@@ -104,11 +104,12 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
         var item: [String: Any] = [:]
         item["videoId"] = asset.assetId
         item["title"] = asset.title
+        item["thumbnailUrl"] = asset.thumbnailURL
         item["totalBytes"] = asset.size
         item["downloadedBytes"] = calculateDownloadedBytes(size: asset.size, progress: asset.percentageCompleted)
         item["progressPercentage"] = asset.percentageCompleted
         item["state"] = mapDownloadStatus(Status(rawValue: asset.status))
-        item["metadata"] = "{}"
+        item["metadata"] = asset.metadata ?? "{}"
         
         return item
     }
