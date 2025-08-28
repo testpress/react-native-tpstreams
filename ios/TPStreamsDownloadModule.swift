@@ -109,7 +109,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
         item["downloadedBytes"] = calculateDownloadedBytes(size: asset.size, progress: asset.percentageCompleted)
         item["progressPercentage"] = asset.percentageCompleted
         item["state"] = mapDownloadStatus(Status(rawValue: asset.status))
-        item["metadata"] = asset.metadata
+        item["metadata"] = asset.metadata ?? "{}"
         
         return item
     }

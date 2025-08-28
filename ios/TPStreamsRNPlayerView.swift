@@ -176,7 +176,6 @@ class TPStreamsRNPlayerView: UIView {
     private func parseMetadataJSON(from jsonString: NSString?) -> [String: String]? {
         guard let metadataString = jsonString as String? else { return nil }
         
-        print("Metadata string: \(metadataString)")
         guard let data = metadataString.data(using: .utf8) else { return nil }
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
