@@ -31,6 +31,8 @@ class TPStreamsRNPlayerView: UIView {
     @objc var onIsLoadingChanged: RCTDirectEventBlock?
     @objc var onError: RCTDirectEventBlock?
     @objc var onAccessTokenExpired: RCTDirectEventBlock?
+
+    private var pendingTokenCompletion: ((String?) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -73,7 +75,7 @@ class TPStreamsRNPlayerView: UIView {
             setupScheduled = false
             return
         }
-
+        setupTokenDelegate()
         configurePlayerView()
         observePlayerChanges()
         setupScheduled = false
@@ -173,6 +175,10 @@ class TPStreamsRNPlayerView: UIView {
         }
     }
 
+    private func setupTokenDelegate() {
+        TPStreamsDownloadModule.shared?.setAccessTokenDelegate(self)
+    }
+
     private func parseMetadataJSON(from jsonString: NSString?) -> [String: String]? {
         guard let metadataString = jsonString as String? else { return nil }
         
@@ -231,10 +237,19 @@ class TPStreamsRNPlayerView: UIView {
 
     @objc func setNewAccessToken(_ newToken: String) {
         print("New access token set: \(newToken)")
-        // TODO: Reinitialize player with new token if needed
+        pendingTokenCompletion?(newToken)
+        pendingTokenCompletion = nil
     }
     
     deinit {
         removeObservers()
+    }
+}
+
+extension TPStreamsRNPlayerView: TokenRequestDelegate {
+    func requestToken(for assetId: String, completion: @escaping (String?) -> Void) {
+        pendingTokenCompletion = completion
+        
+        onAccessTokenExpired?(["videoId": assetId])
     }
 }

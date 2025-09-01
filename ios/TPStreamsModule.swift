@@ -13,8 +13,13 @@ class TPStreamsModule: NSObject {
        DispatchQueue.main.async {
         TPStreamsSDK.initialize(withOrgCode: organizationId as String)
         self.isInitialized = true
+        self.initializeDownloadModule()
        }
      }
+   }
+
+   private func initializeDownloadModule() {
+     let _ = TPStreamsDownloadModule()
    }
 
    @objc
