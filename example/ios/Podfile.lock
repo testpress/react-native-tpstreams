@@ -1666,7 +1666,7 @@ PODS:
     - Sentry/Core (= 8.50.2)
   - Sentry/Core (8.50.2)
   - SocketRocket (0.7.1)
-  - TPStreamsRNPlayerView (1.0.0):
+  - TPStreamsRNPlayerView (1.0.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1689,9 +1689,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - TPStreamsSDK (= 1.2.7)
+    - TPStreamsSDK (= 1.2.8)
     - Yoga
-  - TPStreamsSDK (1.2.7):
+  - TPStreamsSDK (1.2.8):
     - Alamofire (~> 5.9.0)
     - M3U8Kit (~> 1.1.0)
     - ReachabilitySwift (~> 5.2.2)
@@ -2007,8 +2007,8 @@ SPEC CHECKSUMS:
   RealmSwift: 7c258367cc498594aa989b7d9620989a276ad7f4
   Sentry: d95f5f3b32d01324b3e27d3c52747005302cc026
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  TPStreamsRNPlayerView: 17f98aaa841175e62e1ad5efb67c4d60fb936e7a
-  TPStreamsSDK: ad08c81f3e523ef6aa465d864e2714c0a5d582f9
+  TPStreamsRNPlayerView: 53826d5361bcf222998dbe24600697e94b21e6f9
+  TPStreamsSDK: 4f90385c7c2483838cf99982c98ce50de350f830
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
 PODFILE CHECKSUM: 3f7e2acbe0418b2ae4e9fbd9102ff83a37c15215

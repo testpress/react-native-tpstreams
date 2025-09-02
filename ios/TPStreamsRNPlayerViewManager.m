@@ -34,5 +34,6 @@ RCT_EXTERN_METHOD(getCurrentPosition:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(getDuration:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(isPlaying:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(getPlaybackSpeed:(nonnull NSNumber *)node)
+RCT_EXTERN_METHOD(setNewAccessToken:(nonnull NSNumber *)node newToken:(nonnull NSString *)newToken)
 
 @end

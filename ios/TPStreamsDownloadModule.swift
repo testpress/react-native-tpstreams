@@ -11,15 +11,26 @@ private enum PlayerConstants {
     static let statusUnknown = "Unknown"
 }
 
+protocol TokenRequestDelegate: AnyObject {
+    func requestToken(for assetId: String, completion: @escaping (String?) -> Void)
+}
+
 @objc(TPStreamsDownload)
 class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     private let downloadManager = TPStreamsDownloadManager.shared
     private var isListening = false
+    private var tokenDelegate: TokenRequestDelegate?
+    static var shared: TPStreamsDownloadModule?
     
     override init() {
         super.init()
         downloadManager.setTPStreamsDownloadDelegate(tpStreamsDownloadDelegate: self)
+        TPStreamsDownloadModule.shared = self
+    }
+
+    func setAccessTokenDelegate(_ delegate: TokenRequestDelegate) {
+        self.tokenDelegate = delegate
     }
     
     @objc
@@ -84,6 +95,14 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     func onCanceled(assetId: String) {
         if isListening {
             notifyDownloadsChange()
+        }
+    }
+
+    func onRequestNewAccessToken(assetId: String, completion: @escaping (String?) -> Void) {
+         if let delegate = tokenDelegate {
+            delegate.requestToken(for: assetId, completion: completion)
+        } else {
+            completion(nil)
         }
     }
     
