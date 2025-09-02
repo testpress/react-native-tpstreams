@@ -236,7 +236,6 @@ class TPStreamsRNPlayerView: UIView {
     }
 
     @objc func setNewAccessToken(_ newToken: String) {
-        print("New access token set: \(newToken)")
         pendingTokenCompletion?(newToken)
         pendingTokenCompletion = nil
     }
