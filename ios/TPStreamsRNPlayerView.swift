@@ -83,14 +83,19 @@ class TPStreamsRNPlayerView: UIView {
     
     private func cleanupPlayer() {
         removeObservers()
+        player?.pause()
+        
         playerViewController?.view.removeFromSuperview()
         playerViewController?.removeFromParent()
         playerViewController = nil
+        
+        player?.replaceCurrentItem(with: nil)
         player = nil
     }
     
     private func removeObservers() {
         playerStatusObserver?.invalidate()
+        playerStatusObserver = nil
     }
     
     private func createOfflinePlayer() -> TPAVPlayer? {
@@ -239,9 +244,16 @@ class TPStreamsRNPlayerView: UIView {
         pendingTokenCompletion?(newToken)
         pendingTokenCompletion = nil
     }
+
+    override func willMove(toSuperview newSuperview: UIView?) {
+        if newSuperview == nil {
+            cleanupPlayer()
+        }
+        super.willMove(toSuperview: newSuperview)
+    }
     
     deinit {
-        removeObservers()
+        cleanupPlayer()
     }
 }
 
