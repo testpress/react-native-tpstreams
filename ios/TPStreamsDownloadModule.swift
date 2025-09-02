@@ -20,7 +20,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     private let downloadManager = TPStreamsDownloadManager.shared
     private var isListening = false
-    private weak var tokenDelegate: TokenRequestDelegate?
+    private var tokenDelegate: TokenRequestDelegate?
     static var shared: TPStreamsDownloadModule?
     
     override init() {

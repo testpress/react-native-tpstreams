@@ -248,8 +248,11 @@ class TPStreamsRNPlayerView: UIView {
 
 extension TPStreamsRNPlayerView: TokenRequestDelegate {
     func requestToken(for assetId: String, completion: @escaping (String?) -> Void) {
+        guard let onAccessTokenExpired = onAccessTokenExpired else {
+            completion(nil)
+            return
+        }
         pendingTokenCompletion = completion
-        
-        onAccessTokenExpired?(["videoId": assetId])
+        onAccessTokenExpired(["videoId": assetId])
     }
 }
