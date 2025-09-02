@@ -83,17 +83,13 @@ class TPStreamsRNPlayerView: UIView {
     
     private func cleanupPlayer() {
         removeObservers()
-        if let player = player {
-            player.pause()
-        }
+        player?.pause()
         
         playerViewController?.view.removeFromSuperview()
         playerViewController?.removeFromParent()
         playerViewController = nil
         
-        if let player = player {
-            player.replaceCurrentItem(with: nil)
-        }
+        player?.replaceCurrentItem(with: nil)
         player = nil
     }
     
