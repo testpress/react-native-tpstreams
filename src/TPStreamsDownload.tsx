@@ -19,6 +19,16 @@ export type DownloadProgressListener = (
   downloads: DownloadProgressChange[]
 ) => void;
 
+export interface DownloadError {
+  message: string;
+  type: string;
+}
+
+export type DownloadStateChangeListener = (
+  downloadItem: DownloadItem,
+  error: DownloadError | null
+) => void;
+
 const downloadEventEmitter = new NativeEventEmitter(TPStreamsDownload);
 
 export function addDownloadProgressListener(): Promise<void> {
@@ -36,6 +46,14 @@ export function onDownloadProgressChanged(
     'onDownloadProgressChanged',
     listener
   );
+}
+
+export function onDownloadStateChanged(
+  listener: DownloadStateChangeListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadStateChanged', (event) => {
+    listener(event.downloadItem, event.error);
+  });
 }
 
 export function pauseDownload(videoId: string): Promise<void> {
