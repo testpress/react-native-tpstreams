@@ -6,6 +6,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.tpstreams.player.download.DownloadClient
 import com.tpstreams.player.download.DownloadItem
@@ -68,29 +69,54 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
             
             val result = Arguments.createArray()
             for (item in currentDownloads) {
-                val map = Arguments.createMap()
-                map.putString("videoId", item.assetId)
-                map.putString("title", item.title)
-                item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
-                map.putDouble("totalBytes", item.totalBytes.toDouble())
-                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
-                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
-                
-                val metadataJson = org.json.JSONObject()
-                item.metadata.forEach { (key, value) ->
-                    metadataJson.put(key, value)
-                }
-                map.putString("metadata", metadataJson.toString())
-                
+                val map = createDownloadItemMap(item)
                 result.pushMap(map)
             }
-            
             emitEvent("onDownloadProgressChanged", result)
-                
         } catch (e: Exception) {
             Log.e(TAG, "Error in onDownloadsChanged: ${e.message}", e)
         }
+    }
+
+    override fun onDownloadStateChanged(downloadItem: DownloadItem, error: Exception?) {
+        try {  
+            val map = Arguments.createMap()
+            val downloadItemMap = createDownloadItemMap(downloadItem)
+            map.putMap("downloadItem", downloadItemMap)
+            
+            if (error != null) {
+                val errorMap = Arguments.createMap()
+                errorMap.putString("message", error.message ?: "Unknown error")
+                errorMap.putString("type", error.javaClass.simpleName)
+                map.putMap("error", errorMap)
+            } else {
+                map.putNull("error")
+            }
+            
+            emitEvent("onDownloadStateChanged", map)
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadStateChanged: ${e.message}", e)
+        }
+    }
+
+    private fun createDownloadItemMap(item: DownloadItem): WritableMap {
+        val map = Arguments.createMap()
+        map.putString("videoId", item.assetId)
+        map.putString("title", item.title)
+        item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
+        map.putDouble("totalBytes", item.totalBytes.toDouble())
+        map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
+        map.putDouble("progressPercentage", item.progressPercentage.toDouble())
+        map.putString("state", downloadClient.getDownloadStatus(item.assetId))
+        
+        val metadataJson = org.json.JSONObject()
+        item.metadata.forEach { (key, value) ->
+            metadataJson.put(key, value)
+        }
+        map.putString("metadata", metadataJson.toString())
+        
+        return map
     }
 
     private fun emitEvent(eventName: String, data: Any) {
@@ -183,23 +209,7 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
             val result = Arguments.createArray()
             
             for (item in downloadItems) {
-                val map = Arguments.createMap()
-                map.putString("videoId", item.assetId)
-                map.putString("title", item.title)
-                item.thumbnailUrl?.let { map.putString("thumbnailUrl", it) }
-                map.putDouble("totalBytes", item.totalBytes.toDouble())
-                map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
-                map.putDouble("progressPercentage", item.progressPercentage.toDouble())
-                map.putString("state", downloadClient.getDownloadStatus(item.assetId))
-                
-                try {
-                    val metadataJson = org.json.JSONObject(item.metadata as Map<*, *>)
-                    map.putString("metadata", metadataJson.toString())
-                } catch (e: Exception) {
-                    Log.w(TAG, "Error serializing metadata for item ${item.assetId}: ${e.message}")
-                    map.putString("metadata", "{}")
-                }
-                
+                val map = createDownloadItemMap(item)
                 result.pushMap(map)
             }
             

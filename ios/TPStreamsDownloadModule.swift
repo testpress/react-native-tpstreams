@@ -3,11 +3,13 @@ import React
 import TPStreamsSDK
 
 private enum PlayerConstants {
-    static let statusNotDownloaded = "NotDownloaded"
+    static let statusQueued = "Queued"
     static let statusDownloading = "Downloading"
     static let statusPaused = "Paused"
     static let statusCompleted = "Completed"
     static let statusFailed = "Failed"
+    static let statusRemoving = "Removing"
+    static let statusRestarting = "Restarting"
     static let statusUnknown = "Unknown"
 }
 
@@ -64,36 +66,46 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     func onDelete(assetId: String) {
         if isListening {
+            if let offlineAsset = getOfflineAsset(assetId: assetId) {
+                notifyDownloadStateChanged(offlineAsset: offlineAsset)
+            }
             notifyDownloadsChange()
         }
     }
     
     func onStart(offlineAsset: OfflineAsset) {
         if isListening {
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onComplete(offlineAsset: OfflineAsset) {
         if isListening {
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onPause(offlineAsset: OfflineAsset) {
         if isListening {
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onResume(offlineAsset: OfflineAsset) {
         if isListening {
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onCanceled(assetId: String) {
         if isListening {
+            if let offlineAsset = getOfflineAsset(assetId: assetId) {
+                notifyDownloadStateChanged(offlineAsset: offlineAsset)
+            }
             notifyDownloadsChange()
         }
     }
@@ -111,6 +123,28 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
             guard let self = self else { return }
             let downloadAssets = self.getAllDownloadItems()
             self.sendEvent(withName: "onDownloadProgressChanged", body: downloadAssets)
+        }
+    }
+    
+    private func notifyDownloadStateChanged(offlineAsset: OfflineAsset, error: Error? = nil) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let downloadItem = self.mapOfflineAssetToDict(offlineAsset)
+            
+            var eventData: [String: Any] = [:]
+            eventData["downloadItem"] = downloadItem
+            
+            if let error = error {
+                eventData["error"] = [
+                    "message": error.localizedDescription,
+                    "type": String(describing: type(of: error))
+                ]
+            } else {
+                eventData["error"] = NSNull()
+            }
+            
+            self.sendEvent(withName: "onDownloadStateChanged", body: eventData)
         }
     }
     
@@ -230,7 +264,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
             if let asset = offlineAssets.first(where: { $0.assetId == videoId }) {
                 resolve(mapDownloadStatus(Status(rawValue: asset.status)))
             } else {
-                resolve(PlayerConstants.statusNotDownloaded)
+                resolve(PlayerConstants.statusUnknown)
             }
         }
     }
@@ -260,13 +294,17 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
         case .failed:
             return PlayerConstants.statusFailed
         default:
-            return PlayerConstants.statusNotDownloaded
+            return PlayerConstants.statusUnknown
         }
+    }
+
+    private func getOfflineAsset(assetId: String) -> OfflineAsset? {
+        return downloadManager.getAllOfflineAssets().first(where: { $0.assetId == assetId })
     }
 
     @objc
     override func supportedEvents() -> [String] {
-        return ["onDownloadProgressChanged"]
+        return ["onDownloadProgressChanged", "onDownloadStateChanged"]
     }
     
     @objc
