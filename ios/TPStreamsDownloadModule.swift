@@ -60,9 +60,6 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     func onStateChange(status: Status, offlineAsset: OfflineAsset) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: offlineAsset.assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
             notifyDownloadsChange()
         }
     }
@@ -78,36 +75,28 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     func onStart(offlineAsset: OfflineAsset) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: offlineAsset.assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onComplete(offlineAsset: OfflineAsset) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: offlineAsset.assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onPause(offlineAsset: OfflineAsset) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: offlineAsset.assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
     
     func onResume(offlineAsset: OfflineAsset) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: offlineAsset.assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
+            notifyDownloadStateChanged(offlineAsset: offlineAsset)
             notifyDownloadsChange()
         }
     }
