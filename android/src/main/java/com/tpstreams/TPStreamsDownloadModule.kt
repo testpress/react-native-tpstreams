@@ -109,13 +109,8 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
         map.putDouble("downloadedBytes", item.downloadedBytes.toDouble())
         map.putDouble("progressPercentage", item.progressPercentage.toDouble())
         map.putString("state", downloadClient.getDownloadStatus(item.assetId))
-        
-        val metadataJson = org.json.JSONObject()
-        item.metadata.forEach { (key, value) ->
-            metadataJson.put(key, value)
-        }
-        map.putString("metadata", metadataJson.toString())
-        
+        val parsedMetadata = JsonUtils.parseJsonString(item.metadata)
+        map.putMap("metadata", Arguments.makeNativeMap(parsedMetadata))
         return map
     }
 
