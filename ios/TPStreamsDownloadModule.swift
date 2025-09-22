@@ -23,12 +23,16 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     private let downloadManager = TPStreamsDownloadManager.shared
     private var isListening = false
     private var tokenDelegate: TokenRequestDelegate?
-    static var shared: TPStreamsDownloadModule?
-    
+    private static var _shared: TPStreamsDownloadModule?
+
+    static var shared: TPStreamsDownloadModule? {
+        return _shared
+    }
+
     override init() {
         super.init()
+        TPStreamsDownloadModule._shared = self
         downloadManager.setTPStreamsDownloadDelegate(tpStreamsDownloadDelegate: self)
-        TPStreamsDownloadModule.shared = self
     }
 
     func setAccessTokenDelegate(_ delegate: TokenRequestDelegate) {

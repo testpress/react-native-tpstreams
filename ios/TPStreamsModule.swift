@@ -9,7 +9,6 @@ class TPStreamsModule: NSObject {
 
    @objc func initialize(_ organizationId: NSString) {
      if !isInitialized {
-       print("Initializing TPStreamsSDK with org code: \(organizationId)")
        DispatchQueue.main.async {
         TPStreamsSDK.initialize(withOrgCode: organizationId as String)
         self.isInitialized = true
@@ -19,7 +18,7 @@ class TPStreamsModule: NSObject {
    }
 
    private func initializeDownloadModule() {
-     let _ = TPStreamsDownloadModule()
+     _ = TPStreamsDownloadModule.shared
    }
 
    @objc
