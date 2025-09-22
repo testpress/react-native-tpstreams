@@ -47,6 +47,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     @objc
     func addDownloadProgressListener(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         isListening = true
+        notifyDownloadsChange()
         resolve(nil)
     }
     
