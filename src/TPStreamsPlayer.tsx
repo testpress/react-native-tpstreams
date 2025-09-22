@@ -40,7 +40,7 @@ export interface TPStreamsPlayerProps extends ViewProps {
   enableDownload?: boolean;
   offlineLicenseExpireTime?: number;
   showDefaultCaptions?: boolean;
-  downloadMetadata?: { [key: string]: string };
+  downloadMetadata?: { [key: string]: any };
   onPlayerStateChanged?: (state: number) => void;
   onIsPlayingChanged?: (isPlaying: boolean) => void;
   onPlaybackSpeedChanged?: (speed: number) => void;

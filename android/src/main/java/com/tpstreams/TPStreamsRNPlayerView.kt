@@ -30,7 +30,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var startAt: Long = 0
     private var showDefaultCaptions: Boolean = false
     private var enableDownload: Boolean = false
-    private var downloadMetadata: Map<String, String>? = null
+    private var downloadMetadata: Map<String, Any>? = null
     private var offlineLicenseExpireTime: Long = DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
     private var accessTokenCallback: ((String) -> Unit)? = null
 
@@ -87,7 +87,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         this.enableDownload = enableDownload
     }
     
-    fun setDownloadMetadata(metadata: Map<String, String>?) {
+    fun setDownloadMetadata(metadata: Map<String, Any>?) {
         this.downloadMetadata = metadata
     }
     
@@ -116,7 +116,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 startAt,
                 enableDownload, 
                 showDefaultCaptions,
-                downloadMetadata,
+                downloadMetadata?.mapValues { it.value.toString() },
                 offlineLicenseExpireTime
             )
             
