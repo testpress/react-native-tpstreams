@@ -184,12 +184,12 @@ class TPStreamsRNPlayerView: UIView {
         TPStreamsDownloadModule.shared?.setAccessTokenDelegate(self)
     }
 
-    private func parseMetadataJSON(from jsonString: NSString?) -> [String: String]? {
+    private func parseMetadataJSON(from jsonString: NSString?) -> [String: Any]? {
         guard let metadataString = jsonString as String? else { return nil }
         
         guard let data = metadataString.data(using: .utf8) else { return nil }
         do {
-            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                 return json
             }
         } catch {

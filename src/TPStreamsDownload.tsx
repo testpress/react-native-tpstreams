@@ -11,7 +11,7 @@ export interface DownloadItem {
   downloadedBytes: number;
   progressPercentage: number;
   state: string;
-  metadata: string;
+  metadata: string | Record<string, any>;
 }
 
 export type DownloadProgressChange = DownloadItem;
