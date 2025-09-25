@@ -10,6 +10,9 @@ class TPStreamsRNPlayerView: UIView {
     private var player: TPAVPlayer?
     private var playerViewController: TPStreamPlayerViewController?
     private var playerStatusObserver: NSKeyValueObservation?
+    private var playbackSpeedObserver: NSKeyValueObservation?
+    private var timeControlStatusObserver: NSKeyValueObservation?
+    private var playerStateObserver: NSKeyValueObservation?
     private var setupScheduled = false
     
     @objc var videoId: NSString = ""
@@ -25,6 +28,7 @@ class TPStreamsRNPlayerView: UIView {
     @objc var onDuration: RCTDirectEventBlock?
     @objc var onIsPlaying: RCTDirectEventBlock?
     @objc var onPlaybackSpeed: RCTDirectEventBlock?
+    
     @objc var onPlayerStateChanged: RCTDirectEventBlock?
     @objc var onIsPlayingChanged: RCTDirectEventBlock?
     @objc var onPlaybackSpeedChanged: RCTDirectEventBlock?
@@ -96,6 +100,12 @@ class TPStreamsRNPlayerView: UIView {
     private func removeObservers() {
         playerStatusObserver?.invalidate()
         playerStatusObserver = nil
+        playbackSpeedObserver?.invalidate()
+        playbackSpeedObserver = nil
+        timeControlStatusObserver?.invalidate()
+        timeControlStatusObserver = nil
+        playerStateObserver?.invalidate()
+        playerStateObserver = nil
     }
     
     private func createOfflinePlayer() -> TPAVPlayer? {
@@ -167,6 +177,9 @@ class TPStreamsRNPlayerView: UIView {
         
     private func observePlayerChanges() {
         setupSeekObserver()
+        setupPlaybackSpeedObserver()
+        setupPlayingStateObserver()
+        setupPlayerStateObserver()
     }
     
     private func setupSeekObserver() {
@@ -180,6 +193,51 @@ class TPStreamsRNPlayerView: UIView {
         }
     }
 
+    private func setupPlaybackSpeedObserver() {
+        guard let player = player else { return }
+        
+        playbackSpeedObserver = player.observe(\.rate, options: [.new, .initial]) { [weak self] player, _ in
+            DispatchQueue.main.async {
+                self?.onPlaybackSpeedChanged?(["speed": Double(player.rate)])
+            }
+        }
+    }
+
+    private func setupPlayingStateObserver() {
+        guard let player = player else { return }
+        
+        timeControlStatusObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
+            DispatchQueue.main.async {
+                let isPlaying = player.timeControlStatus == .playing
+                self?.onIsPlayingChanged?(["isPlaying": isPlaying])
+            }
+        }
+    }
+    
+    private func setupPlayerStateObserver() {
+        guard let player = player else { return }
+        
+        playerStateObserver = player.observe(\.status, options: [.new, .initial]) { [weak self] player, _ in
+            DispatchQueue.main.async {
+                let state = self?.mapPlayerStateToInteger(player.status) ?? 0
+                self?.onPlayerStateChanged?(["playbackState": state])
+            }
+        }
+    }
+
+    private func mapPlayerStateToInteger(_ status: AVPlayer.Status) -> Int {
+        switch status {
+        case .unknown:
+            return 0
+        case .readyToPlay:
+            return 3
+        case .failed:
+            return 0
+        @unknown default:
+            return 0
+        }
+    }
+    
     private func setupTokenDelegate() {
         TPStreamsDownloadModule.shared?.setAccessTokenDelegate(self)
     }
