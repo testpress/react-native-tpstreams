@@ -53,6 +53,9 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 ### Player Methods
 
 ```js
+import { useRef } from 'react';
+import type { TPStreamsPlayerRef } from 'react-native-tpstreams';
+
 const playerRef = useRef<TPStreamsPlayerRef>(null);
 
 // Control playback
@@ -61,11 +64,15 @@ playerRef.current?.pause();
 playerRef.current?.seekTo(30000); // 30 seconds
 playerRef.current?.setPlaybackSpeed(2.0);
 
-// Get player state
-const position = await playerRef.current?.getCurrentPosition();
-const duration = await playerRef.current?.getDuration();
-const isPlaying = await playerRef.current?.isPlaying();
-const speed = await playerRef.current?.getPlaybackSpeed();
+// Get player state (inside an async function)
+const getPlayerState = async () => {
+  const position = await playerRef.current?.getCurrentPosition();
+  const duration = await playerRef.current?.getDuration();
+  const isPlaying = await playerRef.current?.isPlaying();
+  const speed = await playerRef.current?.getPlaybackSpeed();
+  
+  return { position, duration, isPlaying, speed };
+};
 ```
 
 ### Player Events
@@ -99,17 +106,34 @@ import {
 } from 'react-native-tpstreams';
 
 // Check download status
-const downloaded = await isDownloaded('video-id');
-const downloading = await isDownloading('video-id');
-const status = await getDownloadStatus('video-id');
+const checkDownloadStatus = async (videoId) => {
+  const downloaded = await isDownloaded(videoId);
+  const downloading = await isDownloading(videoId);
+  const status = await getDownloadStatus(videoId);
+  
+  return { downloaded, downloading, status };
+};
 
 // Manage downloads
-await pauseDownload('video-id');
-await resumeDownload('video-id');
-await removeDownload('video-id');
+const manageDownload = async (videoId, action) => {
+  switch (action) {
+    case 'pause':
+      await pauseDownload(videoId);
+      break;
+    case 'resume':
+      await resumeDownload(videoId);
+      break;
+    case 'remove':
+      await removeDownload(videoId);
+      break;
+  }
+};
 
 // Get all downloads
-const downloads = await getAllDownloads();
+const getAllDownloadedVideos = async () => {
+  const downloads = await getAllDownloads();
+  return downloads;
+};
 ```
 
 ### Real-time Progress
