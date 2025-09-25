@@ -146,7 +146,9 @@ import {
 } from 'react-native-tpstreams';
 
 // Start listening
-await addDownloadProgressListener();
+async function startListening() {
+  await addDownloadProgressListener();
+}
 
 // Listen for updates
 const subscription = onDownloadProgressChanged((downloads) => {
@@ -154,8 +156,10 @@ const subscription = onDownloadProgressChanged((downloads) => {
 });
 
 // Cleanup
-subscription.remove();
-await removeDownloadProgressListener();
+async function cleanup() {
+  subscription.remove();
+  await removeDownloadProgressListener();
+}
 ```
 
 ## Resources
