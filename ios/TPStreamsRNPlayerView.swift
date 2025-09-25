@@ -7,6 +7,13 @@ import AVFoundation
 @objc(TPStreamsRNPlayerView)
 class TPStreamsRNPlayerView: UIView {
 
+    private enum PlaybackState: Int {
+        case idle = 1
+        case buffering = 2
+        case ready = 3
+        case ended = 4
+    }
+
     private var player: TPAVPlayer?
     private var playerViewController: TPStreamPlayerViewController?
     private var playerStatusObserver: NSKeyValueObservation?
@@ -198,7 +205,7 @@ class TPStreamsRNPlayerView: UIView {
         
         playbackSpeedObserver = player.observe(\.rate, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
-                self?.onPlaybackSpeedChanged?(["speed": Double(player.rate)])
+                self?.onPlaybackSpeedChanged?(["speed": player.rate])
             }
         }
     }
@@ -219,22 +226,22 @@ class TPStreamsRNPlayerView: UIView {
         
         playerStateObserver = player.observe(\.status, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
-                let state = self?.mapPlayerStateToInteger(player.status) ?? 0
+                let state = self?.mapPlayerStateToAndroid(player.status) ?? PlaybackState.idle.rawValue
                 self?.onPlayerStateChanged?(["playbackState": state])
             }
         }
     }
 
-    private func mapPlayerStateToInteger(_ status: AVPlayer.Status) -> Int {
+    private func mapPlayerStateToAndroid(_ status: AVPlayer.Status) -> Int {
         switch status {
         case .unknown:
-            return 0
+            return PlaybackState.idle.rawValue
         case .readyToPlay:
-            return 3
+            return PlaybackState.ready.rawValue
         case .failed:
-            return 0
+            return PlaybackState.idle.rawValue
         @unknown default:
-            return 0
+            return PlaybackState.idle.rawValue
         }
     }
     
