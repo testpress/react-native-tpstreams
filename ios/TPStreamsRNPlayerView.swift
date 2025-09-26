@@ -184,9 +184,9 @@ class TPStreamsRNPlayerView: UIView {
         
     private func observePlayerChanges() {
         setupSeekObserver()
+        setupPlayerStateObserver()
         setupPlaybackSpeedObserver()
         setupPlayingStateObserver()
-        setupPlayerStateObserver()
     }
     
     private func setupSeekObserver() {
@@ -203,7 +203,7 @@ class TPStreamsRNPlayerView: UIView {
     private func setupPlaybackSpeedObserver() {
         guard let player = player else { return }
         
-        playbackSpeedObserver = player.observe(\.rate, options: [.new, .initial]) { [weak self] player, _ in
+        playbackSpeedObserver = player.observe(\.rate, options: [.new]) { [weak self] player, _ in
             DispatchQueue.main.async {
                 self?.onPlaybackSpeedChanged?(["speed": player.rate])
             }
@@ -230,13 +230,23 @@ class TPStreamsRNPlayerView: UIView {
                 self?.onPlayerStateChanged?(["playbackState": state])
             }
         }
+        
+        timeControlStatusObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
+            DispatchQueue.main.async {
+                let state = self?.mapPlayerStateToAndroid(player.status, timeControlStatus: player.timeControlStatus) ?? PlaybackState.idle.rawValue
+                self?.onPlayerStateChanged?(["playbackState": state])
+            }
+        }
     }
 
-    private func mapPlayerStateToAndroid(_ status: AVPlayer.Status) -> Int {
+    private func mapPlayerStateToAndroid(_ status: AVPlayer.Status, timeControlStatus: AVPlayer.TimeControlStatus? = nil) -> Int {
         switch status {
         case .unknown:
             return PlaybackState.idle.rawValue
         case .readyToPlay:
+            if timeControlStatus == .waitingToPlayAtSpecifiedRate {
+                return PlaybackState.buffering.rawValue
+            }
             return PlaybackState.ready.rawValue
         case .failed:
             return PlaybackState.idle.rawValue
