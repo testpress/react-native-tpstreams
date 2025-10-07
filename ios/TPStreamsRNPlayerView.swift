@@ -4,6 +4,8 @@ import CoreMedia
 import React
 import AVFoundation
 
+let ERROR_CODE_DRM_LICENSE_EXPIRED = 5100
+
 @objc(TPStreamsRNPlayerView)
 class TPStreamsRNPlayerView: UIView {
 
@@ -21,6 +23,7 @@ class TPStreamsRNPlayerView: UIView {
     private var timeControlStatusObserver: NSKeyValueObservation?
     private var playerStateObserver: NSKeyValueObservation?
     private var setupScheduled = false
+    private var pendingOfflineCredentialsCompletion: ((String?, Double) -> Void)?
     
     @objc var videoId: NSString = ""
     @objc var accessToken: NSString = ""
@@ -142,6 +145,15 @@ class TPStreamsRNPlayerView: UIView {
     
     private func configurePlayerView() {
         guard let player = player else { return }
+        player.onRequestOfflineLicenseRenewal = { [weak self] assetId, completion in
+            guard let self = self else {
+                completion(nil, 0)
+                return
+            }
+            self.sendErrorEvent("Playback error", ERROR_CODE_DRM_LICENSE_EXPIRED, "Offline DRM license expired")
+            self.pendingOfflineCredentialsCompletion = completion
+            self.onAccessTokenExpired?(["videoId": assetId])
+        }
         
         let configBuilder = createPlayerConfigBuilder()
         let playerVC = TPStreamPlayerViewController()
@@ -162,6 +174,10 @@ class TPStreamsRNPlayerView: UIView {
             .setprogressBarThumbColor(.systemBlue)
             .setwatchedProgressTrackColor(.systemBlue)
             .setDownloadMetadata(metadataDict)
+
+        if offlineLicenseExpireTime != nil && offlineLicenseExpireTime > 0 {
+            configBuilder.setLicenseDurationSeconds(offlineLicenseExpireTime)
+        }
         
         if enableDownload {
             configBuilder.showDownloadOption()
@@ -237,6 +253,14 @@ class TPStreamsRNPlayerView: UIView {
                 self?.onPlayerStateChanged?(["playbackState": state])
             }
         }
+    }
+
+    private func sendErrorEvent(_ message: String, _ code: Int, _ details: String) {
+        onError?([
+            "message": message,
+            "code": code,
+            "details": details
+        ])
     }
 
     private func mapPlayerStateToAndroid(_ status: AVPlayer.Status, timeControlStatus: AVPlayer.TimeControlStatus? = nil) -> Int {
@@ -318,6 +342,12 @@ class TPStreamsRNPlayerView: UIView {
     @objc func setNewAccessToken(_ newToken: String) {
         pendingTokenCompletion?(newToken)
         pendingTokenCompletion = nil
+        
+        if let OfflineLicenseRenewalCompletion = pendingOfflineCredentialsCompletion {
+            let duration = offlineLicenseExpireTime
+            OfflineLicenseRenewalCompletion(newToken, duration)
+            pendingOfflineCredentialsCompletion = nil
+        }
     }
 
     override func willMove(toSuperview newSuperview: UIView?) {
