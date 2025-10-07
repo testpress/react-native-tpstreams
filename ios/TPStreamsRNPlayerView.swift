@@ -4,10 +4,10 @@ import CoreMedia
 import React
 import AVFoundation
 
-let ERROR_CODE_DRM_LICENSE_EXPIRED = 5100
-
 @objc(TPStreamsRNPlayerView)
 class TPStreamsRNPlayerView: UIView {
+    
+    private static let errorCodeDRMLicenseExpired = 5100
 
     private enum PlaybackState: Int {
         case idle = 1
@@ -150,7 +150,7 @@ class TPStreamsRNPlayerView: UIView {
                 completion(nil, 0)
                 return
             }
-            self.sendErrorEvent("Playback error", ERROR_CODE_DRM_LICENSE_EXPIRED, "Offline DRM license expired")
+            self.sendErrorEvent("Playback error", Self.errorCodeDRMLicenseExpired, "Offline DRM license expired")
             self.pendingOfflineCredentialsCompletion = completion
             self.onAccessTokenExpired?(["videoId": assetId])
         }
@@ -175,7 +175,7 @@ class TPStreamsRNPlayerView: UIView {
             .setwatchedProgressTrackColor(.systemBlue)
             .setDownloadMetadata(metadataDict)
 
-        if offlineLicenseExpireTime != nil && offlineLicenseExpireTime > 0 {
+        if offlineLicenseExpireTime > 0 {
             configBuilder.setLicenseDurationSeconds(offlineLicenseExpireTime)
         }
         
@@ -343,9 +343,9 @@ class TPStreamsRNPlayerView: UIView {
         pendingTokenCompletion?(newToken)
         pendingTokenCompletion = nil
         
-        if let OfflineLicenseRenewalCompletion = pendingOfflineCredentialsCompletion {
+        if let offlineLicenseRenewalCompletion = pendingOfflineCredentialsCompletion {
             let duration = offlineLicenseExpireTime
-            OfflineLicenseRenewalCompletion(newToken, duration)
+            offlineLicenseRenewalCompletion(newToken, duration)
             pendingOfflineCredentialsCompletion = nil
         }
     }
