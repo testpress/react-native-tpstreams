@@ -140,7 +140,6 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
             // Send initial events
             emitEvent("onPlayerStateChanged", mapOf("playbackState" to 0))
             emitEvent("onIsPlayingChanged", mapOf("isPlaying" to false))
-            emitEvent("onPlaybackSpeedChanged", mapOf("speed" to 1.0))
             emitEvent("onIsLoadingChanged", mapOf("isLoading" to false))
         } catch (e: Exception) {
             Log.e("TPStreamsRN", "Error creating player", e)
