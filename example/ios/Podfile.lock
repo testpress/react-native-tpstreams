@@ -1666,7 +1666,8 @@ PODS:
     - Sentry/Core (= 8.50.2)
   - Sentry/Core (8.50.2)
   - SocketRocket (0.7.1)
-  - TPStreamsRNPlayerView (1.0.1):
+  - Toast-Swift (5.1.1)
+  - TPStreamsRNPlayerView (1.0.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1689,14 +1690,15 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - TPStreamsSDK (= 1.2.8)
+    - TPStreamsSDK (= 1.2.11)
     - Yoga
-  - TPStreamsSDK (1.2.8):
+  - TPStreamsSDK (1.2.11):
     - Alamofire (~> 5.9.0)
     - M3U8Kit (~> 1.1.0)
     - ReachabilitySwift (~> 5.2.2)
     - RealmSwift (~> 10.54.2)
     - Sentry (~> 8.50.0)
+    - Toast-Swift (~> 5.1.1)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1783,6 +1785,7 @@ SPEC REPOS:
     - RealmSwift
     - Sentry
     - SocketRocket
+    - Toast-Swift
     - TPStreamsSDK
 
 EXTERNAL SOURCES:
@@ -2007,10 +2010,11 @@ SPEC CHECKSUMS:
   RealmSwift: 7c258367cc498594aa989b7d9620989a276ad7f4
   Sentry: d95f5f3b32d01324b3e27d3c52747005302cc026
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  TPStreamsRNPlayerView: 53826d5361bcf222998dbe24600697e94b21e6f9
-  TPStreamsSDK: 4f90385c7c2483838cf99982c98ce50de350f830
+  Toast-Swift: 7a03a532afe3a560d4044bc7c237e2864d295173
+  TPStreamsRNPlayerView: 4e6240a428025165b0bfcecb9afcc3f79209f4ad
+  TPStreamsSDK: 395f7219a7f421a4e551353010ff2296d76b736f
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
 PODFILE CHECKSUM: 3f7e2acbe0418b2ae4e9fbd9102ff83a37c15215
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
