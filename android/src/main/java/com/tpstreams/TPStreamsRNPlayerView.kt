@@ -242,10 +242,9 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     }
 
     private fun sanitizeLicenseDuration(value: Long?): Long {
-        val candidate = value ?: DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
-        if (candidate <= 0L) {
+        if (value == null || value <= 0L) {
             return DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
         }
-        return minOf(candidate, DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME)
+        return minOf(value, DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME)
     }
 }
