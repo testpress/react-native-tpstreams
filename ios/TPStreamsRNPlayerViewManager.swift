@@ -15,7 +15,7 @@ class TPStreamsRNPlayerViewManager: RCTViewManager {
     }
 
     private func ensureDownloadModuleInitialized() {
-        guard let bridge = self.bridge else {
+        guard let bridge = bridge else {
             return
         }
 

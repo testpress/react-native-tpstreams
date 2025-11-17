@@ -37,7 +37,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
 
     @objc
     func initializeModule() {
-        //no-op method to ensure the module is initialized
+        // no-op to force module initialization for setting up the token expiry delegate chain.
     }
 
     func setAccessTokenDelegate(_ delegate: TokenRequestDelegate) {
