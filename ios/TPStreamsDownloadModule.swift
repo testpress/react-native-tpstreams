@@ -35,6 +35,11 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
         downloadManager.setTPStreamsDownloadDelegate(tpStreamsDownloadDelegate: self)
     }
 
+    @objc
+    func initializeModule() {
+        // no-op to force module initialization for setting up the token expiry delegate chain.
+    }
+
     func setAccessTokenDelegate(_ delegate: TokenRequestDelegate) {
         self.tokenDelegate = delegate
     }
@@ -116,7 +121,7 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     }
 
     func onRequestNewAccessToken(assetId: String, completion: @escaping (String?) -> Void) {
-         if let delegate = tokenDelegate {
+        if let delegate = tokenDelegate {
             delegate.requestToken(for: assetId, completion: completion)
         } else {
             completion(nil)

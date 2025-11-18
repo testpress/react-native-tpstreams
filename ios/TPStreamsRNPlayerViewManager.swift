@@ -6,11 +6,22 @@ import AVFoundation
 @objc(TPStreamsRNPlayerViewManager)
 class TPStreamsRNPlayerViewManager: RCTViewManager {
     override func view() -> UIView! {
+        ensureDownloadModuleInitialized()
         return TPStreamsRNPlayerView()
     }
 
     override static func requiresMainQueueSetup() -> Bool {
         return true
+    }
+
+    private func ensureDownloadModuleInitialized() {
+        guard let bridge = bridge else {
+            return
+        }
+
+        if let module = bridge.module(for: TPStreamsDownloadModule.self) as? TPStreamsDownloadModule {
+            module.initializeModule()
+        }
     }
     
     // MARK: - Player Commands - Simply delegate to the view
