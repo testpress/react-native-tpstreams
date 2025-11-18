@@ -92,7 +92,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     }
     
     fun setOfflineLicenseExpireTime(expireTime: Long?) {
-        this.offlineLicenseExpireTime = expireTime ?: DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
+        this.offlineLicenseExpireTime = sanitizeLicenseDuration(expireTime)
     }
     
     fun setNewAccessToken(newToken: String) {
@@ -239,5 +239,12 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         }
         player = null
         accessTokenCallback = null
+    }
+
+    private fun sanitizeLicenseDuration(value: Long?): Long {
+        if (value == null || value <= 0L) {
+            return DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
+        }
+        return minOf(value, DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME)
     }
 }

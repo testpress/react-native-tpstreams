@@ -16,6 +16,8 @@ class TPStreamsRNPlayerView: UIView {
         case ended = 4
     }
 
+    private static let maxOfflineLicenseDuration: Double = 15 * 24 * 60 * 60
+    
     private var player: TPAVPlayer?
     private var playerViewController: TPStreamPlayerViewController?
     private var playerStatusObserver: NSKeyValueObservation?
@@ -24,13 +26,17 @@ class TPStreamsRNPlayerView: UIView {
     private var playerStateObserver: NSKeyValueObservation?
     private var setupScheduled = false
     private var pendingOfflineCredentialsCompletion: ((String?, Double) -> Void)?
+    private var _offlineLicenseExpireTime: Double = TPStreamsRNPlayerView.maxOfflineLicenseDuration
     
     @objc var videoId: NSString = ""
     @objc var accessToken: NSString = ""
     @objc var shouldAutoPlay: Bool = true
     @objc var startAt: Double = 0
     @objc var enableDownload: Bool = false
-    @objc var offlineLicenseExpireTime: Double = 0
+    @objc var offlineLicenseExpireTime: Double {
+        get { _offlineLicenseExpireTime }
+        set { _offlineLicenseExpireTime = TPStreamsRNPlayerView.sanitizeLicenseDuration(newValue) }
+    }
     @objc var showDefaultCaptions: Bool = false
     @objc var downloadMetadata: NSString?
     
@@ -175,9 +181,7 @@ class TPStreamsRNPlayerView: UIView {
             .setwatchedProgressTrackColor(.systemBlue)
             .setDownloadMetadata(metadataDict)
 
-        if offlineLicenseExpireTime > 0 {
-            configBuilder.setLicenseDurationSeconds(offlineLicenseExpireTime)
-        }
+        configBuilder.setLicenseDurationSeconds(offlineLicenseExpireTime)
         
         if enableDownload {
             configBuilder.showDownloadOption()
@@ -281,6 +285,11 @@ class TPStreamsRNPlayerView: UIView {
     
     private func setupTokenDelegate() {
         TPStreamsDownloadModule.shared?.setAccessTokenDelegate(self)
+    }
+
+    private static func sanitizeLicenseDuration(_ value: Double) -> Double {
+        guard value > 0 else { return maxOfflineLicenseDuration }
+        return min(value, maxOfflineLicenseDuration)
     }
 
     private func parseMetadataJSON(from jsonString: NSString?) -> [String: Any]? {
