@@ -8,6 +8,7 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.tpstreams.player.TPStreamsPlayer
 import com.tpstreams.player.TPStreamsPlayerView
+import com.tpstreams.player.constants.PlaybackError
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.PlaybackException
@@ -128,6 +129,12 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                     }
                     accessTokenCallback = callback
                     emitEvent("onAccessTokenExpired", mapOf("videoId" to videoId))
+                }
+
+                override fun onError(error: PlaybackError, message: String) {
+                    Log.e("TPStreamsRN", "TPStreamsPlayer error: $error - $message")
+                    val errorCode = ERROR_CODE_PLAYER_CREATION_FAILED + error.ordinal
+                    sendErrorEvent("Player error", errorCode, message)
                 }
             }
 
