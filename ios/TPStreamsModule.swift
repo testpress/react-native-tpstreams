@@ -19,7 +19,18 @@ class TPStreamsModule: NSObject {
 
    private func initializeDownloadModule() {
      _ = TPStreamsDownloadModule.shared
+     ensureDownloadModuleInitialized()
    }
+   
+   private func ensureDownloadModuleInitialized() {
+        guard let bridge = RCTBridge.current() else {
+            return
+        }
+
+        if let module = bridge.module(for: TPStreamsDownloadModule.self) as? TPStreamsDownloadModule {
+            module.initializeModule()
+        }
+    }
 
    @objc
    static func requiresMainQueueSetup() -> Bool {
