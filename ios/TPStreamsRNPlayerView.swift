@@ -24,7 +24,15 @@ class TPStreamsRNPlayerView: UIView {
     private var playbackSpeedObserver: NSKeyValueObservation?
     private var timeControlStatusObserver: NSKeyValueObservation?
     private var playerStateObserver: NSKeyValueObservation?
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.color = .white
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
     private var setupScheduled = false
+    private var isPlayerReady = false
     private var pendingOfflineCredentialsCompletion: ((String?, Double) -> Void)?
     private var _offlineLicenseExpireTime: Double = TPStreamsRNPlayerView.maxOfflineLicenseDuration
     
@@ -57,11 +65,13 @@ class TPStreamsRNPlayerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .black
+        setupLoadingIndicator()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         backgroundColor = .black
+        setupLoadingIndicator()
     }
 
     override func layoutSubviews() {
@@ -85,6 +95,7 @@ class TPStreamsRNPlayerView: UIView {
     
     private func setupPlayer() {
         cleanupPlayer()
+        isPlayerReady = false
         
         player = TPStreamsDownloadManager.shared.isAssetDownloaded(assetID: videoId as String)
             ? createOfflinePlayer()
@@ -95,6 +106,7 @@ class TPStreamsRNPlayerView: UIView {
             setupScheduled = false
             return
         }
+        showLoadingIndicator()
         setupTokenDelegate()
         configurePlayerView()
         observePlayerChanges()
@@ -199,6 +211,7 @@ class TPStreamsRNPlayerView: UIView {
         playerVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         playerVC.view.isHidden = false
         bringSubviewToFront(playerVC.view)
+        bringSubviewToFront(loadingIndicator)
         playerVC.didMove(toParent: parentVC)
     }
         
@@ -235,8 +248,17 @@ class TPStreamsRNPlayerView: UIView {
         
         timeControlStatusObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
-                let isPlaying = player.timeControlStatus == .playing
-                self?.onIsPlayingChanged?(["isPlaying": isPlaying])
+                guard let self = self else { return }
+                let timeStatus = player.timeControlStatus
+                let isPlaying = timeStatus == .playing
+
+                // Show loader while buffering; hide only after player is ready.
+                if timeStatus == .waitingToPlayAtSpecifiedRate {
+                    self.showLoadingIndicator()
+                } else if self.isPlayerReady {
+                    self.hideLoadingIndicator()
+                }
+                self.onIsPlayingChanged?(["isPlaying": isPlaying])
             }
         }
     }
@@ -246,8 +268,25 @@ class TPStreamsRNPlayerView: UIView {
         
         playerStateObserver = player.observe(\.status, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
-                let state = self?.mapPlayerStateToAndroid(player.status) ?? PlaybackState.idle.rawValue
-                self?.onPlayerStateChanged?(["playbackState": state])
+                guard let self = self else { return }
+                let status = player.status
+                let state = self.mapPlayerStateToAndroid(status) ?? PlaybackState.idle.rawValue
+                self.onPlayerStateChanged?(["playbackState": state])
+
+                // Drive readiness and loader from AVPlayer.status.
+                switch status {
+                case .readyToPlay:
+                    self.isPlayerReady = true
+                    if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
+                        self.hideLoadingIndicator()
+                    }
+                case .failed:
+                    self.isPlayerReady = false
+                    self.hideLoadingIndicator()
+                default:
+                    self.isPlayerReady = false
+                    self.showLoadingIndicator()
+                }
             }
         }
         
@@ -285,6 +324,30 @@ class TPStreamsRNPlayerView: UIView {
     
     private func setupTokenDelegate() {
         TPStreamsDownloadModule.shared?.setAccessTokenDelegate(self)
+    }
+
+    private func setupLoadingIndicator() {
+        guard loadingIndicator.superview == nil else { return }
+        
+        addSubview(loadingIndicator)
+        
+        NSLayoutConstraint.activate([
+            loadingIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
+    }
+
+    private func showLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.loadingIndicator.startAnimating()
+            self.bringSubviewToFront(self.loadingIndicator)
+        }
+    }
+
+    private func hideLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.loadingIndicator.stopAnimating()
+        }
     }
 
     private static func sanitizeLicenseDuration(_ value: Double) -> Double {
