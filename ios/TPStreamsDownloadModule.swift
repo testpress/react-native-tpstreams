@@ -295,8 +295,6 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
         guard let status = status else { return PlayerConstants.statusUnknown }
         
         switch status {
-        case .acquiringLicense:
-            return PlayerConstants.statusQueued
         case .inProgress:
             return PlayerConstants.statusDownloading
         case .paused:
@@ -304,8 +302,6 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
         case .finished:
             return PlayerConstants.statusCompleted
         case .failed:
-            return PlayerConstants.statusFailed
-        case .licenseAcquisitionFailed:
             return PlayerConstants.statusFailed
         default:
             return PlayerConstants.statusUnknown
