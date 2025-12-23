@@ -7,7 +7,11 @@ import {
   useMemo,
 } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import WebView, { type WebViewMessageEvent } from 'react-native-webview';
+import {
+  WebView,
+  type WebViewMessageEvent,
+  type WebViewErrorEvent,
+} from 'react-native-webview';
 
 import type {
   TPStreamsLiveChatProps,
@@ -91,7 +95,7 @@ const TPStreamsLiveChat = forwardRef<
   );
 
   const handleWebViewError = useCallback(
-    (syntheticEvent: any) => {
+    (syntheticEvent: WebViewErrorEvent) => {
       const { nativeEvent } = syntheticEvent;
       setStatus('error');
       onChatError?.(nativeEvent.description || 'WebView failed to load');
