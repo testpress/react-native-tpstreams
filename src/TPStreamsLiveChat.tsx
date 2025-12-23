@@ -7,14 +7,13 @@ import {
   useMemo,
 } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import WebView from 'react-native-webview';
-import type { WebViewMessageEvent } from 'react-native-webview';
+import WebView, { type WebViewMessageEvent } from 'react-native-webview';
 
 import type {
   TPStreamsLiveChatProps,
   TPStreamsLiveChatRef,
-  ChatMessage,
 } from './types/TPStreamsLiveChatTypes';
+import { isChatMessage } from './types/TPStreamsLiveChatTypes';
 import { generateChatHTML } from './utils/liveChatHtmlGenerator';
 import { CHAT_SDK_CONSTANTS, ChatMessageType } from './utils/constants';
 
@@ -70,7 +69,14 @@ const TPStreamsLiveChat = forwardRef<
             break;
 
           case ChatMessageType.MESSAGE:
-            onMessageReceived?.(message as ChatMessage);
+            if (isChatMessage(message)) {
+              onMessageReceived?.(message);
+            } else {
+              console.warn(
+                '[TPStreamsLiveChat] Received invalid message format:',
+                message
+              );
+            }
             break;
 
           case ChatMessageType.DEBUG:
@@ -141,7 +147,7 @@ const TPStreamsLiveChat = forwardRef<
           html: htmlContent,
           baseUrl: CHAT_SDK_CONSTANTS.BASE_URL,
         }}
-        originWhitelist={['*']}
+        originWhitelist={[CHAT_SDK_CONSTANTS.BASE_URL]}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         onMessage={handleMessage}

@@ -27,6 +27,19 @@ export interface ChatMessage {
 }
 
 /**
+ * Type guard for ChatMessage
+ */
+export function isChatMessage(data: any): data is ChatMessage {
+  return (
+    data &&
+    typeof data.id === 'string' &&
+    typeof data.username === 'string' &&
+    typeof data.message === 'string' &&
+    typeof data.timestamp === 'number'
+  );
+}
+
+/**
  * Typography configuration for the chat interface
  */
 export interface ChatTypography {
