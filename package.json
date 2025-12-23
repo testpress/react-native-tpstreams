@@ -85,6 +85,9 @@
     "turbo": "^1.10.7",
     "typescript": "5.4.5"
   },
+  "dependencies": {
+    "react-native-webview": "^13.16.0"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
