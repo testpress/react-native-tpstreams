@@ -46,6 +46,7 @@ class TPStreamsRNPlayerView: UIView {
         set { _offlineLicenseExpireTime = TPStreamsRNPlayerView.sanitizeLicenseDuration(newValue) }
     }
     @objc var showDefaultCaptions: Bool = false
+    @objc var startInFullscreen: Bool = false
     @objc var downloadMetadata: NSString?
     
     @objc var onCurrentPosition: RCTDirectEventBlock?
@@ -192,6 +193,7 @@ class TPStreamsRNPlayerView: UIView {
             .setprogressBarThumbColor(.systemBlue)
             .setwatchedProgressTrackColor(.systemBlue)
             .setDownloadMetadata(metadataDict)
+            .setStartInFullscreen(startInFullscreen)
 
         configBuilder.setLicenseDurationSeconds(offlineLicenseExpireTime)
         

@@ -23,6 +23,7 @@ export interface NativeProps extends ViewProps {
   enableDownload?: boolean;
   offlineLicenseExpireTime?: Double;
   showDefaultCaptions?: boolean;
+  startInFullscreen?: boolean;
   downloadMetadata?: string;
 
   // Event props for receiving data from native methods

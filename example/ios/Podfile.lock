@@ -9,7 +9,7 @@ PODS:
   - hermes-engine (0.79.2):
     - hermes-engine/Pre-built (= 0.79.2)
   - hermes-engine/Pre-built (0.79.2)
-  - M3U8Kit (1.1.0)
+  - M3U8Kit (1.2.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1335,6 +1335,30 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
+  - react-native-webview (13.16.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - React-NativeModulesApple (0.79.2):
     - glog
     - hermes-engine
@@ -1657,17 +1681,17 @@ PODS:
     - React-logger (= 0.79.2)
     - React-perflogger (= 0.79.2)
     - React-utils (= 0.79.2)
-  - Realm (10.54.5):
-    - Realm/Headers (= 10.54.5)
-  - Realm/Headers (10.54.5)
-  - RealmSwift (10.54.5):
-    - Realm (= 10.54.5)
+  - Realm (10.54.6):
+    - Realm/Headers (= 10.54.6)
+  - Realm/Headers (10.54.6)
+  - RealmSwift (10.54.6):
+    - Realm (= 10.54.6)
   - Sentry (8.50.2):
     - Sentry/Core (= 8.50.2)
   - Sentry/Core (8.50.2)
   - SocketRocket (0.7.1)
   - Toast-Swift (5.1.1)
-  - TPStreamsRNPlayerView (1.0.7):
+  - TPStreamsRNPlayerView (1.1.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1690,11 +1714,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - TPStreamsSDK (= 1.2.11)
+    - TPStreamsSDK (= 1.2.16)
     - Yoga
-  - TPStreamsSDK (1.2.11):
+  - TPStreamsSDK (1.2.16):
     - Alamofire (~> 5.9.0)
-    - M3U8Kit (~> 1.1.0)
+    - M3U8Kit (~> 1.2.0)
     - ReachabilitySwift (~> 5.2.2)
     - RealmSwift (~> 10.54.2)
     - Sentry (~> 8.50.0)
@@ -1742,6 +1766,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1866,6 +1891,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-oscompat:
@@ -1942,7 +1969,7 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 314be5250afa5692b57b4dd1705959e1973a8ebe
-  M3U8Kit: d0f2dae9736a35fc44b54bea10aeebcaa75215b3
+  M3U8Kit: 5a0adeab31b42d24ec76c0620971eac130903984
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 83ffb90c23ee5cea353bd32008a7bca100908f8c
   RCTRequired: eb7c0aba998009f47a540bec9e9d69a54f68136e
@@ -1975,6 +2002,7 @@ SPEC CHECKSUMS:
   React-logger: 8edfcedc100544791cd82692ca5a574240a16219
   React-Mapbuffer: da73f30b000114058d6bc41490dcce204a8ede32
   React-microtasksnativemodule: 444c5701aece79629bb73bd9e7ad8937ae65238c
+  react-native-webview: f0d598682cbc88a97d66da4121873d3467f76635
   React-NativeModulesApple: df8e5bc59e78ca3040ffbf41336889f3bd0fad68
   React-oscompat: ef5df1c734f19b8003e149317d041b8ce1f7d29c
   React-perflogger: 9a151e0b4c933c9205fd648c246506a83f31395d
@@ -2006,13 +2034,13 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 04d5eb15eb46be6720e17a4a7fa92940a776e584
   ReactCodegen: 041559ba76d00f6680dfa0916b3c791f4babe5ea
   ReactCommon: 1511ef100f1afa4c199fe52fe7a8d2529a41429a
-  Realm: ac6ab7d43b76db2bdb48bbd097019bb621d860b8
-  RealmSwift: 7c258367cc498594aa989b7d9620989a276ad7f4
+  Realm: b1b3bc68162fa242132eb7eefbf91d7c40f36a85
+  RealmSwift: 456cfd82a4f23dff8e3456980999331ab69bbf3e
   Sentry: d95f5f3b32d01324b3e27d3c52747005302cc026
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Toast-Swift: 7a03a532afe3a560d4044bc7c237e2864d295173
-  TPStreamsRNPlayerView: 4e6240a428025165b0bfcecb9afcc3f79209f4ad
-  TPStreamsSDK: 395f7219a7f421a4e551353010ff2296d76b736f
+  TPStreamsRNPlayerView: c171519928e05c3e89e0bfa19be3c72bb7a8d48e
+  TPStreamsSDK: e23c5a8c7543a2d9ec323e6ce1c509a832854176
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
 PODFILE CHECKSUM: 3f7e2acbe0418b2ae4e9fbd9102ff83a37c15215

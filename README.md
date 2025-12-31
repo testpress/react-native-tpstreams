@@ -43,11 +43,12 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 |------|------|----------|-------------|
 | `videoId` | `string` | Yes | Video ID to play |
 | `accessToken` | `string` | Yes | Access token for the video |
-| `startAt` | `number` | No | Start position in seconds (default: 0) |
 | `shouldAutoPlay` | `boolean` | No | Auto-play on load (default: true) |
-| `showDefaultCaptions` | `boolean` | No | Show captions if available (default: false) |
+| `startAt` | `number` | No | Start position in seconds (default: 0) |
 | `enableDownload` | `boolean` | No | Enable download functionality (default: false) |
 | `offlineLicenseExpireTime` | `number` | No | License expiration in seconds (default: 15 days) |
+| `showDefaultCaptions` | `boolean` | No | Show captions if available (default: false) |
+| `startInFullscreen` | `boolean` | No | Start the player in fullscreen mode (default: false) |
 | `downloadMetadata` | `object` | No | Custom metadata for downloads |
 
 ### Player Methods

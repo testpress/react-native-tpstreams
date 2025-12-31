@@ -79,6 +79,11 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     view.setShowDefaultCaptions(showDefaultCaptions)
   }
 
+  @ReactProp(name = "startInFullscreen")
+  override fun setStartInFullscreen(view: TPStreamsRNPlayerView, startInFullscreen: Boolean) {
+    view.setStartInFullscreen(startInFullscreen)
+  }
+
   @ReactProp(name = "enableDownload")
   override fun setEnableDownload(view: TPStreamsRNPlayerView, enableDownload: Boolean) {
     view.setEnableDownload(enableDownload)
