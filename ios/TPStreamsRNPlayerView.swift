@@ -41,12 +41,12 @@ class TPStreamsRNPlayerView: UIView {
     @objc var shouldAutoPlay: Bool = true
     @objc var startAt: Double = 0
     @objc var enableDownload: Bool = false
-    @objc var startInFullscreen: Bool = false
     @objc var offlineLicenseExpireTime: Double {
         get { _offlineLicenseExpireTime }
         set { _offlineLicenseExpireTime = TPStreamsRNPlayerView.sanitizeLicenseDuration(newValue) }
     }
     @objc var showDefaultCaptions: Bool = false
+    @objc var startInFullscreen: Bool = false
     @objc var downloadMetadata: NSString?
     
     @objc var onCurrentPosition: RCTDirectEventBlock?
