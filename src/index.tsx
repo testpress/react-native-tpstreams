@@ -33,3 +33,12 @@ export const TPStreams = {
     TPStreamsModule.initialize(organizationId);
   },
 };
+
+export { default as TPStreamsLiveChat } from './TPStreamsLiveChat';
+export type {
+  TPStreamsLiveChatProps,
+  TPStreamsLiveChatRef,
+  ChatColors,
+  ChatTypography,
+  ChatMessage,
+} from './types/TPStreamsLiveChatTypes';
