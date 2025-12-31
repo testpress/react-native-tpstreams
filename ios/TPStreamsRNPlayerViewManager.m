@@ -10,6 +10,7 @@ RCT_EXPORT_VIEW_PROPERTY(startAt, double)
 RCT_EXPORT_VIEW_PROPERTY(enableDownload, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(offlineLicenseExpireTime, double)
 RCT_EXPORT_VIEW_PROPERTY(showDefaultCaptions, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(startInFullscreen, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(downloadMetadata, NSString)
 
 // Event props

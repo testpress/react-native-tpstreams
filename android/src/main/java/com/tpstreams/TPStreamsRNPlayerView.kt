@@ -30,6 +30,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var shouldAutoPlay: Boolean = true
     private var startAt: Long = 0
     private var showDefaultCaptions: Boolean = false
+    private var startInFullscreen: Boolean = false
     private var enableDownload: Boolean = false
     private var downloadMetadata: Map<String, Any>? = null
     private var offlineLicenseExpireTime: Long = DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
@@ -84,6 +85,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         this.showDefaultCaptions = showDefaultCaptions
     }
 
+    fun setStartInFullscreen(startInFullscreen: Boolean) {
+        this.startInFullscreen = startInFullscreen
+    }
+
     fun setEnableDownload(enableDownload: Boolean) {
         this.enableDownload = enableDownload
     }
@@ -117,6 +122,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 startAt,
                 enableDownload, 
                 showDefaultCaptions,
+                startInFullscreen,
                 downloadMetadata?.mapValues { it.value.toString() },
                 offlineLicenseExpireTime
             )

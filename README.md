@@ -48,6 +48,7 @@ import { TPStreamsPlayerView } from "react-native-tpstreams";
 | `showDefaultCaptions` | `boolean` | No | Show captions if available (default: false) |
 | `enableDownload` | `boolean` | No | Enable download functionality (default: false) |
 | `offlineLicenseExpireTime` | `number` | No | License expiration in seconds (default: 15 days) |
+| `startInFullscreen` | `boolean` | No | Start the player in fullscreen mode (default: false) |
 | `downloadMetadata` | `object` | No | Custom metadata for downloads |
 
 ### Player Methods
