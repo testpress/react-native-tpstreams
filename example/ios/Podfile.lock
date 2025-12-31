@@ -1691,7 +1691,7 @@ PODS:
   - Sentry/Core (8.50.2)
   - SocketRocket (0.7.1)
   - Toast-Swift (5.1.1)
-  - TPStreamsRNPlayerView (1.1.4-dev.0):
+  - TPStreamsRNPlayerView (1.1.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2039,7 +2039,7 @@ SPEC CHECKSUMS:
   Sentry: d95f5f3b32d01324b3e27d3c52747005302cc026
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Toast-Swift: 7a03a532afe3a560d4044bc7c237e2864d295173
-  TPStreamsRNPlayerView: ed79a12d66afec1915a5700dc95f96029df22cba
+  TPStreamsRNPlayerView: c171519928e05c3e89e0bfa19be3c72bb7a8d48e
   TPStreamsSDK: e23c5a8c7543a2d9ec323e6ce1c509a832854176
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
