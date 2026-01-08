@@ -36,6 +36,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var downloadMetadata: Map<String, Any>? = null
     private var offlineLicenseExpireTime: Long = DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
     private var accessTokenCallback: ((String) -> Unit)? = null
+    private var isLayoutUpdatePosted = false
 
     init {
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -43,12 +44,16 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     override fun requestLayout() {
         super.requestLayout()
-        post {
-            measure(
-                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-            )
-            layout(left, top, right, bottom)
+        if (!isLayoutUpdatePosted) {
+            isLayoutUpdatePosted = true
+            post {
+                isLayoutUpdatePosted = false
+                measure(
+                    MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                )
+                layout(left, top, right, bottom)
+            }
         }
     }
 
