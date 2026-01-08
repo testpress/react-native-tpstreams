@@ -13,6 +13,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.PlaybackException
 import android.media.MediaCodec
+import android.view.View.MeasureSpec
 
 class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) {
     private val playerView: TPStreamsPlayerView = TPStreamsPlayerView(context)
@@ -35,9 +36,25 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var downloadMetadata: Map<String, Any>? = null
     private var offlineLicenseExpireTime: Long = DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
     private var accessTokenCallback: ((String) -> Unit)? = null
+    private var isLayoutUpdatePosted = false
 
     init {
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+    }
+
+    override fun requestLayout() {
+        super.requestLayout()
+        if (!isLayoutUpdatePosted) {
+            isLayoutUpdatePosted = true
+            post {
+                isLayoutUpdatePosted = false
+                measure(
+                    MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                )
+                layout(left, top, right, bottom)
+            }
+        }
     }
 
     // Emit React Native events
