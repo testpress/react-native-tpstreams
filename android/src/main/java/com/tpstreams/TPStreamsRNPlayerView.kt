@@ -13,6 +13,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.PlaybackException
 import android.media.MediaCodec
+import android.view.View.MeasureSpec
 
 class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) {
     private val playerView: TPStreamsPlayerView = TPStreamsPlayerView(context)
@@ -38,6 +39,17 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     init {
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+    }
+
+    override fun requestLayout() {
+        super.requestLayout()
+        post {
+            measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+            )
+            layout(left, top, right, bottom)
+        }
     }
 
     // Emit React Native events
