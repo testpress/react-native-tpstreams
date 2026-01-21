@@ -49,7 +49,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 playerView.player = p
             }
         }
-}
+    }
 
     override fun requestLayout() {
         super.requestLayout()
