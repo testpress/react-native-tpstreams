@@ -42,6 +42,15 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         addView(playerView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        player?.let { p ->
+            if (playerView.player == null) {
+                playerView.player = p
+            }
+        }
+}
+
     override fun requestLayout() {
         super.requestLayout()
         if (!isLayoutUpdatePosted) {
@@ -258,6 +267,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        playerView.player = null
         player?.pause()
     }
 
