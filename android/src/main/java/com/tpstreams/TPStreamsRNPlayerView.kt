@@ -45,9 +45,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         player?.let { p ->
-            if (playerView.player == null) {
-                playerView.player = p
-            }
+            playerView.player = p
         }
     }
 
