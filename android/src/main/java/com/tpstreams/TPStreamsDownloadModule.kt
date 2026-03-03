@@ -6,6 +6,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.tpstreams.player.download.DownloadClient
@@ -21,6 +22,37 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
 
     override fun getName(): String {
         return "TPStreamsDownload"
+    }
+
+    @ReactMethod
+    fun startDownload(
+        videoId: String,
+        accessToken: String,
+        resolution: String?,
+        metadata: ReadableMap?,
+        promise: Promise
+    ) {
+        try {
+            val metadataString = metadata?.let { org.json.JSONObject(it.toHashMap()).toString() }
+            val metadataMap = JsonUtils.jsonStringToMap(metadataString)
+
+            val activity = currentActivity ?: run {
+                promise.reject("DOWNLOAD_START_ERROR", "No current activity available")
+                return
+            }
+
+            downloadClient.startDownload(
+                activity,
+                videoId,
+                accessToken,
+                resolution,
+                metadataMap
+            )
+            promise.resolve(null)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting download: ${e.message}", e)
+            promise.reject("DOWNLOAD_START_ERROR", e.message, e)
+        }
     }
 
     @ReactMethod

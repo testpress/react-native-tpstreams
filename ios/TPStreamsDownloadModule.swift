@@ -50,6 +50,11 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     }
     
     @objc
+    func startDownload(_ videoId: String, accessToken: String, resolution: String?, metadata: NSDictionary?, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+        resolve(nil)
+    }
+
+    @objc
     func addDownloadProgressListener(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         isListening = true
         notifyDownloadsChange()

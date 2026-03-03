@@ -11,6 +11,13 @@ RCT_EXTERN_METHOD(removeDownloadProgressListener:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
 // Download Control Methods
+RCT_EXTERN_METHOD(startDownload:(NSString *)videoId
+                  accessToken:(NSString *)accessToken
+                  resolution:(NSString *)resolution
+                  metadata:(NSDictionary *)metadata
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(pauseDownload:(NSString *)videoId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
