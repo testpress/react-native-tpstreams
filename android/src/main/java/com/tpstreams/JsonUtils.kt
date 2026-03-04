@@ -1,5 +1,6 @@
 package com.tpstreams
 
+import org.json.JSONException
 import org.json.JSONObject
 
 object JsonUtils {
@@ -51,7 +52,7 @@ object JsonUtils {
             jsonObject.keys()
                 .asSequence()
                 .associate { it to jsonObject.getString(it) }
-        } catch (e: Exception) {
+        } catch (e: JSONException) {
             null
         }
     }
