@@ -62,53 +62,26 @@ export function onDownloadProgressChanged(
   );
 }
 
-export function onDownloadStateChanged(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadStateChanged', (event) => {
-    listener(event.downloadItem, event.error);
-  });
-}
+const createDownloadStateListener =
+  (eventName: string) =>
+  (listener: DownloadStateChangeListener): EmitterSubscription => {
+    return downloadEventEmitter.addListener(eventName, (event) => {
+      listener(event.downloadItem, event.error);
+    });
+  };
 
-export function onDownloadStarted(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadStarted', (event) => {
-    listener(event.downloadItem, event.error);
-  });
-}
-
-export function onDownloadPaused(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadPaused', (event) => {
-    listener(event.downloadItem, event.error);
-  });
-}
-
-export function onDownloadResumed(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadResumed', (event) => {
-    listener(event.downloadItem, event.error);
-  });
-}
-
-export function onDownloadCompleted(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadCompleted', (event) => {
-    listener(event.downloadItem, event.error);
-  });
-}
-
-export function onDownloadFailed(
-  listener: DownloadStateChangeListener
-): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadFailed', (event) => {
-    listener(event.downloadItem, event.error);
-  });
-}
+export const onDownloadStateChanged = createDownloadStateListener(
+  'onDownloadStateChanged'
+);
+export const onDownloadStarted =
+  createDownloadStateListener('onDownloadStarted');
+export const onDownloadPaused = createDownloadStateListener('onDownloadPaused');
+export const onDownloadResumed =
+  createDownloadStateListener('onDownloadResumed');
+export const onDownloadCompleted = createDownloadStateListener(
+  'onDownloadCompleted'
+);
+export const onDownloadFailed = createDownloadStateListener('onDownloadFailed');
 
 export function onDownloadDeleted(
   listener: (videoId: string) => void
