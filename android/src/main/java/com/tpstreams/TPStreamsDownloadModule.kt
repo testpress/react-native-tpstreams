@@ -111,34 +111,54 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     }
 
     override fun onDownloadStarted(downloadItem: DownloadItem) {
-        if (isListening) {
-            emitEvent("onDownloadStarted", createDownloadStateEventMap(downloadItem))
+        try {
+            if (isListening) {
+                emitEvent("onDownloadStarted", createDownloadStateEventMap(downloadItem))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadStarted: ${e.message}", e)
         }
     }
 
     override fun onDownloadResumed(downloadItem: DownloadItem) {
-        if (isListening) {
-            emitEvent("onDownloadResumed", createDownloadStateEventMap(downloadItem))
+        try {
+            if (isListening) {
+                emitEvent("onDownloadResumed", createDownloadStateEventMap(downloadItem))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadResumed: ${e.message}", e)
         }
     }
 
     override fun onDownloadCompleted(downloadItem: DownloadItem) {
-        if (isListening) {
-            emitEvent("onDownloadCompleted", createDownloadStateEventMap(downloadItem))
+        try {
+            if (isListening) {
+                emitEvent("onDownloadCompleted", createDownloadStateEventMap(downloadItem))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadCompleted: ${e.message}", e)
         }
     }
 
     override fun onDownloadFailed(downloadItem: DownloadItem, error: Exception) {
-        if (isListening) {
-            emitEvent("onDownloadFailed", createDownloadStateEventMap(downloadItem, error))
+        try {
+            if (isListening) {
+                emitEvent("onDownloadFailed", createDownloadStateEventMap(downloadItem, error))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadFailed: ${e.message}", e)
         }
     }
 
     override fun onDownloadDeleted(assetId: String) {
-        if (isListening) {
-            val map = Arguments.createMap()
-            map.putString("videoId", assetId)
-            emitEvent("onDownloadDeleted", map)
+        try {
+            if (isListening) {
+                val map = Arguments.createMap()
+                map.putString("videoId", assetId)
+                emitEvent("onDownloadDeleted", map)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadDeleted: ${e.message}", e)
         }
     }
 
