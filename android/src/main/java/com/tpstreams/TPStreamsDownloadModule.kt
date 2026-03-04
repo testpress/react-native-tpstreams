@@ -110,23 +110,58 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
         }
     }
 
-    override fun onDownloadStateChanged(downloadItem: DownloadItem, error: Exception?) {
-        try {  
+    override fun onDownloadStarted(downloadItem: DownloadItem) {
+        if (isListening) {
+            emitEvent("onDownloadStarted", createDownloadStateEventMap(downloadItem))
+        }
+    }
+
+    override fun onDownloadResumed(downloadItem: DownloadItem) {
+        if (isListening) {
+            emitEvent("onDownloadResumed", createDownloadStateEventMap(downloadItem))
+        }
+    }
+
+    override fun onDownloadCompleted(downloadItem: DownloadItem) {
+        if (isListening) {
+            emitEvent("onDownloadCompleted", createDownloadStateEventMap(downloadItem))
+        }
+    }
+
+    override fun onDownloadFailed(downloadItem: DownloadItem, error: Exception) {
+        if (isListening) {
+            emitEvent("onDownloadFailed", createDownloadStateEventMap(downloadItem, error))
+        }
+    }
+
+    override fun onDownloadDeleted(assetId: String) {
+        if (isListening) {
             val map = Arguments.createMap()
-            val downloadItemMap = createDownloadItemMap(downloadItem)
-            map.putMap("downloadItem", downloadItemMap)
-            
-            if (error != null) {
-                val errorMap = Arguments.createMap()
-                errorMap.putString("message", error.message ?: "Unknown error")
-                errorMap.putString("type", error.javaClass.simpleName)
-                map.putMap("error", errorMap)
-            } else {
-                map.putNull("error")
+            map.putString("videoId", assetId)
+            emitEvent("onDownloadDeleted", map)
+        }
+    }
+
+    private fun createDownloadStateEventMap(downloadItem: DownloadItem, error: Exception? = null): WritableMap {
+        val map = Arguments.createMap()
+        map.putMap("downloadItem", createDownloadItemMap(downloadItem))
+
+        if (error != null) {
+            val errorMap = Arguments.createMap()
+            errorMap.putString("message", error.message ?: "Unknown error")
+            errorMap.putString("type", error.javaClass.simpleName)
+            map.putMap("error", errorMap)
+        } else {
+            map.putNull("error")
+        }
+        return map
+    }
+
+    override fun onDownloadStateChanged(downloadItem: DownloadItem, error: Exception?) {
+        try {
+            if (isListening) {
+                emitEvent("onDownloadStateChanged", createDownloadStateEventMap(downloadItem, error))
             }
-            
-            emitEvent("onDownloadStateChanged", map)
-            
         } catch (e: Exception) {
             Log.e(TAG, "Error in onDownloadStateChanged: ${e.message}", e)
         }

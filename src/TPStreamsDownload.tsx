@@ -70,6 +70,54 @@ export function onDownloadStateChanged(
   });
 }
 
+export function onDownloadStarted(
+  listener: DownloadStateChangeListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadStarted', (event) => {
+    listener(event.downloadItem, event.error);
+  });
+}
+
+export function onDownloadPaused(
+  listener: DownloadStateChangeListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadPaused', (event) => {
+    listener(event.downloadItem, event.error);
+  });
+}
+
+export function onDownloadResumed(
+  listener: DownloadStateChangeListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadResumed', (event) => {
+    listener(event.downloadItem, event.error);
+  });
+}
+
+export function onDownloadCompleted(
+  listener: DownloadStateChangeListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadCompleted', (event) => {
+    listener(event.downloadItem, event.error);
+  });
+}
+
+export function onDownloadFailed(
+  listener: DownloadStateChangeListener
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadFailed', (event) => {
+    listener(event.downloadItem, event.error);
+  });
+}
+
+export function onDownloadDeleted(
+  listener: (videoId: string) => void
+): EmitterSubscription {
+  return downloadEventEmitter.addListener('onDownloadDeleted', (event) => {
+    listener(event.videoId);
+  });
+}
+
 export function pauseDownload(videoId: string): Promise<void> {
   return TPStreamsDownload.pauseDownload(videoId);
 }
