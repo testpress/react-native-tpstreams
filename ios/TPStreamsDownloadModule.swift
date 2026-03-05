@@ -50,6 +50,20 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     }
     
     @objc
+    func startDownload(_ videoId: String, accessToken: String, resolution: String?, metadata: NSDictionary?, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let metadataDict = metadata as? [String: Any]
+            let res = (resolution?.isEmpty ?? true) ? nil : resolution
+            let presentingVC = (res == nil) ? RCTPresentedViewController() : nil
+            
+            self.downloadManager.startDownload(assetID: videoId, accessToken: accessToken, resolution: res, allowResolutionFallback: true, metadata: metadataDict, presentingViewController: presentingVC, completion: nil)
+            resolve(nil)
+        }
+    }
+
+    @objc
     func addDownloadProgressListener(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         isListening = true
         notifyDownloadsChange()

@@ -1,5 +1,6 @@
 package com.tpstreams
 
+import org.json.JSONException
 import org.json.JSONObject
 
 object JsonUtils {
@@ -43,4 +44,16 @@ object JsonUtils {
         }
         return map
     }
-} 
+
+    fun jsonStringToMap(jsonString: String?): Map<String, String>? {
+        if (jsonString.isNullOrEmpty()) return null
+        return try {
+            val jsonObject = JSONObject(jsonString)
+            jsonObject.keys()
+                .asSequence()
+                .associate { it to jsonObject.getString(it) }
+        } catch (e: JSONException) {
+            null
+        }
+    }
+}

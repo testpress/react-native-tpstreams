@@ -31,6 +31,20 @@ export type DownloadStateChangeListener = (
 
 const downloadEventEmitter = new NativeEventEmitter(TPStreamsDownload);
 
+export function startDownload(
+  videoId: string,
+  accessToken: string,
+  resolution: string | null = null,
+  metadata: Record<string, any> | null = null
+): Promise<void> {
+  return TPStreamsDownload.startDownload(
+    videoId,
+    accessToken,
+    resolution,
+    metadata
+  );
+}
+
 export function addDownloadProgressListener(): Promise<void> {
   return TPStreamsDownload.addDownloadProgressListener();
 }

@@ -8,6 +8,7 @@ export { default as TPStreamsPlayerView } from './TPStreamsPlayer';
 export type { TPStreamsPlayerRef } from './TPStreamsPlayer';
 
 export {
+  startDownload,
   pauseDownload,
   resumeDownload,
   removeDownload,

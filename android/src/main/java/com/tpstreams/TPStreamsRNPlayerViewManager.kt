@@ -96,20 +96,7 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
 
   @ReactProp(name = "downloadMetadata")
   override fun setDownloadMetadata(view: TPStreamsRNPlayerView, metadata: String?) {
-    val metadataMap = if (!metadata.isNullOrEmpty()) {
-      try {
-        val jsonObject = org.json.JSONObject(metadata)
-        val map = jsonObject.keys()
-        .asSequence()
-        .associate { it to jsonObject.getString(it) }
-        .toMutableMap()
-        map
-      } catch (e: org.json.JSONException) {
-        android.util.Log.w("TPStreamsRN", "Error parsing download metadata: ${e.message}")
-        null
-      }
-    } else null
-    view.setDownloadMetadata(metadataMap)
+    view.setDownloadMetadata(JsonUtils.jsonStringToMap(metadata))
   }
 
   // Command implementations
