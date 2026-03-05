@@ -84,17 +84,19 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     func onStateChange(status: Status, offlineAsset: OfflineAsset) {
         if isListening {
-            if status == .failed {
-                notifyDownloadLifecycleEvent(name: "onDownloadFailed", asset: offlineAsset)
-            } else {
-                notifyDownloadsChange()
-            }
+            notifyDownloadsChange()
         }
     }
     
     func onDelete(assetId: String) {
         if isListening {
             emitDeletedEvent(assetId: assetId)
+        }
+    }
+
+    func onFailed(offlineAsset: OfflineAsset, error: Error?) {
+        if isListening {
+            notifyDownloadLifecycleEvent(name: "onDownloadFailed", asset: offlineAsset, error: error)
         }
     }
     
