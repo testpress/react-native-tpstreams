@@ -90,48 +90,76 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
     
     func onDelete(assetId: String) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
-            notifyDownloadsChange()
+            emitDeletedEvent(assetId: assetId)
+        }
+    }
+
+    func onFailed(offlineAsset: OfflineAsset, error: Error?) {
+        if isListening {
+            notifyDownloadLifecycleEvent(name: "onDownloadFailed", asset: offlineAsset, error: error)
         }
     }
     
     func onStart(offlineAsset: OfflineAsset) {
         if isListening {
-            notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            notifyDownloadsChange()
+            notifyDownloadLifecycleEvent(name: "onDownloadStarted", asset: offlineAsset)
         }
     }
     
     func onComplete(offlineAsset: OfflineAsset) {
         if isListening {
-            notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            notifyDownloadsChange()
+            notifyDownloadLifecycleEvent(name: "onDownloadCompleted", asset: offlineAsset)
         }
     }
     
     func onPause(offlineAsset: OfflineAsset) {
         if isListening {
-            notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            notifyDownloadsChange()
+            notifyDownloadLifecycleEvent(name: "onDownloadPaused", asset: offlineAsset)
         }
     }
     
     func onResume(offlineAsset: OfflineAsset) {
         if isListening {
-            notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            notifyDownloadsChange()
+            notifyDownloadLifecycleEvent(name: "onDownloadResumed", asset: offlineAsset)
         }
     }
     
     func onCanceled(assetId: String) {
         if isListening {
-            if let offlineAsset = getOfflineAsset(assetId: assetId) {
-                notifyDownloadStateChanged(offlineAsset: offlineAsset)
-            }
-            notifyDownloadsChange()
+            emitDeletedEvent(assetId: assetId)
         }
+    }
+
+    private func notifyDownloadLifecycleEvent(name: String, asset: OfflineAsset, error: Error? = nil) {
+        emitSingleDownloadEvent(name: name, asset: asset, error: error)
+        emitSingleDownloadEvent(name: "onDownloadStateChanged", asset: asset, error: error)
+        notifyDownloadsChange()
+    }
+
+    private func emitSingleDownloadEvent(name: String, asset: OfflineAsset, error: Error? = nil) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let downloadItem = self.mapOfflineAssetToDict(asset)
+            var eventData: [String: Any] = ["downloadItem": downloadItem]
+            
+            if let error = error {
+                eventData["error"] = [
+                    "message": error.localizedDescription,
+                    "type": String(describing: type(of: error))
+                ]
+            } else {
+                eventData["error"] = NSNull()
+            }
+            
+            self.sendEvent(withName: name, body: eventData)
+        }
+    }
+
+    private func emitDeletedEvent(assetId: String) {
+        let eventData: [String: Any] = ["videoId": assetId]
+        self.sendEvent(withName: "onDownloadDeleted", body: eventData)
+        notifyDownloadsChange()
     }
 
     func onRequestNewAccessToken(assetId: String, completion: @escaping (String?) -> Void) {
@@ -147,28 +175,6 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
             guard let self = self else { return }
             let downloadAssets = self.getAllDownloadItems()
             self.sendEvent(withName: "onDownloadProgressChanged", body: downloadAssets)
-        }
-    }
-    
-    private func notifyDownloadStateChanged(offlineAsset: OfflineAsset, error: Error? = nil) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let downloadItem = self.mapOfflineAssetToDict(offlineAsset)
-            
-            var eventData: [String: Any] = [:]
-            eventData["downloadItem"] = downloadItem
-            
-            if let error = error {
-                eventData["error"] = [
-                    "message": error.localizedDescription,
-                    "type": String(describing: type(of: error))
-                ]
-            } else {
-                eventData["error"] = NSNull()
-            }
-            
-            self.sendEvent(withName: "onDownloadStateChanged", body: eventData)
         }
     }
     
@@ -328,7 +334,16 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
 
     @objc
     override func supportedEvents() -> [String] {
-        return ["onDownloadProgressChanged", "onDownloadStateChanged"]
+        return [
+            "onDownloadProgressChanged",
+            "onDownloadStateChanged",
+            "onDownloadStarted",
+            "onDownloadPaused",
+            "onDownloadResumed",
+            "onDownloadCompleted",
+            "onDownloadFailed",
+            "onDownloadDeleted"
+        ]
     }
     
     @objc

@@ -62,11 +62,32 @@ export function onDownloadProgressChanged(
   );
 }
 
-export function onDownloadStateChanged(
-  listener: DownloadStateChangeListener
+const createDownloadStateListener =
+  (eventName: string) =>
+  (listener: DownloadStateChangeListener): EmitterSubscription => {
+    return downloadEventEmitter.addListener(eventName, (event) => {
+      listener(event.downloadItem, event.error);
+    });
+  };
+
+export const onDownloadStateChanged = createDownloadStateListener(
+  'onDownloadStateChanged'
+);
+export const onDownloadStarted =
+  createDownloadStateListener('onDownloadStarted');
+export const onDownloadPaused = createDownloadStateListener('onDownloadPaused');
+export const onDownloadResumed =
+  createDownloadStateListener('onDownloadResumed');
+export const onDownloadCompleted = createDownloadStateListener(
+  'onDownloadCompleted'
+);
+export const onDownloadFailed = createDownloadStateListener('onDownloadFailed');
+
+export function onDownloadDeleted(
+  listener: (videoId: string) => void
 ): EmitterSubscription {
-  return downloadEventEmitter.addListener('onDownloadStateChanged', (event) => {
-    listener(event.downloadItem, event.error);
+  return downloadEventEmitter.addListener('onDownloadDeleted', (event) => {
+    listener(event.videoId);
   });
 }
 

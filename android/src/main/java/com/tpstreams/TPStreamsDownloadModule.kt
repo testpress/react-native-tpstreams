@@ -110,23 +110,78 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
         }
     }
 
-    override fun onDownloadStateChanged(downloadItem: DownloadItem, error: Exception?) {
-        try {  
-            val map = Arguments.createMap()
-            val downloadItemMap = createDownloadItemMap(downloadItem)
-            map.putMap("downloadItem", downloadItemMap)
-            
-            if (error != null) {
-                val errorMap = Arguments.createMap()
-                errorMap.putString("message", error.message ?: "Unknown error")
-                errorMap.putString("type", error.javaClass.simpleName)
-                map.putMap("error", errorMap)
-            } else {
-                map.putNull("error")
+    override fun onDownloadStarted(downloadItem: DownloadItem) {
+        try {
+            if (isListening) {
+                emitEvent("onDownloadStarted", createDownloadStateEventMap(downloadItem))
             }
-            
-            emitEvent("onDownloadStateChanged", map)
-            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadStarted: ${e.message}", e)
+        }
+    }
+
+    override fun onDownloadResumed(downloadItem: DownloadItem) {
+        try {
+            if (isListening) {
+                emitEvent("onDownloadResumed", createDownloadStateEventMap(downloadItem))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadResumed: ${e.message}", e)
+        }
+    }
+
+    override fun onDownloadCompleted(downloadItem: DownloadItem) {
+        try {
+            if (isListening) {
+                emitEvent("onDownloadCompleted", createDownloadStateEventMap(downloadItem))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadCompleted: ${e.message}", e)
+        }
+    }
+
+    override fun onDownloadFailed(downloadItem: DownloadItem, error: Exception) {
+        try {
+            if (isListening) {
+                emitEvent("onDownloadFailed", createDownloadStateEventMap(downloadItem, error))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadFailed: ${e.message}", e)
+        }
+    }
+
+    override fun onDownloadDeleted(assetId: String) {
+        try {
+            if (isListening) {
+                val map = Arguments.createMap()
+                map.putString("videoId", assetId)
+                emitEvent("onDownloadDeleted", map)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onDownloadDeleted: ${e.message}", e)
+        }
+    }
+
+    private fun createDownloadStateEventMap(downloadItem: DownloadItem, error: Exception? = null): WritableMap {
+        val map = Arguments.createMap()
+        map.putMap("downloadItem", createDownloadItemMap(downloadItem))
+
+        if (error != null) {
+            val errorMap = Arguments.createMap()
+            errorMap.putString("message", error.message ?: "Unknown error")
+            errorMap.putString("type", error.javaClass.simpleName)
+            map.putMap("error", errorMap)
+        } else {
+            map.putNull("error")
+        }
+        return map
+    }
+
+    override fun onDownloadStateChanged(downloadItem: DownloadItem, error: Exception?) {
+        try {
+            if (isListening) {
+                emitEvent("onDownloadStateChanged", createDownloadStateEventMap(downloadItem, error))
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error in onDownloadStateChanged: ${e.message}", e)
         }
