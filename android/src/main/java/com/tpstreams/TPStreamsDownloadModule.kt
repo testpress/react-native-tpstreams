@@ -36,7 +36,7 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
             val metadataString = metadata?.let { org.json.JSONObject(it.toHashMap()).toString() }
             val metadataMap = JsonUtils.jsonStringToMap(metadataString)
 
-            val activity = currentActivity ?: run {
+            val activity =reactApplicationContext.currentActivity?: run {
                 promise.reject("DOWNLOAD_START_ERROR", "No current activity available")
                 return
             }
