@@ -9,9 +9,12 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import com.tpstreams.player.download.DownloadClient
 import com.tpstreams.player.download.DownloadItem
 
+@OptIn(UnstableApi::class)
 class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), DownloadClient.Listener {
 
     private val downloadClient: DownloadClient by lazy {

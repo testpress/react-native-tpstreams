@@ -12,9 +12,12 @@ import com.tpstreams.player.constants.PlaybackError
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.PlaybackException
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import android.media.MediaCodec
 import android.view.View.MeasureSpec
 
+@OptIn(UnstableApi::class)
 class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) {
     private val playerView: TPStreamsPlayerView = TPStreamsPlayerView(context)
     private var player: TPStreamsPlayer? = null
