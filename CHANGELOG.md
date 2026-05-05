@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.15] - 2026-05-05
 ### Changed
-- Update TPStreams Android Player to **1.1.15** to prevent fullscreen transition crashes caused by `Detaching surface timed out`.
+- Update TPStreams Android Player to **1.1.16** for improved fullscreen playback stability.
+
+### Fixed
+- Prevent fullscreen transition crashes caused by `Detaching surface timed out`.
+- Prevent fullscreen reattachment from showing the loading spinner when playback is already ready.
 
 ## [1.1.14] - 2026-04-24
 ### Added
