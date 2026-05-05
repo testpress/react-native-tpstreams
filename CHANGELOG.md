@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.15] - 2026-05-05
+### Changed
+- Update TPStreams Android Player to **1.1.15** to prevent fullscreen transition crashes caused by `Detaching surface timed out`.
+
 ## [1.1.14] - 2026-04-24
 ### Added
 - Add clock drift diagnostics to error reports in SDK (via TPStreams Android Player **1.1.13-beta.2**)
@@ -105,6 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow flexible metadata types to support complex data structures (#38)
 - Trigger download state event when starting progress listener (iOS)
 
+[1.1.15]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.14...v1.1.15
 [1.1.14]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.13...v1.1.14
 [1.1.13]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.12...v1.1.13
 [1.1.12]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.11...v1.1.12
