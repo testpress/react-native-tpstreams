@@ -16,6 +16,12 @@ import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import android.media.MediaCodec
 import android.view.View.MeasureSpec
+import androidx.media3.database.DatabaseProvider
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.cache.Cache
+import androidx.media3.exoplayer.offline.DownloadManager
+import java.util.concurrent.ExecutorService
 
 @OptIn(UnstableApi::class)
 class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) {
@@ -139,6 +145,8 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     fun tryCreatePlayer() {
         if (videoId.isNullOrEmpty() || accessToken.isNullOrEmpty()) return
         if (player != null) return
+
+        ensureDownloadManagerHealthy()
 
         try {
             player = TPStreamsPlayer.create(
@@ -270,6 +278,87 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         super.onDetachedFromWindow()
         playerView.player = null
         player?.pause()
+    }
+
+    /**
+     * Workaround for a bug in TPStreamsAndroidPlayer: DownloadController.isInitialized is never
+     * reset to false even after TPSDownloadService.onDestroy() calls DownloadManager.release(),
+     * which kills its internal HandlerThread. On the next download attempt, the stale
+     * DownloadManager is reused and sending a message to its dead handler throws:
+     *   IllegalStateException: Handler {…} sending message to a Handler on a dead thread
+     *
+     * Fix: detect the dead HandlerThread via reflection. If dead, replace the DownloadManager
+     * inside DownloadController with a fresh instance that reuses the existing SimpleCache
+     * (we cannot recreate SimpleCache — a file lock prevents opening the same directory twice).
+     * Then reset the DownloadClient singleton so it binds to the new DownloadManager.
+     */
+    @OptIn(UnstableApi::class)
+    private fun ensureDownloadManagerHealthy() {
+        try {
+            val ctrlClass = Class.forName("com.tpstreams.player.download.DownloadController")
+            val instance = ctrlClass.getDeclaredField("INSTANCE").apply { isAccessible = true }.get(null) ?: return
+
+            val isInitField = ctrlClass.getDeclaredField("isInitialized").apply { isAccessible = true }
+            if (!(isInitField.get(instance) as Boolean)) return // not yet initialized, TPStreamsPlayer.create will init it
+
+            val dmField = ctrlClass.getDeclaredField("downloadManager").apply { isAccessible = true }
+            val dm = dmField.get(instance) ?: return
+
+            if (isDownloadManagerAlive(dm)) return // healthy, nothing to do
+
+            Log.w("TPStreamsRNPlayerView", "DownloadManager HandlerThread is dead — reinitializing with fresh instance")
+
+            // Reuse existing components; SimpleCache must not be recreated (file lock)
+            val dbProvider = ctrlClass.getDeclaredField("databaseProvider").apply { isAccessible = true }.get(instance) as? DatabaseProvider ?: return
+            val cache = ctrlClass.getDeclaredField("downloadCache").apply { isAccessible = true }.get(instance) as? Cache ?: return
+            val httpDsf = ctrlClass.getDeclaredField("httpDataSourceFactory").apply { isAccessible = true }.get(instance) as? DataSource.Factory ?: return
+            val executor = ctrlClass.getDeclaredField("downloadExecutor").apply { isAccessible = true }.get(instance) as? ExecutorService ?: return
+
+            val appCtx = context.applicationContext
+            val newDm = DownloadManager(
+                appCtx, dbProvider, cache,
+                DefaultDataSource.Factory(appCtx, httpDsf),
+                executor
+            ).apply { maxParallelDownloads = 3 }
+
+            dmField.set(instance, newDm)
+            Log.d("TPStreamsRNPlayerView", "DownloadController: fresh DownloadManager installed")
+
+            resetDownloadClientSingleton()
+
+        } catch (e: Exception) {
+            Log.w("TPStreamsRNPlayerView", "ensureDownloadManagerHealthy: ${e.message}")
+        }
+    }
+
+    private fun isDownloadManagerAlive(dm: Any): Boolean {
+        return try {
+            val handlerField = dm.javaClass.getDeclaredField("internalHandler").apply { isAccessible = true }
+            val handler = handlerField.get(dm) ?: return false
+            var clz: Class<*>? = handler.javaClass
+            var mLooperField: java.lang.reflect.Field? = null
+            while (clz != null && mLooperField == null) {
+                try { mLooperField = clz.getDeclaredField("mLooper").apply { isAccessible = true } }
+                catch (_: NoSuchFieldException) { clz = clz.superclass }
+            }
+            val looper = mLooperField?.get(handler) as? android.os.Looper
+            looper?.thread?.isAlive == true
+        } catch (e: Exception) {
+            // If we can't determine liveness, assume alive — conservative, avoids spurious reinit
+            Log.w("TPStreamsRNPlayerView", "isDownloadManagerAlive: can't determine, assuming alive: ${e.message}")
+            true
+        }
+    }
+
+    private fun resetDownloadClientSingleton() {
+        try {
+            val clientClass = Class.forName("com.tpstreams.player.download.DownloadClient")
+            val instanceField = clientClass.getDeclaredField("instance").apply { isAccessible = true }
+            instanceField.set(null, null)
+            Log.d("TPStreamsRNPlayerView", "DownloadClient: singleton reset for fresh binding")
+        } catch (e: Exception) {
+            Log.w("TPStreamsRNPlayerView", "resetDownloadClientSingleton: ${e.message}")
+        }
     }
 
     fun releasePlayer() {
