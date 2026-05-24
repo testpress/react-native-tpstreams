@@ -17,9 +17,10 @@ import com.tpstreams.player.download.DownloadItem
 @OptIn(UnstableApi::class)
 class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), DownloadClient.Listener {
 
-    private val downloadClient: DownloadClient by lazy {
-        DownloadClient.getInstance(reactContext)
-    }
+    // Computed property — always returns the current singleton, which may be replaced
+    // by ensureDownloadManagerHealthy() in TPStreamsRNPlayerView after a service restart.
+    private val downloadClient: DownloadClient
+        get() = DownloadClient.getInstance(reactContext)
 
     private var isListening = false
 
@@ -61,11 +62,12 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
     @ReactMethod
     fun addDownloadProgressListener(promise: Promise) {
         try {
-            if (!isListening) {
-                downloadClient.addListener(this)
-                isListening = true
-                Log.d(TAG, "Started listening for download progress")
-            }
+            // Always call addListener — DownloadClient.listeners is a Set so duplicates on
+            // the same instance are ignored. After a DownloadClient singleton reset (caused
+            // by ensureDownloadManagerHealthy), the new instance needs this listener added.
+            downloadClient.addListener(this)
+            isListening = true
+            Log.d(TAG, "Started listening for download progress")
             promise.resolve(null)
         } catch (e: Exception) {
             Log.e(TAG, "Error starting progress listener: ${e.message}", e)
