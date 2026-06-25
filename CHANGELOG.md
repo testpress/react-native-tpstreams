@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.18] - 2026-06-25
+
+### Changed
+
+- Update TPStreamsSDK Android Player to **1.1.20**.
+  - Add network diagnostics and playback error classification with automatic retry handling for recoverable network issues.
+  - Add request URLs in Sentry error reports to improve debugging of asset loading failures.
+
 ## [1.1.17] - 2026-06-12
 
 ### Changed
@@ -128,6 +136,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow flexible metadata types to support complex data structures (#38)
 - Trigger download state event when starting progress listener (iOS)
 
+[1.1.18]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.17...v1.1.18
+[1.1.17]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.16...v1.1.17
+[1.1.16]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.15...v1.1.16
 [1.1.15]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.14...v1.1.15
 [1.1.14]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.13...v1.1.14
 [1.1.13]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.12...v1.1.13
