@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.18] - 2026-06-25
 
 ### Changed
-
+- Update TPStreams iOS Player SDK from 1.2.30 to 1.2.33, which includes caption  support.
 - Update TPStreamsSDK Android Player to **1.1.20**.
   - Add network diagnostics and playback error classification with automatic retry handling for recoverable network issues.
   - Add request URLs in Sentry error reports to improve debugging of asset loading failures.

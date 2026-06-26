@@ -165,6 +165,7 @@ export default function App() {
               onIsLoadingChanged={handleIsLoadingChanged}
               onError={handleError}
               enableDownload={true}
+              showDefaultCaptions={true}
             />
           </View>
 

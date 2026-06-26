@@ -201,6 +201,11 @@ class TPStreamsRNPlayerView: UIView {
             configBuilder.showDownloadOption()
         }
         
+        if showDefaultCaptions {
+            configBuilder.enableCaptions(true)
+            configBuilder.autoSelectFirstSubtitle(true)
+        }
+
         return configBuilder
     }
     
