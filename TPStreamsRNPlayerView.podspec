@@ -21,9 +21,9 @@ Pod::Spec.new do |s|
       'DEFINES_MODULE' => 'YES',
       'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'
     }
-  s.dependency "TPStreamsSDK" , "1.2.33"
+  s.dependency "TPStreamsSDK" , "1.2.35"
 
-  
+
   # Ensure the module is not built as a framework to avoid bridging header conflicts
   s.static_framework = true
 

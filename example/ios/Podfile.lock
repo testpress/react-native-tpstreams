@@ -1663,15 +1663,15 @@ PODS:
   - Realm/Headers (10.54.6)
   - RealmSwift (10.54.6):
     - Realm (= 10.54.6)
-  - Sentry (9.19.0):
-    - Sentry/Core (= 9.19.0)
-  - Sentry/Core (9.19.0)
+  - Sentry (9.19.1):
+    - Sentry/Core (= 9.19.1)
+  - Sentry/Core (9.19.1)
   - SocketRocket (0.7.1)
   - SwiftSubtitles (1.8.1):
     - DSFRegex (~> 3.4.0)
     - TinyCSV (~> 1.0.0)
   - TinyCSV (1.0.1)
-  - TPStreamsRNPlayerView (1.1.17):
+  - TPStreamsRNPlayerView (1.1.18):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1694,9 +1694,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - TPStreamsSDK (= 1.2.33)
+    - TPStreamsSDK (= 1.2.35)
     - Yoga
-  - TPStreamsSDK (1.2.33):
+  - TPStreamsSDK (1.2.35):
     - Alamofire (~> 5.9.0)
     - M3U8Kit (~> 1.2.0)
     - ReachabilitySwift (~> 5.2.2)
@@ -2015,14 +2015,14 @@ SPEC CHECKSUMS:
   ReactCommon: 1511ef100f1afa4c199fe52fe7a8d2529a41429a
   Realm: b1b3bc68162fa242132eb7eefbf91d7c40f36a85
   RealmSwift: 456cfd82a4f23dff8e3456980999331ab69bbf3e
-  Sentry: 996238da99d8710438655666395d94c49604981f
+  Sentry: e4588d62ac3fd3c82652bb7c8a215ec8c3de776b
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SwiftSubtitles: db6159ae70a180a1cfa22dd4eb845e25c000b271
   TinyCSV: f6124d52f5cdc61cdda211b7578884185206e80e
-  TPStreamsRNPlayerView: 4dedc2f30362fb18f08b76fa8fb9e0937116bcfa
-  TPStreamsSDK: b8c6fbeae18e0f0496a9b2a4c577b1b7806129f6
+  TPStreamsRNPlayerView: ba4d924b68f55c4c5ca421dd3f242a7ed8585b8a
+  TPStreamsSDK: 001be312a5feb841cccc5c652e00ec2f5e97927e
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
 PODFILE CHECKSUM: 3f7e2acbe0418b2ae4e9fbd9102ff83a37c15215
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

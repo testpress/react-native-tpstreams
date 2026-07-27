@@ -5,10 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.20] - 2026-07-27
+
+### Changed
+- Update TPStreams iOS Player SDK from 1.2.33 to **1.2.35**, which includes:
+  - Offline license duration API.
+  - Live stream playback fix for Testpress.
+  - CocoaPods flags fix.
+  - Corrected `setupCompletion` callback timing.
+  - Invalid URL error reporting.
+- Update TPStreamsSDK Android Player from 1.1.20 to **1.2.4**, which includes:
+  - Fix secure decoder crash on MediaTek devices during fullscreen transitions.
+
+### Fixed
+- Correct Xcode version in CI workflow.
+
 ## [1.1.18] - 2026-06-25
 
 ### Changed
-- Update TPStreams iOS Player SDK from 1.2.30 to 1.2.33, which includes caption  support.
+- Update TPStreams iOS Player SDK from 1.2.30 to 1.2.33, which includes caption support.
 - Update TPStreamsSDK Android Player to **1.2.4**, which includes:
   - Fix secure decoder crash on MediaTek devices during fullscreen transitions.
 
@@ -135,6 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow flexible metadata types to support complex data structures (#38)
 - Trigger download state event when starting progress listener (iOS)
 
+[1.1.20]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.18...v1.1.20
 [1.1.18]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.17...v1.1.18
 [1.1.17]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.16...v1.1.17
 [1.1.16]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.15...v1.1.16
