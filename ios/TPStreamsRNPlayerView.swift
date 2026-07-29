@@ -20,7 +20,8 @@ class TPStreamsRNPlayerView: UIView {
     private var playerViewController: TPStreamPlayerViewController?
     private var playerStatusObserver: NSKeyValueObservation?
     private var playbackSpeedObserver: NSKeyValueObservation?
-    private var timeControlStatusObserver: NSKeyValueObservation?
+    private var playingStateObserver: NSKeyValueObservation?
+    private var playbackStateTimeControlObserver: NSKeyValueObservation?
     private var playerStateObserver: NSKeyValueObservation?
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
@@ -30,7 +31,9 @@ class TPStreamsRNPlayerView: UIView {
         return indicator
     }()
     private var setupScheduled = false
-    private var isPlayerReady = false
+    /// RN bridge overlay is only for the first load. Mid-playback buffering/renewal
+    /// is owned by the native SDK spinner (avoids stuck overlay after DRM renewal).
+    private var hasCompletedInitialLoad = false
     private var pendingOfflineCredentialsCompletion: ((String?, Double) -> Void)?
     private var _offlineLicenseExpireTime: Double = LicenseDurationUtils.DEFAULT_LICENSE_EXPIRY_SECONDS
     
@@ -94,7 +97,7 @@ class TPStreamsRNPlayerView: UIView {
     
     private func setupPlayer() {
         cleanupPlayer()
-        isPlayerReady = false
+        hasCompletedInitialLoad = false
         
         player = TPStreamsDownloadManager.shared.isAssetDownloaded(assetID: videoId as String)
             ? createOfflinePlayer()
@@ -129,8 +132,10 @@ class TPStreamsRNPlayerView: UIView {
         playerStatusObserver = nil
         playbackSpeedObserver?.invalidate()
         playbackSpeedObserver = nil
-        timeControlStatusObserver?.invalidate()
-        timeControlStatusObserver = nil
+        playingStateObserver?.invalidate()
+        playingStateObserver = nil
+        playbackStateTimeControlObserver?.invalidate()
+        playbackStateTimeControlObserver = nil
         playerStateObserver?.invalidate()
         playerStateObserver = nil
     }
@@ -251,19 +256,10 @@ class TPStreamsRNPlayerView: UIView {
     private func setupPlayingStateObserver() {
         guard let player = player else { return }
         
-        timeControlStatusObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
+        playingStateObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
-                guard let self = self else { return }
-                let timeStatus = player.timeControlStatus
-                let isPlaying = timeStatus == .playing
-
-                // Show loader while buffering; hide only after player is ready.
-                if timeStatus == .waitingToPlayAtSpecifiedRate {
-                    self.showLoadingIndicator()
-                } else if self.isPlayerReady {
-                    self.hideLoadingIndicator()
-                }
-                self.onIsPlayingChanged?(["isPlaying": isPlaying])
+                let isPlaying = player.timeControlStatus == .playing
+                self?.onIsPlayingChanged?(["isPlaying": isPlaying])
             }
         }
     }
@@ -278,29 +274,41 @@ class TPStreamsRNPlayerView: UIView {
                 let state = self.mapPlayerStateToAndroid(status) ?? PlaybackState.idle.rawValue
                 self.onPlayerStateChanged?(["playbackState": state])
 
-                // Drive readiness and loader from AVPlayer.status.
                 switch status {
                 case .readyToPlay:
-                    self.isPlayerReady = true
-                    if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
-                        self.hideLoadingIndicator()
-                    }
+                    self.completeInitialLoadIfReady(player)
                 case .failed:
-                    self.isPlayerReady = false
                     self.hideLoadingIndicator()
                 default:
-                    self.isPlayerReady = false
-                    self.showLoadingIndicator()
+                    if !self.hasCompletedInitialLoad {
+                        self.showLoadingIndicator()
+                    }
                 }
             }
         }
         
-        timeControlStatusObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
+        playbackStateTimeControlObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
-                let state = self?.mapPlayerStateToAndroid(player.status, timeControlStatus: player.timeControlStatus) ?? PlaybackState.idle.rawValue
-                self?.onPlayerStateChanged?(["playbackState": state])
+                guard let self = self else { return }
+                let state = self.mapPlayerStateToAndroid(
+                    player.status,
+                    timeControlStatus: player.timeControlStatus
+                ) ?? PlaybackState.idle.rawValue
+                self.onPlayerStateChanged?(["playbackState": state])
+                self.completeInitialLoadIfReady(player)
             }
         }
+    }
+
+    /// Hides the RN overlay once the first load is ready and not waiting to start.
+    /// Mid-playback waiting (e.g. offline DRM renewal) must not revive this overlay.
+    private func completeInitialLoadIfReady(_ player: AVPlayer) {
+        guard !hasCompletedInitialLoad else { return }
+        guard player.status == .readyToPlay else { return }
+        guard player.timeControlStatus != .waitingToPlayAtSpecifiedRate else { return }
+
+        hideLoadingIndicator()
+        hasCompletedInitialLoad = true
     }
 
     private func sendErrorEvent(_ message: String, _ code: Int, _ details: String) {
@@ -419,6 +427,12 @@ class TPStreamsRNPlayerView: UIView {
             let duration = offlineLicenseExpireTime
             offlineLicenseRenewalCompletion(newToken, duration)
             pendingOfflineCredentialsCompletion = nil
+            // Only clear the RN overlay after initial load. If renewal fires before
+            // .readyToPlay (stale offline credentials on first open), keep the
+            // initial-load spinner until completeInitialLoadIfReady runs.
+            if hasCompletedInitialLoad {
+                hideLoadingIndicator()
+            }
         }
     }
 
