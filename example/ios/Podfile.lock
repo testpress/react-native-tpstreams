@@ -1671,7 +1671,7 @@ PODS:
     - DSFRegex (~> 3.4.0)
     - TinyCSV (~> 1.0.0)
   - TinyCSV (1.0.1)
-  - TPStreamsRNPlayerView (1.1.18):
+  - TPStreamsRNPlayerView (1.1.20):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2019,7 +2019,7 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SwiftSubtitles: db6159ae70a180a1cfa22dd4eb845e25c000b271
   TinyCSV: f6124d52f5cdc61cdda211b7578884185206e80e
-  TPStreamsRNPlayerView: ba4d924b68f55c4c5ca421dd3f242a7ed8585b8a
+  TPStreamsRNPlayerView: 048dd5323e299accb71af6db5b6250364d5b9134
   TPStreamsSDK: 001be312a5feb841cccc5c652e00ec2f5e97927e
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 

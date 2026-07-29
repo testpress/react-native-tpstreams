@@ -19,7 +19,11 @@ import {
   type DownloadItem,
 } from 'react-native-tpstreams';
 
-const DownloadList = () => {
+interface DownloadListProps {
+  onPlayVideo?: (videoId: string) => void;
+}
+
+const DownloadList = ({ onPlayVideo }: DownloadListProps) => {
   const [downloads, setDownloads] = useState<DownloadItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -95,7 +99,13 @@ const DownloadList = () => {
     const isPaused = item.state === 'Paused';
 
     return (
-      <View key={item.videoId} style={styles.downloadItem}>
+      <TouchableOpacity
+        key={item.videoId}
+        style={styles.downloadItem}
+        onPress={() => isCompleted && onPlayVideo?.(item.videoId)}
+        disabled={!isCompleted}
+        activeOpacity={isCompleted ? 0.7 : 1}
+      >
         <Text style={styles.title}>
           {item.title || `Video ${item.videoId}`}
         </Text>
@@ -122,6 +132,10 @@ const DownloadList = () => {
             {(item.downloadedBytes / (1024 * 1024)).toFixed(1)} MB /
             {(item.totalBytes / (1024 * 1024)).toFixed(1)} MB
           </Text>
+        )}
+
+        {isCompleted && (
+          <Text style={styles.tapToPlayHint}>Tap to play offline</Text>
         )}
 
         <View style={styles.buttonContainer}>
@@ -154,7 +168,7 @@ const DownloadList = () => {
             <Text style={styles.buttonText}>Remove</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -273,6 +287,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  tapToPlayHint: {
+    fontSize: 13,
+    color: '#007AFF',
+    fontWeight: '600',
+    marginBottom: 8,
   },
   emptyText: {
     textAlign: 'center',
