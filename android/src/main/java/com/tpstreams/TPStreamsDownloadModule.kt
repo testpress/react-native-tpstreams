@@ -33,6 +33,7 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
         accessToken: String,
         resolution: String?,
         metadata: ReadableMap?,
+        offlineLicenseExpireTime: Double?,
         promise: Promise
     ) {
         try {
@@ -49,7 +50,8 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
                 videoId,
                 accessToken,
                 resolution,
-                metadataMap
+                metadataMap,
+                offlineLicenseExpireTime?.toLong()
             )
             promise.resolve(null)
         } catch (e: Exception) {
