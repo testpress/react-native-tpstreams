@@ -24,7 +24,6 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private val reactContext: ReactContext = context
 
     companion object {
-        private const val DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME = 15L * 24L * 60L * 60L // 15 days in seconds
         private const val ERROR_CODE_PLAYER_CREATION_FAILED = 1001
         private const val ERROR_CODE_DRM_LICENSE_EXPIRED = 5001
     }
@@ -37,7 +36,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var startInFullscreen: Boolean = false
     private var enableDownload: Boolean = false
     private var downloadMetadata: Map<String, Any>? = null
-    private var offlineLicenseExpireTime: Long = DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
+    private var offlineLicenseExpireTime: Long = LicenseDurationUtils.DEFAULT_LICENSE_EXPIRY_SECONDS
     private var accessTokenCallback: ((String) -> Unit)? = null
     private var isLayoutUpdatePosted = false
 
@@ -125,7 +124,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     }
     
     fun setOfflineLicenseExpireTime(expireTime: Long?) {
-        this.offlineLicenseExpireTime = sanitizeLicenseDuration(expireTime)
+        this.offlineLicenseExpireTime = LicenseDurationUtils.sanitize(expireTime)
     }
     
     fun setNewAccessToken(newToken: String) {
@@ -280,12 +279,5 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         }
         player = null
         accessTokenCallback = null
-    }
-
-    private fun sanitizeLicenseDuration(value: Long?): Long {
-        if (value == null || value <= 0L) {
-            return DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME
-        }
-        return minOf(value, DEFAULT_OFFLINE_LICENSE_EXPIRE_TIME)
     }
 }

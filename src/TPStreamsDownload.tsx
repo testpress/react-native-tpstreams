@@ -35,13 +35,15 @@ export function startDownload(
   videoId: string,
   accessToken: string,
   resolution: string | null = null,
-  metadata: Record<string, any> | null = null
+  metadata: Record<string, any> | null = null,
+  offlineLicenseExpireTime?: number
 ): Promise<void> {
   return TPStreamsDownload.startDownload(
     videoId,
     accessToken,
     resolution,
-    metadata
+    metadata,
+    offlineLicenseExpireTime ?? null
   );
 }
 

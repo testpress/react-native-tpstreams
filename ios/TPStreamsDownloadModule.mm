@@ -15,6 +15,7 @@ RCT_EXTERN_METHOD(startDownload:(NSString *)videoId
                   accessToken:(NSString *)accessToken
                   resolution:(NSString *)resolution
                   metadata:(NSDictionary *)metadata
+                  offlineLicenseExpireTime:(NSNumber *)offlineLicenseExpireTime
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
