@@ -51,7 +51,7 @@ class TPStreamsDownloadModule(private val reactContext: ReactApplicationContext)
                 accessToken,
                 resolution,
                 metadataMap,
-                offlineLicenseExpireTime?.toLong()
+                LicenseDurationUtils.sanitize(offlineLicenseExpireTime?.toLong())
             )
             promise.resolve(null)
         } catch (e: Exception) {

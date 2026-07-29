@@ -15,8 +15,6 @@ class TPStreamsRNPlayerView: UIView {
         case ready = 3
         case ended = 4
     }
-
-    private static let maxOfflineLicenseDuration: Double = 15 * 24 * 60 * 60
     
     private var player: TPAVPlayer?
     private var playerViewController: TPStreamPlayerViewController?
@@ -34,7 +32,7 @@ class TPStreamsRNPlayerView: UIView {
     private var setupScheduled = false
     private var isPlayerReady = false
     private var pendingOfflineCredentialsCompletion: ((String?, Double) -> Void)?
-    private var _offlineLicenseExpireTime: Double = TPStreamsRNPlayerView.maxOfflineLicenseDuration
+    private var _offlineLicenseExpireTime: Double = LicenseDurationUtils.DEFAULT_LICENSE_EXPIRY_SECONDS
     
     @objc var videoId: NSString = ""
     @objc var accessToken: NSString = ""
@@ -43,7 +41,7 @@ class TPStreamsRNPlayerView: UIView {
     @objc var enableDownload: Bool = false
     @objc var offlineLicenseExpireTime: Double {
         get { _offlineLicenseExpireTime }
-        set { _offlineLicenseExpireTime = TPStreamsRNPlayerView.sanitizeLicenseDuration(newValue) }
+        set { _offlineLicenseExpireTime = LicenseDurationUtils.sanitize(newValue) }
     }
     @objc var showDefaultCaptions: Bool = false
     @objc var startInFullscreen: Bool = false
@@ -355,11 +353,6 @@ class TPStreamsRNPlayerView: UIView {
         DispatchQueue.main.async {
             self.loadingIndicator.stopAnimating()
         }
-    }
-
-    private static func sanitizeLicenseDuration(_ value: Double) -> Double {
-        guard value > 0 else { return maxOfflineLicenseDuration }
-        return min(value, maxOfflineLicenseDuration)
     }
 
     private func parseMetadataJSON(from jsonString: NSString?) -> [String: Any]? {

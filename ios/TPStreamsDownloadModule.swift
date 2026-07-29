@@ -72,7 +72,9 @@ class TPStreamsDownloadModule: RCTEventEmitter, TPStreamsDownloadDelegate {
                 resolution: res,
                 allowResolutionFallback: true,
                 metadata: metadataDict,
-                offlineLicenseDurationSeconds: offlineLicenseExpireTime?.doubleValue,
+                offlineLicenseDurationSeconds: LicenseDurationUtils.sanitize(
+                    offlineLicenseExpireTime?.doubleValue ?? 0
+                ),
                 presentingViewController: presentingVC,
                 completion: nil
             )
