@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.21] - 2026-08-05
+
+### Added
+- Add optional `offlineLicenseExpireTime` to the `startDownload` API, wired through iOS and Android native download modules (#54)
+
+### Changed
+- Update TPStreams iOS Player SDK from 1.2.35 to **1.2.36**, which includes:
+  - Use a per-player `AVContentKeySession` for offline DRM, ensuring expired licenses are validated on every playback instead of being bypassed by cached content keys from a shared session (#153)
+  - Migrate RealmSwift from 10.54.2 to 20.0.4 (#154)
+  - Make offline asset deletion thread-safe by carrying only plain asset and content ids across threads, and running encryption-key cleanup on the content key delegate queue (#155)
+- Update TPStreamsSDK Android Player from 1.2.4 to **1.2.6**, which includes:
+  - Expose `offlineLicenseExpireTime` on `DownloadClient.startDownload` (via **1.2.5**) (#54)
+  - Upgrade `androidx.media3` from 1.7.1 to 1.8.1, the last release line that supports minSdk 21 (1.9+ raises the minimum to 23) (#117)
+  - Playback fixes: VP9 Widevine playback on some devices, an extended detached-surface workaround for Lenovo/Motorola/realme devices, Bluetooth A/V sync after pause-resume, and several DASH/HLS fixes
+  - Adapt download preparation to the updated `DownloadHelper.Callback.onPrepared` callback signature in 1.8.0 (#117)
+
 ## [1.1.20] - 2026-07-27
 
 ### Changed
@@ -150,6 +166,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow flexible metadata types to support complex data structures (#38)
 - Trigger download state event when starting progress listener (iOS)
 
+[1.1.21]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.20...v1.1.21
 [1.1.20]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.18...v1.1.20
 [1.1.18]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.17...v1.1.18
 [1.1.17]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.16...v1.1.17
