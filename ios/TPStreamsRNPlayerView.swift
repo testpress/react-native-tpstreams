@@ -199,8 +199,10 @@ class TPStreamsRNPlayerView: UIView {
             configBuilder.showDownloadOption()
         }
         
+        // Always expose the captions option, matching Android where the menu is
+        // always shown. The prop only controls auto-selecting the first track.
+        configBuilder.enableCaptions(true)
         if showDefaultCaptions {
-            configBuilder.enableCaptions(true)
             configBuilder.autoSelectFirstSubtitle(true)
         }
 
