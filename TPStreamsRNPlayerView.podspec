@@ -21,6 +21,10 @@ Pod::Spec.new do |s|
       'DEFINES_MODULE' => 'YES',
       'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'
     }
+  # TODO: bump once the presence-heartbeat PR (iOSPlayerSDK
+  # feat/presence-sdk-integration) merges and releases — this pinned version
+  # predates TPStreamPlayerViewControllerDelegate.presenceTokenExpired, so
+  # TPStreamsRNPlayerView.swift's conformance to it will not compile until then.
   s.dependency "TPStreamsSDK" , "1.2.36"
 
 

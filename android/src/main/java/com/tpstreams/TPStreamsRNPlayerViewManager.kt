@@ -27,6 +27,7 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     private const val EVENT_IS_LOADING_CHANGED = "onIsLoadingChanged"
     private const val EVENT_ERROR = "onError"
     private const val EVENT_ACCESS_TOKEN_EXPIRED = "onAccessTokenExpired"
+    private const val EVENT_PRESENCE_TOKEN_EXPIRED = "onPresenceTokenExpired"
   }
   
   private val mDelegate: ViewManagerDelegate<TPStreamsRNPlayerView> = 
@@ -48,6 +49,7 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
       .put(EVENT_IS_LOADING_CHANGED, MapBuilder.of("registrationName", EVENT_IS_LOADING_CHANGED))
       .put(EVENT_ERROR, MapBuilder.of("registrationName", EVENT_ERROR))
       .put(EVENT_ACCESS_TOKEN_EXPIRED, MapBuilder.of("registrationName", EVENT_ACCESS_TOKEN_EXPIRED))
+      .put(EVENT_PRESENCE_TOKEN_EXPIRED, MapBuilder.of("registrationName", EVENT_PRESENCE_TOKEN_EXPIRED))
       .build()
   }
 
@@ -135,7 +137,11 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
   override fun setNewAccessToken(view: TPStreamsRNPlayerView, newToken: String) {
     view.setNewAccessToken(newToken)
   }
-  
+
+  override fun setNewPresenceToken(view: TPStreamsRNPlayerView, newToken: String) {
+    view.setNewPresenceToken(newToken)
+  }
+
   override fun onAfterUpdateTransaction(view: TPStreamsRNPlayerView) {
     super.onAfterUpdateTransaction(view)
     view.tryCreatePlayer()

@@ -25,6 +25,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPlaybackSpeedChanged, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onIsLoadingChanged, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAccessTokenExpired, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onPresenceTokenExpired, RCTDirectEventBlock)
 
 // Player commands
 RCT_EXTERN_METHOD(play:(nonnull NSNumber *)node)
@@ -36,5 +37,6 @@ RCT_EXTERN_METHOD(getDuration:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(isPlaying:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(getPlaybackSpeed:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(setNewAccessToken:(nonnull NSNumber *)node newToken:(nonnull NSString *)newToken)
+RCT_EXTERN_METHOD(setNewPresenceToken:(nonnull NSNumber *)node newToken:(nonnull NSString *)newToken)
 
 @end
