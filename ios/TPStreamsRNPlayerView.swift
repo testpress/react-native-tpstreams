@@ -58,8 +58,10 @@ class TPStreamsRNPlayerView: UIView {
     @objc var onIsLoadingChanged: RCTDirectEventBlock?
     @objc var onError: RCTDirectEventBlock?
     @objc var onAccessTokenExpired: RCTDirectEventBlock?
+    @objc var onPresenceTokenExpired: RCTDirectEventBlock?
 
     private var pendingTokenCompletion: ((String?) -> Void)?
+    private var pendingPresenceTokenCompletion: ((String?) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -176,7 +178,8 @@ class TPStreamsRNPlayerView: UIView {
         let playerVC = TPStreamPlayerViewController()
         playerVC.player = player
         playerVC.config = configBuilder.build()
-        
+        playerVC.delegate = self
+
         attachPlayerViewController(playerVC)
         
         if shouldAutoPlay { player.play() }
@@ -424,6 +427,11 @@ class TPStreamsRNPlayerView: UIView {
         }
     }
 
+    @objc func setNewPresenceToken(_ newToken: String) {
+        pendingPresenceTokenCompletion?(newToken.isEmpty ? nil : newToken)
+        pendingPresenceTokenCompletion = nil
+    }
+
     override func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
             cleanupPlayer()
@@ -444,5 +452,26 @@ extension TPStreamsRNPlayerView: TokenRequestDelegate {
         }
         pendingTokenCompletion = completion
         onAccessTokenExpired(["videoId": assetId])
+    }
+}
+
+// The four full-screen callbacks have no default body in
+// TPStreamPlayerViewControllerDelegate — presenceTokenExpired is the only one
+// this RN wrapper currently has any use for; the rest are unimplemented
+// no-ops rather than newly surfacing full-screen events RN did not have
+// before.
+extension TPStreamsRNPlayerView: TPStreamPlayerViewControllerDelegate {
+    func willEnterFullScreenMode() {}
+    func didEnterFullScreenMode() {}
+    func willExitFullScreenMode() {}
+    func didExitFullScreenMode() {}
+
+    func presenceTokenExpired(forVideo videoId: String, completion: @escaping (String?) -> Void) {
+        guard let onPresenceTokenExpired = onPresenceTokenExpired else {
+            completion(nil)
+            return
+        }
+        pendingPresenceTokenCompletion = completion
+        onPresenceTokenExpired(["videoId": videoId])
     }
 }

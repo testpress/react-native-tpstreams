@@ -38,6 +38,7 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var downloadMetadata: Map<String, Any>? = null
     private var offlineLicenseExpireTime: Long = LicenseDurationUtils.DEFAULT_LICENSE_EXPIRY_SECONDS
     private var accessTokenCallback: ((String) -> Unit)? = null
+    private var presenceTokenCallback: ((String) -> Unit)? = null
     private var isLayoutUpdatePosted = false
 
     init {
@@ -135,6 +136,14 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         } ?: Log.w("TPStreamsRNPlayerView", "No callback available for token refresh")
     }
 
+    fun setNewPresenceToken(newToken: String) {
+        Log.d("TPStreamsRNPlayerView", "Setting new presence token")
+        presenceTokenCallback?.let { callback ->
+            callback(newToken)
+            presenceTokenCallback = null
+        } ?: Log.w("TPStreamsRNPlayerView", "No callback available for presence token refresh")
+    }
+
     fun tryCreatePlayer() {
         if (videoId.isNullOrEmpty() || accessToken.isNullOrEmpty()) return
         if (player != null) return
@@ -161,6 +170,15 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                     }
                     accessTokenCallback = callback
                     emitEvent("onAccessTokenExpired", mapOf("videoId" to videoId))
+                }
+
+                override fun onPresenceTokenExpired(videoId: String, callback: (String) -> Unit) {
+                    if (presenceTokenCallback != null) {
+                        Log.w("TPStreamsRNPlayerView", "onPresenceTokenExpired called while another refresh is in progress. Ignoring.")
+                        return
+                    }
+                    presenceTokenCallback = callback
+                    emitEvent("onPresenceTokenExpired", mapOf("videoId" to videoId))
                 }
 
                 override fun onError(error: PlaybackError, message: String) {
@@ -279,5 +297,6 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         }
         player = null
         accessTokenCallback = null
+        presenceTokenCallback = null
     }
 }

@@ -55,6 +55,19 @@ export interface TPStreamsPlayerProps extends ViewProps {
     videoId: string,
     callback: (newToken: string) => void
   ) => void;
+  /**
+   * Called on a 401 from the presence heartbeat loop — an expired token and
+   * a device-binding mismatch look identical from here, and both are
+   * resolved the same way: fetch a fresh playback config and call
+   * callback with its presence token. Optional: presence is still
+   * rollout-gated to a handful of organizations, and leaving this unset
+   * simply means the heartbeat loop quietly stops after a 401 instead of
+   * resuming, the same as if presence were disabled.
+   */
+  onPresenceTokenExpired?: (
+    videoId: string,
+    callback: (newToken: string) => void
+  ) => void;
 }
 
 /**
@@ -82,6 +95,7 @@ const TPStreamsPlayerView = forwardRef<
     onIsLoadingChanged,
     onError,
     onAccessTokenExpired,
+    onPresenceTokenExpired,
     ...restProps
   } = props;
 
@@ -187,6 +201,28 @@ const TPStreamsPlayerView = forwardRef<
     [onAccessTokenExpired]
   );
 
+  const handlePresenceTokenExpired = useCallback(
+    (event: { nativeEvent: { videoId: string } }) => {
+      const { videoId: expiredVideoId } = event.nativeEvent;
+      const resolve = (newToken: string) => {
+        if (nativeRef.current) {
+          Commands.setNewPresenceToken(nativeRef.current, newToken);
+        } else {
+          console.error('[RN] Native ref is not available');
+        }
+      };
+      if (onPresenceTokenExpired) {
+        onPresenceTokenExpired(expiredVideoId, resolve);
+      } else {
+        // Matches the native side's own default: nothing set means presence
+        // isn't wired up, so back off rather than wait on a callback that
+        // will never fire.
+        resolve('');
+      }
+    },
+    [onPresenceTokenExpired]
+  );
+
   // Helper to create promise-based API methods
   const createPromiseMethod = useCallback(
     (command: (ref: any) => void, eventKey: string) => {
@@ -261,6 +297,7 @@ const TPStreamsPlayerView = forwardRef<
     onIsLoadingChanged: handleIsLoadingChanged,
     onError: handleError,
     onAccessTokenExpired: handleAccessTokenExpired,
+    onPresenceTokenExpired: handlePresenceTokenExpired,
   };
 
   return <TPStreamsPlayerNative {...nativeProps} ref={nativeRef} />;
