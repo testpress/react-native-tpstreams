@@ -32,6 +32,19 @@ export interface TPStreamsPlayerRef {
 }
 
 // Prop types for the player component
+export interface WatermarkConfig {
+  text: string;
+  x?: number;
+  y?: number;
+  color?: number;
+  textSize?: number;
+  opacity?: number;
+  animation?: {
+    type: 'pingPong';
+    duration?: number;
+  };
+}
+
 export interface TPStreamsPlayerProps extends ViewProps {
   videoId?: string;
   accessToken?: string;
@@ -42,6 +55,8 @@ export interface TPStreamsPlayerProps extends ViewProps {
   showDefaultCaptions?: boolean;
   startInFullscreen?: boolean;
   downloadMetadata?: { [key: string]: any };
+  userId?: string;
+  watermarks?: WatermarkConfig[];
   onPlayerStateChanged?: (state: number) => void;
   onIsPlayingChanged?: (isPlaying: boolean) => void;
   onPlaybackSpeedChanged?: (speed: number) => void;
@@ -75,6 +90,8 @@ const TPStreamsPlayerView = forwardRef<
     showDefaultCaptions,
     startInFullscreen,
     downloadMetadata,
+    userId,
+    watermarks,
     style,
     onPlayerStateChanged,
     onIsPlayingChanged,
@@ -250,6 +267,8 @@ const TPStreamsPlayerView = forwardRef<
       ? JSON.stringify(downloadMetadata)
       : undefined,
     offlineLicenseExpireTime,
+    userId,
+    watermarks: watermarks ? JSON.stringify(watermarks) : undefined,
     style,
     onCurrentPosition,
     onDuration,

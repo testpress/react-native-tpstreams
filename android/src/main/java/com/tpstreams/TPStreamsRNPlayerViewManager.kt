@@ -94,6 +94,16 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     view.setOfflineLicenseExpireTime(expireTime.toLong())
   }
 
+  @ReactProp(name = "userId")
+  override fun setUserId(view: TPStreamsRNPlayerView, userId: String?) {
+    view.setUserId(userId)
+  }
+
+  @ReactProp(name = "watermarks")
+  override fun setWatermarks(view: TPStreamsRNPlayerView, watermarks: String?) {
+    view.setWatermarks(watermarks)
+  }
+
   @ReactProp(name = "downloadMetadata")
   override fun setDownloadMetadata(view: TPStreamsRNPlayerView, metadata: String?) {
     view.setDownloadMetadata(JsonUtils.jsonStringToMap(metadata))

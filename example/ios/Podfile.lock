@@ -1658,11 +1658,11 @@ PODS:
     - React-logger (= 0.79.2)
     - React-perflogger (= 0.79.2)
     - React-utils (= 0.79.2)
-  - Realm (10.54.6):
-    - Realm/Headers (= 10.54.6)
-  - Realm/Headers (10.54.6)
-  - RealmSwift (10.54.6):
-    - Realm (= 10.54.6)
+  - Realm (20.0.4):
+    - Realm/Headers (= 20.0.4)
+  - Realm/Headers (20.0.4)
+  - RealmSwift (20.0.4):
+    - Realm (= 20.0.4)
   - Sentry (9.19.1):
     - Sentry/Core (= 9.19.1)
   - Sentry/Core (9.19.1)
@@ -1671,7 +1671,7 @@ PODS:
     - DSFRegex (~> 3.4.0)
     - TinyCSV (~> 1.0.0)
   - TinyCSV (1.0.1)
-  - TPStreamsRNPlayerView (1.1.18):
+  - TPStreamsRNPlayerView (1.1.23):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1694,13 +1694,13 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - TPStreamsSDK (= 1.2.35)
+    - TPStreamsSDK (= 1.2.40)
     - Yoga
-  - TPStreamsSDK (1.2.35):
+  - TPStreamsSDK (1.2.40):
     - Alamofire (~> 5.9.0)
     - M3U8Kit (~> 1.2.0)
     - ReachabilitySwift (~> 5.2.2)
-    - RealmSwift (~> 10.54.2)
+    - RealmSwift (~> 20.0.4)
     - Sentry (< 10, >= 8.50)
     - SwiftSubtitles (= 1.8.1)
   - Yoga (0.0.0)
@@ -2013,16 +2013,16 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 04d5eb15eb46be6720e17a4a7fa92940a776e584
   ReactCodegen: 041559ba76d00f6680dfa0916b3c791f4babe5ea
   ReactCommon: 1511ef100f1afa4c199fe52fe7a8d2529a41429a
-  Realm: b1b3bc68162fa242132eb7eefbf91d7c40f36a85
-  RealmSwift: 456cfd82a4f23dff8e3456980999331ab69bbf3e
+  Realm: 1fca83c42ac1d5c7767974882c8de5a7abca4d89
+  RealmSwift: 84f36320f6133dea78d05c55bb46bba4387d6828
   Sentry: e4588d62ac3fd3c82652bb7c8a215ec8c3de776b
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SwiftSubtitles: db6159ae70a180a1cfa22dd4eb845e25c000b271
   TinyCSV: f6124d52f5cdc61cdda211b7578884185206e80e
-  TPStreamsRNPlayerView: ba4d924b68f55c4c5ca421dd3f242a7ed8585b8a
-  TPStreamsSDK: 001be312a5feb841cccc5c652e00ec2f5e97927e
+  TPStreamsRNPlayerView: 4daad5dbb5825de312121f160169d43a0a7acaea
+  TPStreamsSDK: 16ba69f629e1304dac9df7507549d602d1b56cf9
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
-PODFILE CHECKSUM: 3f7e2acbe0418b2ae4e9fbd9102ff83a37c15215
+PODFILE CHECKSUM: 08a4565f4110d19f3a5ab47f6646d8ebdc9d16f9
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2
