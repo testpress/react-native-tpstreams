@@ -1,4 +1,4 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 // Export the native component with a different name to avoid conflicts
 export { default as TPStreamsPlayerNative } from './TPStreamsPlayerViewNativeComponent';
 export * from './TPStreamsPlayerViewNativeComponent';
@@ -35,9 +35,19 @@ export {
 
 const TPStreamsModule = NativeModules.TPStreams;
 
+export interface TPStreamsConfig {
+  allowFallbackToL3?: boolean;
+}
+
 export const TPStreams = {
-  initialize: (organizationId: string): void => {
-    TPStreamsModule.initialize(organizationId);
+  initialize: (organizationId: string, config: TPStreamsConfig = {}): void => {
+    if (Platform.OS === 'android') {
+      TPStreamsModule.initialize(organizationId, {
+        allowFallbackToL3: config.allowFallbackToL3 ?? false,
+      });
+    } else {
+      TPStreamsModule.initialize(organizationId);
+    }
   },
 };
 

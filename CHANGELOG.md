@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.24] - 2026-08-20
+
+### Added
+- `userId` prop — enables per-user resume playback. Pass a unique user
+  identifier to resume where each user left off.
+- `watermarks` prop — render text overlays on the player. Supports position,
+  color, size, opacity, and `pingPong` animation.
+- Export `WatermarkConfig` type for TypeScript users.
+- `TPStreams.initialize()` now accepts an optional config object with
+  `allowFallbackToL3` (Android only) for Widevine L1→L3 fallback.
+
+### Changed
+- Update iOS SDK from 1.2.36 to **1.2.40** (resume playback, watermarks).
+- Update Android SDK from 1.2.6 to **1.2.8** (resume playback, watermarks).
+
 ## [1.1.23] - 2026-08-11
 
 ### Fixed
