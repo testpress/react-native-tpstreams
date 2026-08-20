@@ -14,7 +14,9 @@ class TPStreamsRNModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod
     fun initialize(organizationId: String, config: ReadableMap? = null) {
-        val allowFallbackToL3 = config?.getBoolean("allowFallbackToL3") ?: false
+        val allowFallbackToL3 = config?.let {
+            if (it.hasKey("allowFallbackToL3")) it.getBoolean("allowFallbackToL3") else false
+        } ?: false
         TPStreamsSDK.init(organizationId, allowFallbackToL3 = allowFallbackToL3)
     }
 } 
