@@ -46,6 +46,8 @@ class TPStreamsRNPlayerView: UIView {
     @objc var showDefaultCaptions: Bool = false
     @objc var startInFullscreen: Bool = false
     @objc var downloadMetadata: NSString?
+    @objc var userId: NSString?
+    @objc var watermarks: NSString?
     
     @objc var onCurrentPosition: RCTDirectEventBlock?
     @objc var onDuration: RCTDirectEventBlock?
@@ -192,6 +194,7 @@ class TPStreamsRNPlayerView: UIView {
             .setwatchedProgressTrackColor(.systemBlue)
             .setDownloadMetadata(metadataDict)
             .setStartInFullscreen(startInFullscreen)
+            .setUserId(userId as String?)
 
         configBuilder.setLicenseDurationSeconds(offlineLicenseExpireTime)
         
@@ -206,7 +209,53 @@ class TPStreamsRNPlayerView: UIView {
             configBuilder.autoSelectFirstSubtitle(true)
         }
 
+        // Apply watermarks if provided
+        if let watermarkConfigs = parseWatermarks() {
+            configBuilder.setWatermarks(watermarkConfigs)
+        }
+
         return configBuilder
+    }
+    
+    private func parseWatermarks() -> [WatermarkConfig]? {
+        guard let watermarkString = watermarks as String? else { return nil }
+        guard let data = watermarkString.data(using: .utf8) else { return nil }
+        
+        do {
+            guard let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] else {
+                return nil
+            }
+            
+            return jsonArray.map { dict in
+                let text = dict["text"] as? String ?? ""
+                let x = dict["x"] as? Int64 ?? 0
+                let y = dict["y"] as? Int64 ?? 0
+                let color = dict["color"] as? Int64 ?? 0xFFFFFFFF
+                let textSize = dict["textSize"] as? Double ?? 14.0
+                let opacity = dict["opacity"] as? Double ?? 0.3
+                
+                var animation: WatermarkAnimation? = nil
+                if let animationDict = dict["animation"] as? [String: Any],
+                   let typeString = animationDict["type"] as? String,
+                   typeString == "pingPong" {
+                    let duration = animationDict["duration"] as? Int64 ?? 10000
+                    animation = WatermarkAnimation(type: .pingPong, duration: duration)
+                }
+                
+                return WatermarkConfig(
+                    text: text,
+                    x: x,
+                    y: y,
+                    color: color,
+                    textSize: textSize,
+                    opacity: opacity,
+                    animation: animation
+                )
+            }
+        } catch {
+            print("Error parsing watermarks: \(error)")
+            return nil
+        }
     }
     
     private func attachPlayerViewController(_ playerVC: TPStreamPlayerViewController) {

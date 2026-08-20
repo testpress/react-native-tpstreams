@@ -9,6 +9,9 @@ import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.tpstreams.player.TPStreamsPlayer
 import com.tpstreams.player.TPStreamsPlayerView
 import com.tpstreams.player.constants.PlaybackError
+import com.tpstreams.player.WatermarkConfig
+import com.tpstreams.player.WatermarkAnimation
+import com.tpstreams.player.WatermarkAnimationType
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.PlaybackException
@@ -37,6 +40,8 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     private var enableDownload: Boolean = false
     private var downloadMetadata: Map<String, Any>? = null
     private var offlineLicenseExpireTime: Long = LicenseDurationUtils.DEFAULT_LICENSE_EXPIRY_SECONDS
+    private var userId: String? = null
+    private var watermarks: String? = null
     private var accessTokenCallback: ((String) -> Unit)? = null
     private var isLayoutUpdatePosted = false
 
@@ -127,6 +132,22 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
         this.offlineLicenseExpireTime = LicenseDurationUtils.sanitize(expireTime)
     }
     
+    fun setUserId(userId: String?) {
+        if (this.userId == userId) return
+        this.userId = userId
+        if (player != null && !videoId.isNullOrEmpty() && !accessToken.isNullOrEmpty()) {
+            releasePlayer()
+            tryCreatePlayer()
+        }
+    }
+    
+    fun setWatermarks(watermarks: String?) {
+        this.watermarks = watermarks
+        if (player != null) {
+            applyWatermarks()
+        }
+    }
+    
     fun setNewAccessToken(newToken: String) {
         Log.d("TPStreamsRNPlayerView", "Setting new access token")
         accessTokenCallback?.let { callback ->
@@ -150,8 +171,12 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                 showDefaultCaptions,
                 startInFullscreen,
                 downloadMetadata?.mapValues { it.value.toString() },
-                offlineLicenseExpireTime
+                offlineLicenseExpireTime,
+                userId = userId
             )
+            
+            // Apply watermarks if provided
+            applyWatermarks()
             
             player?.listener = object : TPStreamsPlayer.Listener {
                 override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
@@ -238,6 +263,48 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     
     fun setPlaybackSpeed(speed: Float) {
         player?.setPlaybackSpeed(speed)
+    }
+
+    private fun applyWatermarks() {
+        val watermarkJson = watermarks ?: return
+        try {
+            val watermarkArray = org.json.JSONArray(watermarkJson)
+            val watermarkConfigs = mutableListOf<WatermarkConfig>()
+            
+            for (i in 0 until watermarkArray.length()) {
+                val obj = watermarkArray.getJSONObject(i)
+                
+                val animation = if (obj.has("animation") && !obj.isNull("animation")) {
+                    val animObj = obj.getJSONObject("animation")
+                    val typeStr = animObj.optString("type", "pingPong")
+                    val duration = animObj.optLong("duration", 10000L)
+                    if (typeStr == "pingPong") {
+                        WatermarkAnimation(
+                            type = WatermarkAnimationType.PING_PONG,
+                            duration = duration
+                        )
+                    } else null
+                } else null
+                
+                val config = WatermarkConfig(
+                    text = obj.getString("text"),
+                    x = obj.optInt("x", 0),
+                    y = obj.optInt("y", 0),
+                    color = obj.optInt("color", android.graphics.Color.WHITE),
+                    textSize = obj.optDouble("textSize", 14.0).toFloat(),
+                    opacity = obj.optDouble("opacity", 0.3).toFloat(),
+                    animation = animation
+                )
+                watermarkConfigs.add(config)
+            }
+            
+            if (watermarkConfigs.isNotEmpty()) {
+                playerView.setWatermarks(watermarkConfigs)
+            }
+        } catch (e: Exception) {
+            Log.e("TPStreamsRN", "Error parsing watermarks", e)
+            sendErrorEvent("Invalid watermarks configuration", 0, e.message)
+        }
     }
 
     // Player information methods with event emission

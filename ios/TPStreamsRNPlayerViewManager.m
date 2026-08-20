@@ -12,6 +12,8 @@ RCT_EXPORT_VIEW_PROPERTY(offlineLicenseExpireTime, double)
 RCT_EXPORT_VIEW_PROPERTY(showDefaultCaptions, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(startInFullscreen, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(downloadMetadata, NSString)
+RCT_EXPORT_VIEW_PROPERTY(userId, NSString)
+RCT_EXPORT_VIEW_PROPERTY(watermarks, NSString)
 
 // Event props
 RCT_EXPORT_VIEW_PROPERTY(onCurrentPosition, RCTDirectEventBlock)

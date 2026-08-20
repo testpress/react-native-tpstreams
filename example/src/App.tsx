@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,10 +6,37 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Switch,
 } from 'react-native';
 import { TPStreamsPlayerView } from 'react-native-tpstreams';
-import type { TPStreamsPlayerRef } from 'react-native-tpstreams';
+import type {
+  TPStreamsPlayerRef,
+  WatermarkConfig,
+} from 'react-native-tpstreams';
 import DownloadList from './DownloadList';
+
+const SAMPLE_WATERMARKS: WatermarkConfig[] = [
+  {
+    text: 'DRAFT',
+    x: 50,
+    y: 50,
+    color: 0x80ffffff,
+    textSize: 24,
+    opacity: 0.4,
+  },
+  {
+    text: 'tpstreams.com',
+    x: 80,
+    y: 90,
+    color: 0xccffffff,
+    textSize: 12,
+    opacity: 0.6,
+    animation: {
+      type: 'pingPong',
+      duration: 12000,
+    },
+  },
+];
 
 export default function App() {
   const playerRef = useRef<TPStreamsPlayerRef>(null);
@@ -18,32 +45,29 @@ export default function App() {
     'player'
   );
 
+  const [userId] = useState('demo-user-123');
+  const [showWatermarks, setShowWatermarks] = useState(true);
+
   const handlePlay = () => {
     playerRef.current?.play();
-    console.log('Play called');
   };
 
   const handlePause = () => {
     playerRef.current?.pause();
-    console.log('Pause called');
   };
 
   const handleSeek = () => {
     playerRef.current?.seekTo(30000);
-    console.log('Seek to 30s called');
   };
 
   const handleSpeedNormal = () => {
     playerRef.current?.setPlaybackSpeed(1.0);
-    console.log('Speed set to 1.0x');
   };
 
   const handleSpeedFast = () => {
     playerRef.current?.setPlaybackSpeed(2.0);
-    console.log('Speed set to 2.0x');
   };
 
-  // Get current position with the new Promise-based approach
   const checkCurrentPosition = async () => {
     try {
       const position = await playerRef.current?.getCurrentPosition();
@@ -53,7 +77,6 @@ export default function App() {
     }
   };
 
-  // Get duration with the new Promise-based approach
   const checkDuration = async () => {
     try {
       const duration = await playerRef.current?.getDuration();
@@ -63,7 +86,6 @@ export default function App() {
     }
   };
 
-  // Get playing status with the new Promise-based approach
   const checkIsPlaying = async () => {
     try {
       const playing = await playerRef.current?.isPlaying();
@@ -73,7 +95,6 @@ export default function App() {
     }
   };
 
-  // Get playback speed with the new Promise-based approach
   const checkPlaybackSpeed = async () => {
     try {
       const speed = await playerRef.current?.getPlaybackSpeed();
@@ -83,21 +104,20 @@ export default function App() {
     }
   };
 
-  // Event handlers for player events
   const handlePlayerStateChanged = (state: number) => {
-    console.log(`EVENT - Player state changed: ${state}`);
+    console.log(`Player state: ${state}`);
   };
 
   const handleIsPlayingChanged = (isPlaying: boolean) => {
-    console.log(`EVENT - Is playing changed: ${isPlaying}`);
+    console.log(`Is playing: ${isPlaying}`);
   };
 
   const handlePlaybackSpeedChanged = (speed: number) => {
-    console.log(`EVENT - Playback speed changed: ${speed}`);
+    console.log(`Playback speed: ${speed}`);
   };
 
   const handleIsLoadingChanged = (isLoading: boolean) => {
-    console.log(`EVENT - Is loading changed: ${isLoading}`);
+    console.log(`Is loading: ${isLoading}`);
   };
 
   const handleError = (error: {
@@ -110,7 +130,15 @@ export default function App() {
     setLastError(errorMessage);
   };
 
-  // Navigation
+  const handleAccessTokenExpired = useCallback(
+    (expiredVideoId: string, callback: (newToken: string) => void) => {
+      console.log(`Access token expired for video: ${expiredVideoId}`);
+      const freshToken = 'cde2c1a6-434d-4fd1-99f4-9e2024bf2576';
+      callback(freshToken);
+    },
+    []
+  );
+
   const navigateToDownloads = () => {
     setCurrentScreen('downloads');
   };
@@ -119,7 +147,6 @@ export default function App() {
     setCurrentScreen('player');
   };
 
-  // Render the navigation header
   const renderHeader = () => (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>
@@ -138,7 +165,6 @@ export default function App() {
     </View>
   );
 
-  // Main render function
   if (currentScreen === 'downloads') {
     return (
       <View style={styles.container}>
@@ -159,11 +185,14 @@ export default function App() {
               videoId="4P3nJXp2xFT"
               accessToken="cde2c1a6-434d-4fd1-99f4-9e2024bf2576"
               style={styles.player}
+              userId={userId}
+              watermarks={showWatermarks ? SAMPLE_WATERMARKS : undefined}
               onPlayerStateChanged={handlePlayerStateChanged}
               onIsPlayingChanged={handleIsPlayingChanged}
               onPlaybackSpeedChanged={handlePlaybackSpeedChanged}
               onIsLoadingChanged={handleIsLoadingChanged}
               onError={handleError}
+              onAccessTokenExpired={handleAccessTokenExpired}
               enableDownload={true}
               showDefaultCaptions={true}
             />
@@ -174,6 +203,21 @@ export default function App() {
               <Text style={styles.errorText}>{lastError}</Text>
             </View>
           )}
+
+          <View style={styles.configSection}>
+            <Text style={styles.sectionTitle}>Configuration</Text>
+            <View style={styles.configRow}>
+              <Text style={styles.configLabel}>User ID</Text>
+              <Text style={styles.configValue}>{userId}</Text>
+            </View>
+            <View style={styles.configRow}>
+              <Text style={styles.configLabel}>Watermarks</Text>
+              <Switch
+                value={showWatermarks}
+                onValueChange={setShowWatermarks}
+              />
+            </View>
+          </View>
 
           <View style={styles.buttonSection}>
             <Text style={styles.sectionTitle}>Playback Controls</Text>
@@ -293,6 +337,35 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#b71c1c',
     fontSize: 14,
+  },
+  configSection: {
+    width: '90%',
+    padding: 12,
+    marginTop: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  configRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  configLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  configValue: {
+    fontSize: 14,
+    color: '#666',
   },
   buttonSection: {
     width: '90%',

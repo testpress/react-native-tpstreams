@@ -5,7 +5,7 @@ export * from './TPStreamsPlayerViewNativeComponent';
 
 // Export the wrapper component as TPStreamsPlayerView
 export { default as TPStreamsPlayerView } from './TPStreamsPlayer';
-export type { TPStreamsPlayerRef } from './TPStreamsPlayer';
+export type { TPStreamsPlayerRef, WatermarkConfig } from './TPStreamsPlayer';
 
 export {
   startDownload,
