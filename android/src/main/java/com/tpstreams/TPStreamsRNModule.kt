@@ -3,6 +3,7 @@ package com.tpstreams
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
 import com.tpstreams.player.TPStreamsSDK
 
 class TPStreamsRNModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -12,7 +13,10 @@ class TPStreamsRNModule(reactContext: ReactApplicationContext) : ReactContextBas
     }
 
     @ReactMethod
-    fun initialize(organizationId: String) {
-        TPStreamsSDK.init(organizationId)
+    fun initialize(organizationId: String, config: ReadableMap? = null) {
+        val allowFallbackToL3 = config?.let {
+            if (it.hasKey("allowFallbackToL3")) it.getBoolean("allowFallbackToL3") else false
+        } ?: false
+        TPStreamsSDK.init(organizationId, allowFallbackToL3 = allowFallbackToL3)
     }
 } 
