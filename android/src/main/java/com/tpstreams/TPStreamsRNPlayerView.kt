@@ -72,10 +72,11 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
     }
 
     // Emit React Native events
-    private fun emitEvent(eventName: String, data: Map<String, Any>) {
+    private fun emitEvent(eventName: String, data: Map<String, Any?>) {
         val event = Arguments.createMap()
         data.forEach { (key, value) ->
             when (value) {
+                null -> event.putNull(key)
                 is Int -> event.putInt(key, value)
                 is Double -> event.putDouble(key, value)
                 is Boolean -> event.putBoolean(key, value)
@@ -192,6 +193,10 @@ class TPStreamsRNPlayerView(context: ThemedReactContext) : FrameLayout(context) 
                     Log.e("TPStreamsRN", "TPStreamsPlayer error: $error - $message")
                     val errorCode = ERROR_CODE_PLAYER_CREATION_FAILED + error.ordinal
                     sendErrorEvent("Player error", errorCode, message)
+                }
+
+                override fun onSubtitleStateChanged(enabled: Boolean, language: String?) {
+                    emitEvent("onSubtitleStateChanged", mapOf("enabled" to enabled, "language" to language))
                 }
             }
 

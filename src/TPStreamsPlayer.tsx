@@ -70,6 +70,7 @@ export interface TPStreamsPlayerProps extends ViewProps {
     videoId: string,
     callback: (newToken: string) => void
   ) => void;
+  onSubtitleStateChanged?: (enabled: boolean, language?: string) => void;
 }
 
 /**
@@ -99,6 +100,7 @@ const TPStreamsPlayerView = forwardRef<
     onIsLoadingChanged,
     onError,
     onAccessTokenExpired,
+    onSubtitleStateChanged,
     ...restProps
   } = props;
 
@@ -204,6 +206,14 @@ const TPStreamsPlayerView = forwardRef<
     [onAccessTokenExpired]
   );
 
+  const handleSubtitleStateChanged = useCallback(
+    (event: any) => {
+      const { enabled, language } = event.nativeEvent;
+      onSubtitleStateChanged?.(enabled, language || undefined);
+    },
+    [onSubtitleStateChanged]
+  );
+
   // Helper to create promise-based API methods
   const createPromiseMethod = useCallback(
     (command: (ref: any) => void, eventKey: string) => {
@@ -280,6 +290,7 @@ const TPStreamsPlayerView = forwardRef<
     onIsLoadingChanged: handleIsLoadingChanged,
     onError: handleError,
     onAccessTokenExpired: handleAccessTokenExpired,
+    onSubtitleStateChanged: handleSubtitleStateChanged,
   };
 
   return <TPStreamsPlayerNative {...nativeProps} ref={nativeRef} />;

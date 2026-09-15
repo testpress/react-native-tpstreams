@@ -120,6 +120,11 @@ export default function App() {
     console.log(`Is loading: ${isLoading}`);
   };
 
+  const handleSubtitleStateChanged = (enabled: boolean, language?: string) => {
+    const msg = `Subtitles ${enabled ? 'ON' : 'OFF'}${language ? ` (${language})` : ''}`;
+    console.log(msg);
+  };
+
   const handleError = (error: {
     message: string;
     code: number;
@@ -133,7 +138,7 @@ export default function App() {
   const handleAccessTokenExpired = useCallback(
     (expiredVideoId: string, callback: (newToken: string) => void) => {
       console.log(`Access token expired for video: ${expiredVideoId}`);
-      const freshToken = 'cde2c1a6-434d-4fd1-99f4-9e2024bf2576';
+      const freshToken = '9327e2d0-fa13-4288-902d-840f32cd0eed';
       callback(freshToken);
     },
     []
@@ -182,8 +187,8 @@ export default function App() {
           <View style={styles.playerContainer}>
             <TPStreamsPlayerView
               ref={playerRef}
-              videoId="4P3nJXp2xFT"
-              accessToken="cde2c1a6-434d-4fd1-99f4-9e2024bf2576"
+              videoId="7xbZeQzR36h"
+              accessToken="3d9838f3-db51-4fc3-8472-075ab5e40b64"
               style={styles.player}
               userId={userId}
               watermarks={showWatermarks ? SAMPLE_WATERMARKS : undefined}
@@ -193,6 +198,7 @@ export default function App() {
               onIsLoadingChanged={handleIsLoadingChanged}
               onError={handleError}
               onAccessTokenExpired={handleAccessTokenExpired}
+              onSubtitleStateChanged={handleSubtitleStateChanged}
               enableDownload={true}
               showDefaultCaptions={true}
             />

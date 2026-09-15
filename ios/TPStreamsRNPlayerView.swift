@@ -60,6 +60,7 @@ class TPStreamsRNPlayerView: UIView {
     @objc var onIsLoadingChanged: RCTDirectEventBlock?
     @objc var onError: RCTDirectEventBlock?
     @objc var onAccessTokenExpired: RCTDirectEventBlock?
+    @objc var onSubtitleStateChanged: RCTDirectEventBlock?
 
     private var pendingTokenCompletion: ((String?) -> Void)?
     
@@ -176,6 +177,7 @@ class TPStreamsRNPlayerView: UIView {
         
         let configBuilder = createPlayerConfigBuilder()
         let playerVC = TPStreamPlayerViewController()
+        playerVC.delegate = self
         playerVC.player = player
         playerVC.config = configBuilder.build()
         
@@ -493,5 +495,20 @@ extension TPStreamsRNPlayerView: TokenRequestDelegate {
         }
         pendingTokenCompletion = completion
         onAccessTokenExpired(["videoId": assetId])
+    }
+}
+
+extension TPStreamsRNPlayerView: TPStreamPlayerViewControllerDelegate {
+    func willEnterFullScreenMode() {}
+    func didEnterFullScreenMode() {}
+    func willExitFullScreenMode() {}
+    func didExitFullScreenMode() {}
+
+    func onSubtitleStateChanged(enabled: Bool, language: String?) {
+        var eventData: [String: Any] = ["enabled": enabled]
+        if let language = language {
+            eventData["language"] = language
+        }
+        onSubtitleStateChanged?(eventData)
     }
 }

@@ -27,6 +27,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPlaybackSpeedChanged, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onIsLoadingChanged, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAccessTokenExpired, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onSubtitleStateChanged, RCTDirectEventBlock)
 
 // Player commands
 RCT_EXTERN_METHOD(play:(nonnull NSNumber *)node)
