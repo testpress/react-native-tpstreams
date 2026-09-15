@@ -47,10 +47,6 @@ export default function App() {
 
   const [userId] = useState('demo-user-123');
   const [showWatermarks, setShowWatermarks] = useState(true);
-  const [subtitleInfo, setSubtitleInfo] = useState<{
-    enabled: boolean;
-    language?: string;
-  }>({ enabled: false });
 
   const handlePlay = () => {
     playerRef.current?.play();
@@ -127,7 +123,6 @@ export default function App() {
   const handleSubtitleStateChanged = (enabled: boolean, language?: string) => {
     const msg = `Subtitles ${enabled ? 'ON' : 'OFF'}${language ? ` (${language})` : ''}`;
     console.log(msg);
-    setSubtitleInfo({ enabled, language });
   };
 
   const handleError = (error: {
@@ -227,14 +222,6 @@ export default function App() {
                 value={showWatermarks}
                 onValueChange={setShowWatermarks}
               />
-            </View>
-            <View style={styles.configRow}>
-              <Text style={styles.configLabel}>Subtitles</Text>
-              <Text style={styles.configValue}>
-                {subtitleInfo.enabled
-                  ? `ON${subtitleInfo.language ? ` (${subtitleInfo.language})` : ''}`
-                  : 'OFF'}
-              </Text>
             </View>
           </View>
 
