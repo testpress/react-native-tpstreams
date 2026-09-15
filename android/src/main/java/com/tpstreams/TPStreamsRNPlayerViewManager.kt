@@ -27,6 +27,7 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
     private const val EVENT_IS_LOADING_CHANGED = "onIsLoadingChanged"
     private const val EVENT_ERROR = "onError"
     private const val EVENT_ACCESS_TOKEN_EXPIRED = "onAccessTokenExpired"
+    private const val EVENT_SUBTITLE_STATE_CHANGED = "onSubtitleStateChanged"
   }
   
   private val mDelegate: ViewManagerDelegate<TPStreamsRNPlayerView> = 
@@ -48,6 +49,7 @@ class TPStreamsRNPlayerViewManager : SimpleViewManager<TPStreamsRNPlayerView>(),
       .put(EVENT_IS_LOADING_CHANGED, MapBuilder.of("registrationName", EVENT_IS_LOADING_CHANGED))
       .put(EVENT_ERROR, MapBuilder.of("registrationName", EVENT_ERROR))
       .put(EVENT_ACCESS_TOKEN_EXPIRED, MapBuilder.of("registrationName", EVENT_ACCESS_TOKEN_EXPIRED))
+      .put(EVENT_SUBTITLE_STATE_CHANGED, MapBuilder.of("registrationName", EVENT_SUBTITLE_STATE_CHANGED))
       .build()
   }
 

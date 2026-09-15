@@ -47,6 +47,10 @@ export default function App() {
 
   const [userId] = useState('demo-user-123');
   const [showWatermarks, setShowWatermarks] = useState(true);
+  const [subtitleInfo, setSubtitleInfo] = useState<{
+    enabled: boolean;
+    language?: string;
+  }>({ enabled: false });
 
   const handlePlay = () => {
     playerRef.current?.play();
@@ -120,6 +124,12 @@ export default function App() {
     console.log(`Is loading: ${isLoading}`);
   };
 
+  const handleSubtitleStateChanged = (enabled: boolean, language?: string) => {
+    const msg = `Subtitles ${enabled ? 'ON' : 'OFF'}${language ? ` (${language})` : ''}`;
+    console.log(msg);
+    setSubtitleInfo({ enabled, language });
+  };
+
   const handleError = (error: {
     message: string;
     code: number;
@@ -133,7 +143,7 @@ export default function App() {
   const handleAccessTokenExpired = useCallback(
     (expiredVideoId: string, callback: (newToken: string) => void) => {
       console.log(`Access token expired for video: ${expiredVideoId}`);
-      const freshToken = 'cde2c1a6-434d-4fd1-99f4-9e2024bf2576';
+      const freshToken = '9327e2d0-fa13-4288-902d-840f32cd0eed';
       callback(freshToken);
     },
     []
@@ -182,8 +192,8 @@ export default function App() {
           <View style={styles.playerContainer}>
             <TPStreamsPlayerView
               ref={playerRef}
-              videoId="4P3nJXp2xFT"
-              accessToken="cde2c1a6-434d-4fd1-99f4-9e2024bf2576"
+              videoId="7xbZeQzR36h"
+              accessToken="3d9838f3-db51-4fc3-8472-075ab5e40b64"
               style={styles.player}
               userId={userId}
               watermarks={showWatermarks ? SAMPLE_WATERMARKS : undefined}
@@ -193,6 +203,7 @@ export default function App() {
               onIsLoadingChanged={handleIsLoadingChanged}
               onError={handleError}
               onAccessTokenExpired={handleAccessTokenExpired}
+              onSubtitleStateChanged={handleSubtitleStateChanged}
               enableDownload={true}
               showDefaultCaptions={true}
             />
@@ -216,6 +227,14 @@ export default function App() {
                 value={showWatermarks}
                 onValueChange={setShowWatermarks}
               />
+            </View>
+            <View style={styles.configRow}>
+              <Text style={styles.configLabel}>Subtitles</Text>
+              <Text style={styles.configValue}>
+                {subtitleInfo.enabled
+                  ? `ON${subtitleInfo.language ? ` (${subtitleInfo.language})` : ''}`
+                  : 'OFF'}
+              </Text>
             </View>
           </View>
 

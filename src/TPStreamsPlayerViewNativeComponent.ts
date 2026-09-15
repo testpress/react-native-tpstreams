@@ -41,6 +41,10 @@ export interface NativeProps extends ViewProps {
   onIsLoadingChanged?: DirectEventHandler<{ isLoading: boolean }>;
   onError?: DirectEventHandler<ErrorEvent>;
   onAccessTokenExpired?: DirectEventHandler<{ videoId: string }>;
+  onSubtitleStateChanged?: DirectEventHandler<{
+    enabled: boolean;
+    language?: string;
+  }>;
 }
 
 interface TPStreamsPlayerViewCommands {
