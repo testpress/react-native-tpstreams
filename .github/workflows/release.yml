@@ -1,0 +1,91 @@
+name: GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v1.1.28)'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v1.1.28)'
+        required: true
+        type: string
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Tag
+        id: vars
+        run: |
+          INPUT_TAG="${{ inputs.tag || github.ref_name }}"
+          if git rev-parse "refs/tags/$INPUT_TAG" >/dev/null 2>&1; then
+            TAG="$INPUT_TAG"
+          elif git rev-parse "refs/tags/v$INPUT_TAG" >/dev/null 2>&1; then
+            TAG="v$INPUT_TAG"
+          else
+            if [[ "$INPUT_TAG" =~ ^v ]]; then
+              TAG="$INPUT_TAG"
+            else
+              TAG="v$INPUT_TAG"
+            fi
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
+
+      - name: Extract Release Notes from Changelog
+        id: changelog
+        env:
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const tag = process.env.TAG || "";
+            const version = tag.replace(/^v/, "");
+            if (!fs.existsSync("CHANGELOG.md")) {
+              console.log("CHANGELOG.md not found.");
+              process.exit(0);
+            }
+            const content = fs.readFileSync("CHANGELOG.md", "utf8");
+            const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const regex = new RegExp(`##\\s*\\[?v?${escapedVersion}\\]?[^\\r\\n]*\\r?\\n([\\s\\S]*?)(?=\\r?\\n##\\s|\\r?\\n\\[[0-9]|$)`);
+            const match = content.match(regex);
+            const notes = match ? match[1].trim() : "";
+            if (notes) {
+              console.log("Found release notes for version: " + version);
+              fs.writeFileSync("RELEASE_NOTES.md", notes);
+            } else {
+              console.log("No specific changelog entry found for version: " + version);
+            }
+          '
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          if [ -s RELEASE_NOTES.md ]; then
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes-file RELEASE_NOTES.md \
+              --verify-tag
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --generate-notes \
+              --verify-tag
+          fi

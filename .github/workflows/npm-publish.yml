@@ -51,3 +51,10 @@ jobs:
           git push origin --tags
           
           echo "react-native-tpstreams v${NEW_VERSION} is released on npm"
+
+      - name: Trigger GitHub Release Workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          gh workflow run release.yml -f tag="v${NEW_VERSION}"
