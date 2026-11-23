@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.31] - 2026-11-13
+
+### Changed
+- Update TPStreams iOS Player SDK from 1.2.43 to **1.2.48**:
+  - Fix offline playback becoming stuck in an endless buffering state after an expired license is renewed while the video is open.
+  - Fix fullscreen landscape orientation when host app restricts orientation to portrait (e.g., Flutter or portrait-only apps) by presenting a dedicated `TPStreamFullScreenViewController` (#185).
+- Update TPStreams Android Player from 1.2.20 to **1.2.21**:
+  - Improve offline playback reliability by renewing DRM licenses when they are close to expiry or renewal fails.
+  - Respect the configured rental duration for offline DRM downloads and license renewals.
+
 ## [1.1.30] - 2026-11-03
 
 ### Changed
@@ -232,6 +242,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow flexible metadata types to support complex data structures (#38)
 - Trigger download state event when starting progress listener (iOS)
 
+[1.1.32]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.31...v1.1.32
+[1.1.31]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.30...v1.1.31
 [1.1.30]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.29...v1.1.30
 [1.1.29]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.28...v1.1.29
 [1.1.28]: https://github.com/testpress/react-native-tpstreams/compare/v1.1.27...v1.1.28
